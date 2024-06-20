@@ -202,7 +202,7 @@ class ZoneCategoryControllerTest {
         mockMvc.perform(put("/api/zoneCategories/{id}", 2)
                         .content(new ObjectMapper().writeValueAsString(zoneCategoryModifyRequest))
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isAccepted())
+                .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id").value(zoneCategoryResponse.getId()))
                 .andExpect(jsonPath("$.name").value(zoneCategoryResponse.getName()))
@@ -271,7 +271,7 @@ class ZoneCategoryControllerTest {
     void deleteZoneCategoryTest() throws Exception {
 
         mockMvc.perform(delete("/api/zoneCategories/{id}", 2))
-                .andExpect(status().isAccepted())
+                .andExpect(status().isNoContent())
                 .andDo(document("ZoneCategory-delete-success",
                         pathParameters(
                                 parameterWithName("id").description("ZoneCategory 아이디")

@@ -48,7 +48,7 @@ public class ZoneCategoryController {
         ZoneCategoryResponse zoneCategoryResponse = zoneCategoryService.modifyZoneCategory(id, zoneCategoryModifyRequest);
 
         return ResponseEntity
-                .status(HttpStatus.ACCEPTED)
+                .status(HttpStatus.CREATED)
                 .body(zoneCategoryResponse);
     }
 
@@ -57,7 +57,7 @@ public class ZoneCategoryController {
         zoneCategoryService.deleteZoneCategory(id);
 
         return ResponseEntity
-                .status(HttpStatus.ACCEPTED)
+                .status(HttpStatus.NO_CONTENT)
                 .build();
     }
 
