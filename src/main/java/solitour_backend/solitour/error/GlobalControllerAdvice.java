@@ -5,7 +5,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import solitour_backend.solitour.error.exception.RequestValidationFailedException;
-import solitour_backend.solitour.place.exception.PlaceNotExistsException;
 import solitour_backend.solitour.zone_category.exception.ZoneCategoryAlreadyExistsException;
 import solitour_backend.solitour.zone_category.exception.ZoneCategoryNotExistsException;
 
