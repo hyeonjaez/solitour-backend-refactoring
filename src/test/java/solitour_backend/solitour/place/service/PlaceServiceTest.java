@@ -36,8 +36,8 @@ class PlaceServiceTest {
     @Test
     @DisplayName("place 조회 테스트")
     void getPlaceTest() {
-        Place place = new Place(1L, "hi", "hyeon", new BigDecimal("1.1"), new BigDecimal("1.2"), "wnth", true);
-        PlaceResponse expected = new PlaceResponse(1L, "hi", "hyeon", "wnth", true);
+        Place place = new Place(1L, "hi", "hyeon", new BigDecimal("1.1"), new BigDecimal("1.2"), "wnth");
+        PlaceResponse expected = new PlaceResponse(1L, "hi", "hyeon", "wnth");
 
         when(placeRepository.findById(any(Long.class))).thenReturn(Optional.of(place));
         when(placeMapper.mapToPlaceResponse(any(Place.class))).thenReturn(expected);
@@ -48,7 +48,6 @@ class PlaceServiceTest {
         assertEquals(expected.getSearchId(), result.getSearchId());
         assertEquals(expected.getName(), result.getName());
         assertEquals(expected.getAddress(), result.getAddress());
-        assertEquals(expected.getIsCustom(), result.getIsCustom());
     }
 
     @Test
@@ -62,8 +61,8 @@ class PlaceServiceTest {
     @Test
     @DisplayName("place 등록 테스트")
     void savePlaceTest() {
-        Place place = new Place(1L, "hi", "hyeon", new BigDecimal("1.1"), new BigDecimal("1.2"), "wnth", true);
-        PlaceResponse expected = new PlaceResponse(1L, "hi", "hyeon", "wnth", true);
+        Place place = new Place(1L, "hi", "hyeon", new BigDecimal("1.1"), new BigDecimal("1.2"), "wnth");
+        PlaceResponse expected = new PlaceResponse(1L, "hi", "hyeon", "wnth");
         PlaceRegisterRequest placeRegisterRequest = new PlaceRegisterRequest();
 
         ReflectionTestUtils.setField(placeRegisterRequest, "searchId", "hi");
@@ -83,14 +82,13 @@ class PlaceServiceTest {
         assertEquals(expected.getSearchId(), result.getSearchId());
         assertEquals(expected.getName(), result.getName());
         assertEquals(expected.getAddress(), result.getAddress());
-        assertEquals(expected.getIsCustom(), result.getIsCustom());
     }
 
     @Test
     @DisplayName("place 수정 테스트")
     void updatePlaceTest() {
-        Place place = new Place(1L, "hi", "hyeon", new BigDecimal("1.1"), new BigDecimal("1.2"), "wnth", true);
-        PlaceResponse expected = new PlaceResponse(1L, "hi", "hyeon", "wnth", true);
+        Place place = new Place(1L, "hi", "hyeon", new BigDecimal("1.1"), new BigDecimal("1.2"), "wnth");
+        PlaceResponse expected = new PlaceResponse(1L, "hi", "hyeon", "wnth");
 
         PlaceModifyRequest placeModifyRequest = new PlaceModifyRequest();
 
@@ -99,7 +97,6 @@ class PlaceServiceTest {
         ReflectionTestUtils.setField(placeModifyRequest, "xAxis", new BigDecimal("1.1"));
         ReflectionTestUtils.setField(placeModifyRequest, "yAxis", new BigDecimal("1.2"));
         ReflectionTestUtils.setField(placeModifyRequest, "address", "wnth");
-        ReflectionTestUtils.setField(placeModifyRequest, "isCustom", true);
 
         when(placeRepository.findById(any(Long.class))).thenReturn(Optional.of(place));
         when(placeMapper.mapToPlaceResponse(any(Place.class))).thenReturn(expected);
@@ -111,7 +108,6 @@ class PlaceServiceTest {
         assertEquals(expected.getSearchId(), result.getSearchId());
         assertEquals(expected.getName(), result.getName());
         assertEquals(expected.getAddress(), result.getAddress());
-        assertEquals(expected.getIsCustom(), result.getIsCustom());
     }
 
     @Test
@@ -124,7 +120,6 @@ class PlaceServiceTest {
         ReflectionTestUtils.setField(placeModifyRequest, "xAxis", new BigDecimal("1.1"));
         ReflectionTestUtils.setField(placeModifyRequest, "yAxis", new BigDecimal("1.2"));
         ReflectionTestUtils.setField(placeModifyRequest, "address", "wnth");
-        ReflectionTestUtils.setField(placeModifyRequest, "isCustom", true);
 
         when(placeRepository.findById(any(Long.class))).thenReturn(Optional.empty());
 
