@@ -1,30 +1,26 @@
-package solitour_backend.solitour.book_mark.entity;
+package solitour_backend.solitour.great_information.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import solitour_backend.solitour.gathering.entity.Gathering;
 import solitour_backend.solitour.information.entity.Information;
 import solitour_backend.solitour.user.entity.User;
 
 @Entity
 @Getter
-@Table(name = "book_mark")
+@Table(name = "great_information")
 @NoArgsConstructor
-@IdClass(BookMarkId.class)
-public class BookMark {
+public class GreatInformation {
     @Id
+    @Column(name = "great_information_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
-    @Id
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "information_id")
     private Information information;
-
-    @Id
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "gathering_id")
-    private Gathering gathering;
 }
