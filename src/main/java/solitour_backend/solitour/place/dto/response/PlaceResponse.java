@@ -11,5 +11,4 @@ public class PlaceResponse {
     private String searchId;
     private String name;
     private String address;
-    private Boolean isCustom;
 }
