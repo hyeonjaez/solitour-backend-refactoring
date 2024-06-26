@@ -1,6 +1,8 @@
 package solitour_backend.solitour.user.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import solitour_backend.solitour.user_status.entity.UserStatus;
@@ -9,7 +11,9 @@ import java.time.LocalDateTime;
 
 @Entity
 @Getter
+@Builder
 @Table(name = "user")
+@AllArgsConstructor
 @NoArgsConstructor
 public class User {
     @Id
