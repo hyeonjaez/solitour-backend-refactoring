@@ -1,15 +1,19 @@
 package solitour_backend.solitour.place.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 
 @Entity
 @Getter
+@Setter
 @Table(name = "place")
 @NoArgsConstructor
+@AllArgsConstructor
 public class Place {
 
     @Id
@@ -32,15 +36,11 @@ public class Place {
     @Column(name = "place_address")
     private String address;
 
-    @Column(name = "place_is_custom")
-    private Boolean isCustom;
-
-    public Place(String searchId, String name, BigDecimal xAxis, BigDecimal yAxis, String address, Boolean isCustom) {
+    public Place(String searchId, String name, BigDecimal xAxis, BigDecimal yAxis, String address) {
         this.searchId = searchId;
         this.name = name;
         this.xAxis = xAxis;
         this.yAxis = yAxis;
         this.address = address;
-        this.isCustom = isCustom;
     }
 }

@@ -3,9 +3,11 @@ package solitour_backend.solitour.category.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Getter
+@Setter
 @Table(name = "category")
 @NoArgsConstructor
 public class Category {

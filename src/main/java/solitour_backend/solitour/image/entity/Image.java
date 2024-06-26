@@ -3,9 +3,10 @@ package solitour_backend.solitour.image.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import solitour_backend.solitour.gathering.entity.Gathering;
-import solitour_backend.solitour.image_status.entity.ImageStatus;
+import solitour_backend.solitour.image.image_status.ImageStatus;
+import solitour_backend.solitour.image.image_status.ImageStatusConverter;
 import solitour_backend.solitour.information.entity.Information;
+import solitour_backend.solitour.user.entity.User;
 
 import java.time.LocalDate;
 
@@ -19,17 +20,16 @@ public class Image {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "image_status_id")
+    @Convert(converter = ImageStatusConverter.class)
     private ImageStatus imageStatus;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "information_id")
     private Information information;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "gathering_id")
-    private Gathering gathering;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @Column(name = "image_address")
     private String address;
