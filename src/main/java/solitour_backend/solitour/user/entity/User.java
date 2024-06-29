@@ -3,7 +3,8 @@ package solitour_backend.solitour.user.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import solitour_backend.solitour.user_status.entity.UserStatus;
+import solitour_backend.solitour.user.user_status.UserStatus;
+import solitour_backend.solitour.user.user_status.UserStatusConverter;
 
 import java.time.LocalDateTime;
 
@@ -17,8 +18,7 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "user_status_id")
+    @Convert(converter = UserStatusConverter.class)
     private UserStatus userStatus;
 
     @Column(name = "user_oauth_id")
