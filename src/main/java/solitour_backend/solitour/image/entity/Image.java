@@ -36,4 +36,12 @@ public class Image {
 
     @Column(name = "image_created_date")
     private LocalDate createdDate;
+
+    public Image(ImageStatus imageStatus, Information information, User user, String address, LocalDate createdDate) {
+        this.imageStatus = imageStatus;
+        this.information = information;
+        this.user = user;
+        this.address = address;
+        this.createdDate = createdDate;
+    }
 }
