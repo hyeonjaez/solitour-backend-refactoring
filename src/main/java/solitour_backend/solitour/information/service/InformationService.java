@@ -3,9 +3,13 @@ package solitour_backend.solitour.information.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import solitour_backend.solitour.category.entity.Category;
 import solitour_backend.solitour.category.repository.CategoryRepository;
-import solitour_backend.solitour.image.service.ImageService;
+import solitour_backend.solitour.image.entity.Image;
+import solitour_backend.solitour.image.image_status.ImageStatus;
+import solitour_backend.solitour.image.repository.ImageRepository;
+import solitour_backend.solitour.image.s3.S3Uploader;
 import solitour_backend.solitour.info_tag.entity.InfoTag;
 import solitour_backend.solitour.info_tag.repository.InfoTagRepository;
 import solitour_backend.solitour.information.dto.mapper.InformationMapper;
@@ -18,9 +22,12 @@ import solitour_backend.solitour.place.repository.PlaceRepository;
 import solitour_backend.solitour.tag.dto.mapper.TagMapper;
 import solitour_backend.solitour.tag.entity.Tag;
 import solitour_backend.solitour.tag.repository.TagRepository;
+import solitour_backend.solitour.user.entity.User;
+import solitour_backend.solitour.user.repository.UserRepository;
 import solitour_backend.solitour.zone_category.entity.ZoneCategory;
 import solitour_backend.solitour.zone_category.repository.ZoneCategoryRepository;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -36,8 +43,11 @@ public class InformationService {
     private final TagMapper tagMapper;
     private final InfoTagRepository infoTagRepository;
     private final InformationMapper informationMapper;
+    private final UserRepository userRepository;
+    private final S3Uploader s3Uploader;
 
-    private final ImageService imageService;
+    public static final String IMAGE_PATH = "information";
+    private final ImageRepository imageRepository;
 
 
     @Transactional
@@ -54,14 +64,13 @@ public class InformationService {
                         informationRegisterRequest.getPlaceRegisterRequest().getAddress())
         );
 
-        //TODO user 해야함
-        //TODO image는 어떻게 해야할지
+        User user = userRepository.findById(informationRegisterRequest.getUserId()).orElseThrow();
 
         Information information =
                 new Information(
                         category,
                         zoneCategory,
-                        null,
+                        user,
                         savePlace,
                         informationRegisterRequest.getInformationTitle(),
                         informationRegisterRequest.getInformationAddress(),
@@ -72,6 +81,18 @@ public class InformationService {
                 );
 
         Information saveInformation = informationRepository.save(information);
+        LocalDate localDate = LocalDate.now();
+
+        String thumbNailImageUrl = s3Uploader.upload(informationRegisterRequest.getThumbNailImage(), IMAGE_PATH, saveInformation.getId());
+        Image thumbImage = new Image(ImageStatus.THUMBNAIL, saveInformation, null, thumbNailImageUrl, localDate);
+        imageRepository.save(thumbImage);
+
+        for (MultipartFile multipartFile : informationRegisterRequest.getContentImages()) {
+            String upload = s3Uploader.upload(multipartFile, IMAGE_PATH, saveInformation.getId());
+            Image contentImage = new Image(ImageStatus.CONTENT, saveInformation, null, upload, localDate);
+            imageRepository.save(contentImage);
+        }
+
 
         List<Tag> tags = tagMapper.mapToTags(informationRegisterRequest.getTagRegisterRequests());
         List<Tag> saveTags = tagRepository.saveAll(tags);
@@ -79,6 +100,7 @@ public class InformationService {
         for (Tag tag : saveTags) {
             infoTagRepository.save(new InfoTag(tag, saveInformation));
         }
+
 
         return informationMapper.mapToInformationResponse(information);
     }
