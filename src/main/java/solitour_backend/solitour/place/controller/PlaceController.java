@@ -6,7 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import solitour_backend.solitour.error.exception.RequestValidationFailedException;
+import solitour_backend.solitour.error.Utils;
 import solitour_backend.solitour.place.dto.request.PlaceModifyRequest;
 import solitour_backend.solitour.place.dto.request.PlaceRegisterRequest;
 import solitour_backend.solitour.place.dto.response.PlaceResponse;
@@ -28,9 +28,7 @@ public class PlaceController {
 
     @PostMapping
     public ResponseEntity<PlaceResponse> registerPlace(@Valid @RequestBody PlaceRegisterRequest placeRegisterRequest, BindingResult bindingResult) {
-        if (bindingResult.hasErrors() || placeRegisterRequest.validate()) {
-            throw new RequestValidationFailedException(bindingResult);
-        }
+        Utils.validationRequest(bindingResult);
         PlaceResponse placeResponse = placeService.savePlace(placeRegisterRequest);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(placeResponse);
@@ -38,9 +36,7 @@ public class PlaceController {
 
     @PutMapping("/{id}")
     public ResponseEntity<PlaceResponse> modifyPlace(@PathVariable("id") Long id, @Valid @RequestBody PlaceModifyRequest placeModifyRequest, BindingResult bindingResult) {
-        if (bindingResult.hasErrors() || placeModifyRequest.validate()) {
-            throw new RequestValidationFailedException(bindingResult);
-        }
+        Utils.validationRequest(bindingResult);
         PlaceResponse placeResponse = placeService.updatePlace(id, placeModifyRequest);
 
         return ResponseEntity.status(HttpStatus.OK).body(placeResponse);
