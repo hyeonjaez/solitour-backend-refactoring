@@ -13,6 +13,6 @@ public class ImageStatusConverter implements AttributeConverter<ImageStatus, Str
 
     @Override
     public ImageStatus convertToEntityAttribute(String dbData) {
-        return ImageStatus.valueOf(dbData);
+        return ImageStatus.fromName(dbData);
     }
 }
