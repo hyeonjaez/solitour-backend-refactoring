@@ -23,7 +23,7 @@ import solitour_backend.solitour.tag.dto.mapper.TagMapper;
 import solitour_backend.solitour.tag.entity.Tag;
 import solitour_backend.solitour.tag.repository.TagRepository;
 import solitour_backend.solitour.user.entity.User;
-import solitour_backend.solitour.user.repository.UserRepository;
+import solitour_backend.solitour.user.entity.UserRepository;
 import solitour_backend.solitour.zone_category.entity.ZoneCategory;
 import solitour_backend.solitour.zone_category.repository.ZoneCategoryRepository;
 
@@ -51,7 +51,7 @@ public class InformationService {
 
 
     @Transactional
-    public InformationResponse registerInformation(InformationRegisterRequest informationRegisterRequest) {
+    public InformationResponse registerInformation(InformationRegisterRequest informationRegisterRequest, MultipartFile thumbnail, List<MultipartFile> contentImages) {
         Category category = categoryRepository.findById(informationRegisterRequest.getCategoryId()).orElseThrow();
         ZoneCategory zoneCategory = zoneCategoryRepository.findById(informationRegisterRequest.getZoneCategoryId()).orElseThrow();
 
@@ -83,11 +83,11 @@ public class InformationService {
         Information saveInformation = informationRepository.save(information);
         LocalDate localDate = LocalDate.now();
 
-        String thumbNailImageUrl = s3Uploader.upload(informationRegisterRequest.getThumbNailImage(), IMAGE_PATH, saveInformation.getId());
+        String thumbNailImageUrl = s3Uploader.upload(thumbnail, IMAGE_PATH, saveInformation.getId());
         Image thumbImage = new Image(ImageStatus.THUMBNAIL, saveInformation, null, thumbNailImageUrl, localDate);
         imageRepository.save(thumbImage);
 
-        for (MultipartFile multipartFile : informationRegisterRequest.getContentImages()) {
+        for (MultipartFile multipartFile : contentImages) {
             String upload = s3Uploader.upload(multipartFile, IMAGE_PATH, saveInformation.getId());
             Image contentImage = new Image(ImageStatus.CONTENT, saveInformation, null, upload, localDate);
             imageRepository.save(contentImage);
