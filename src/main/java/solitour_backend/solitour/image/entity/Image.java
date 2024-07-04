@@ -20,6 +20,7 @@ public class Image {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "image_status_id")
     @Convert(converter = ImageStatusConverter.class)
     private ImageStatus imageStatus;
 
