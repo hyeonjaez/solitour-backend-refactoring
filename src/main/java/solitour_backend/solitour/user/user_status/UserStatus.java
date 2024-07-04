@@ -19,7 +19,7 @@ public enum UserStatus {
 
     public static UserStatus fromName(String name) {
         return Arrays.stream(UserStatus.values())
-                .filter(e -> e.name.equals(name))
+                .filter(e -> e.getName().equals(name))
                 .findAny()
                 .orElse(null);
     }
