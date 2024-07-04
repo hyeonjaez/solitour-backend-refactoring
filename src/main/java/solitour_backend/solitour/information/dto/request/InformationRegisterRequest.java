@@ -2,7 +2,6 @@ package solitour_backend.solitour.information.dto.request;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.web.multipart.MultipartFile;
 import solitour_backend.solitour.place.dto.request.PlaceRegisterRequest;
 import solitour_backend.solitour.tag.dto.request.TagRegisterRequest;
 
@@ -26,9 +25,5 @@ public class InformationRegisterRequest {
     private Integer zoneCategoryId;
 
     private List<TagRegisterRequest> tagRegisterRequests;
-
-    private MultipartFile thumbNailImage;
-
-    private List<MultipartFile> contentImages;
 
 }
