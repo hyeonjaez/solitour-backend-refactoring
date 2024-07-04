@@ -25,9 +25,11 @@ public class InformationController {
 
     @PostMapping
     public ResponseEntity<InformationResponse> createInformation(@Valid @RequestPart("request") InformationRegisterRequest informationRegisterRequest,
+                                                                 @RequestPart("thumbNailImage") MultipartFile thumbnail,
+                                                                 @RequestPart("contentImages") List<MultipartFile> contentImages,
                                                                  BindingResult bindingResult) {
         Utils.validationRequest(bindingResult);
-        InformationResponse informationResponse = informationService.registerInformation(informationRegisterRequest);
+        InformationResponse informationResponse = informationService.registerInformation(informationRegisterRequest, thumbnail, contentImages);
 
 
         return ResponseEntity
