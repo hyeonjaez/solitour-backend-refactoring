@@ -13,6 +13,6 @@ public class UserStatusConverter implements AttributeConverter<UserStatus, Strin
 
     @Override
     public UserStatus convertToEntityAttribute(String dbData) {
-        return UserStatus.valueOf(dbData);
+        return UserStatus.fromName(dbData);
     }
 }
