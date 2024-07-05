@@ -22,6 +22,7 @@ import solitour_backend.solitour.user.entity.User;
 public class Token {
 
   @Id
+  @Column(name = "token_id")
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
