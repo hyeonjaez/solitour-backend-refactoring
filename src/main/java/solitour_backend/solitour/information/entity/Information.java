@@ -54,4 +54,16 @@ public class Information {
     @Column(name = "information_tip")
     private String tip;
 
+    public Information(Category category, ZoneCategory zoneCategory, User user, Place place, String title, String address, LocalDateTime createdDate, Integer viewCount, String content, String tip) {
+        this.category = category;
+        this.zoneCategory = zoneCategory;
+        this.user = user;
+        this.place = place;
+        this.title = title;
+        this.address = address;
+        this.createdDate = createdDate;
+        this.viewCount = viewCount;
+        this.content = content;
+        this.tip = tip;
+    }
 }

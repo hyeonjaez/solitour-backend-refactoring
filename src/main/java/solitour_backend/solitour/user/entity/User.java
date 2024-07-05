@@ -22,6 +22,7 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "user_status_id")
     @Convert(converter = UserStatusConverter.class)
     private UserStatus userStatus;
 

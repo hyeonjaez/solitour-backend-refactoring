@@ -10,15 +10,23 @@ import solitour_backend.solitour.tag.entity.Tag;
 @Getter
 @Table(name = "info_tag")
 @NoArgsConstructor
-@IdClass(InfoTagId.class)
 public class InfoTag {
+
     @Id
+    @Column(name = "info_tag_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tag_id")
     private Tag tag;
 
-    @Id
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "information_id")
     private Information information;
+
+    public InfoTag(Tag tag, Information information) {
+        this.tag = tag;
+        this.information = information;
+    }
 }
