@@ -28,6 +28,9 @@ public class User {
     @Column(name = "user_oauth_id")
     private String oauthId;
 
+    @Column(name = "provider")
+    private String provider;
+
     @Column(name = "user_nickname")
     private String nickname;
 
