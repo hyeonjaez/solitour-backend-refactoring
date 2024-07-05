@@ -8,6 +8,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,6 +18,7 @@ import solitour_backend.solitour.user.entity.User;
 @Getter
 @NoArgsConstructor()
 @Entity
+@Table(name = "token")
 public class Token {
 
   @Id
@@ -23,7 +26,7 @@ public class Token {
   private Long id;
 
   @OneToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "member_id")
+  @JoinColumn(name = "user_id")
   private User user;
 
   @Column(nullable = false)
