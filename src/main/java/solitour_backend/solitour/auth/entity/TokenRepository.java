@@ -10,7 +10,7 @@ public interface TokenRepository extends Repository<Token, Long> {
 
   Token save(Token token);
 
-  Optional<Token> findByUserId(Long memberId);
+  Optional<Token> findByUserId(Long userId);
 
   @Modifying
   @Query("delete from Token t where t.user.id = :userId")
