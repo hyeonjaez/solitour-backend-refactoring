@@ -69,5 +69,5 @@ public class GoogleConnector {
 
         return response.getAccessToken();
     }
-    
+
 }
