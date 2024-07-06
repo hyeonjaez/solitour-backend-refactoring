@@ -27,6 +27,7 @@ public class GoogleConnector {
 
     private final GoogleProvider provider;
 
+
     public ResponseEntity<GoogleUserResponse> requestGoogleUserInfo(String code, String redirectUrl) {
         String googleToken = requestAccessToken(code, redirectUrl);
 
