@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -28,7 +27,8 @@ public class GoogleConnector {
 
     private final GoogleProvider provider;
 
-    public ResponseEntity<GoogleUserResponse> requestUserInfo(String code, String redirectUrl) {
+
+    public ResponseEntity<GoogleUserResponse> requestGoogleUserInfo(String code, String redirectUrl) {
         String googleToken = requestAccessToken(code, redirectUrl);
 
         HttpHeaders headers = new HttpHeaders();
@@ -65,17 +65,10 @@ public class GoogleConnector {
     }
 
     private String extractAccessToken(ResponseEntity<GoogleTokenResponse> responseEntity) {
-//        validateResponseStatusOk(responseEntity.getStatusCode());
-
         GoogleTokenResponse response = Optional.ofNullable(responseEntity.getBody())
                 .orElseThrow(() -> new RuntimeException("구글 토큰을 가져오는데 실패했습니다."));
 
         return response.getAccessToken();
     }
 
-//    private void validateResponseStatusOk(HttpStatus status) {
-//        if (!status.is2xxSuccessful()) {
-//            throw new RuntimeException("구글 토큰을 가져오는데 실패했습니다.");
-//        }
-//    }
 }
