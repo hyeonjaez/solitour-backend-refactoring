@@ -21,7 +21,7 @@ public class ZoneCategoryController {
     private final ZoneCategoryService zoneCategoryService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<ZoneCategoryResponse> getZoneCategory(@PathVariable Integer id) {
+    public ResponseEntity<ZoneCategoryResponse> getZoneCategory(@PathVariable Long id) {
         ZoneCategoryResponse zoneCategoryResponse = zoneCategoryService.getZoneCategoryById(id);
 
         return ResponseEntity
@@ -42,7 +42,7 @@ public class ZoneCategoryController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ZoneCategoryResponse> modifyZoneCategory(@PathVariable Integer id, @Valid @RequestBody ZoneCategoryModifyRequest zoneCategoryModifyRequest, BindingResult bindingResult) {
+    public ResponseEntity<ZoneCategoryResponse> modifyZoneCategory(@PathVariable Long id, @Valid @RequestBody ZoneCategoryModifyRequest zoneCategoryModifyRequest, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             throw new RequestValidationFailedException(bindingResult);
         }
@@ -54,7 +54,7 @@ public class ZoneCategoryController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteZoneCategory(@PathVariable Integer id) {
+    public ResponseEntity<Void> deleteZoneCategory(@PathVariable Long id) {
         zoneCategoryService.deleteZoneCategory(id);
 
         return ResponseEntity

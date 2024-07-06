@@ -16,8 +16,18 @@ public class ZoneCategory {
 
     @Id
     @Column(name = "zone_category_id")
-    private Integer id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_zone_category_id")
+    private ZoneCategory parentZoneCategory;
 
     @Column(name = "zone_category_name")
     private String name;
+
+    public ZoneCategory(ZoneCategory parentZoneCategory, String name) {
+        this.parentZoneCategory = parentZoneCategory;
+        this.name = name;
+    }
 }
