@@ -16,7 +16,6 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import solitour_backend.solitour.auth.support.google.dto.GoogleTokenResponse;
 import solitour_backend.solitour.auth.support.google.dto.GoogleUserResponse;
-import solitour_backend.solitour.auth.support.google.dto.GoogleUserResponse2;
 
 @Getter
 @RequiredArgsConstructor
@@ -65,17 +64,10 @@ public class GoogleConnector {
     }
 
     private String extractAccessToken(ResponseEntity<GoogleTokenResponse> responseEntity) {
-//        validateResponseStatusOk(responseEntity.getStatusCode());
-
         GoogleTokenResponse response = Optional.ofNullable(responseEntity.getBody())
                 .orElseThrow(() -> new RuntimeException("구글 토큰을 가져오는데 실패했습니다."));
 
         return response.getAccessToken();
     }
-
-//    private void validateResponseStatusOk(HttpStatus status) {
-//        if (!status.is2xxSuccessful()) {
-//            throw new RuntimeException("구글 토큰을 가져오는데 실패했습니다.");
-//        }
-//    }
+    
 }
