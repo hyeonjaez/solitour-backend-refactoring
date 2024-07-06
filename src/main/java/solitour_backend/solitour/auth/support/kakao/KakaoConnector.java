@@ -27,7 +27,7 @@ public class KakaoConnector {
 
   private final KakaoProvider provider;
 
-  public ResponseEntity<KakaoUserResponse> requestUserInfo(String code, String redirectUrl) {
+  public ResponseEntity<KakaoUserResponse> requestKakaoUserInfo(String code, String redirectUrl) {
     String kakaoToken = requestAccessToken(code, redirectUrl);
 
     HttpHeaders headers = new HttpHeaders();

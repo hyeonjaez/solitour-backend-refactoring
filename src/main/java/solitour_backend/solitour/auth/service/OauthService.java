@@ -1,18 +1,17 @@
 package solitour_backend.solitour.auth.service;
 
 
-import jakarta.security.auth.message.AuthException;
 import java.time.LocalDateTime;
-import java.util.Optional;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import solitour_backend.solitour.auth.entity.Token;
 import solitour_backend.solitour.auth.service.dto.response.AccessTokenResponse;
 import solitour_backend.solitour.auth.service.dto.response.LoginResponse;
 import solitour_backend.solitour.auth.service.dto.response.OauthLinkResponse;
 import solitour_backend.solitour.auth.support.JwtTokenProvider;
+import solitour_backend.solitour.auth.support.RandomNickName;
+import solitour_backend.solitour.auth.support.google.GoogleConnector;
 import solitour_backend.solitour.auth.support.google.GoogleProvider;
 import solitour_backend.solitour.auth.support.google.dto.GoogleUserResponse;
 import solitour_backend.solitour.auth.support.kakao.KakaoConnector;
@@ -31,6 +30,7 @@ public class OauthService {
   private final JwtTokenProvider jwtTokenProvider;
   private final KakaoConnector kakaoConnector;
   private final KakaoProvider kakaoProvider;
+  private final GoogleConnector googleConnector;
   private final GoogleProvider googleProvider;
 
   public OauthLinkResponse generateAuthUrl(String type, String redirectUrl) {
@@ -40,9 +40,8 @@ public class OauthService {
 
   @Transactional
   public LoginResponse requestAccessToken(String type, String code, String redirectUrl) {
-    KakaoUserResponse response = requestUserInfo(type, code, redirectUrl);
-
-    User user = findOrSaveUser(response);
+    User user = checkAndSaveUser(type, code, redirectUrl);
+    
     String token = jwtTokenProvider.createAccessToken(user.getId());
     String refreshToken = jwtTokenProvider.createRefreshToken(user.getId());
 
@@ -51,22 +50,38 @@ public class OauthService {
     return new LoginResponse(token, refreshToken);
   }
 
-  private KakaoUserResponse requestUserInfo(String type, String code, String redirectUrl) {
-
-    ResponseEntity<KakaoUserResponse> responseEntity = kakaoConnector.requestUserInfo(code,
-        redirectUrl);
-
-    return Optional.ofNullable(responseEntity.getBody())
-        .orElseThrow(() -> new RuntimeException("카카오 사용자 정보를 가져오는데 실패했습니다."));
+  private User checkAndSaveUser(String type, String code, String redirectUrl) {
+    if(Objects.equals(type, "kakao")){
+      KakaoUserResponse response = kakaoConnector.requestKakaoUserInfo(code, redirectUrl).getBody();
+      String nickname = response.getKakaoAccount().getProfile().getNickName();
+      return userRepository.findByNickname(nickname)
+          .orElseGet(() -> saveKakaoUser(response));
+    }
+    if(Objects.equals(type, "google")){
+      GoogleUserResponse response = googleConnector.requestGoogleUserInfo(code, redirectUrl).getBody();
+      String email = response.getEmail();
+      return userRepository.findByEmail(email)
+          .orElseGet(() -> saveGoogleUser(response));
+    }
+    else{
+      throw new RuntimeException("지원하지 않는 oauth 타입입니다.");
+    }
+  }
+  private User saveGoogleUser(GoogleUserResponse response) {
+    User user = User.builder()
+        .userStatus(UserStatus.ACTIVATE)
+        .oauthId(response.getId())
+        .provider("google")
+        .isAdmin(false)
+        .nickname(RandomNickName.generateRandomNickname())
+        .name(response.getName())
+        .email(response.getEmail())
+        .createdAt(LocalDateTime.now())
+        .build();
+    return userRepository.save(user);
   }
 
-  private User findOrSaveUser(KakaoUserResponse response) {
-    String nickname = response.getKakaoAccount().getProfile().getNickName();
-    return userRepository.findByNickname(nickname)
-        .orElseGet(() -> saveUser(response));
-  }
-
-  private User saveUser(KakaoUserResponse response) {
+  private User saveKakaoUser(KakaoUserResponse response) {
     User user = User.builder()
         .userStatus(UserStatus.ACTIVATE)
         .oauthId(String.valueOf(response.getId()))

@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -17,6 +16,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import solitour_backend.solitour.auth.support.google.dto.GoogleTokenResponse;
 import solitour_backend.solitour.auth.support.google.dto.GoogleUserResponse;
+import solitour_backend.solitour.auth.support.google.dto.GoogleUserResponse2;
 
 @Getter
 @RequiredArgsConstructor
@@ -28,7 +28,7 @@ public class GoogleConnector {
 
     private final GoogleProvider provider;
 
-    public ResponseEntity<GoogleUserResponse> requestUserInfo(String code, String redirectUrl) {
+    public ResponseEntity<GoogleUserResponse> requestGoogleUserInfo(String code, String redirectUrl) {
         String googleToken = requestAccessToken(code, redirectUrl);
 
         HttpHeaders headers = new HttpHeaders();
