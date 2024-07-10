@@ -1,5 +1,6 @@
 package solitour_backend.solitour.auth.service.dto.response;
 
+import jakarta.servlet.http.Cookie;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -10,6 +11,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class LoginResponse {
 
-    private String accessToken;
-    private String refreshToken;
+    private Cookie accessToken;
+    private Cookie refreshToken;
 }

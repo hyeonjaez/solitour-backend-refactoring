@@ -1,6 +1,7 @@
 package solitour_backend.solitour.auth.controller;
 
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,7 +24,6 @@ public class OauthController {
 
     private final OauthService oauthService;
 
-
     @GetMapping(value = "/login", params = {"type", "redirectUrl"})
     public ResponseEntity<OauthLinkResponse> access(@RequestParam String type,@RequestParam String redirectUrl) {
         OauthLinkResponse response = oauthService.generateAuthUrl(type,redirectUrl);
@@ -31,9 +31,13 @@ public class OauthController {
     }
 
     @GetMapping(value = "/login", params = {"type", "code", "redirectUrl"})
-    public ResponseEntity<LoginResponse> login(@RequestParam String type, @RequestParam String code, @RequestParam String redirectUrl) {
+    public ResponseEntity<LoginResponse> login(HttpServletResponse response,@RequestParam String type, @RequestParam String code, @RequestParam String redirectUrl) {
         LoginResponse loginResponse = oauthService.requestAccessToken(type, code, redirectUrl);
-        return ResponseEntity.ok(loginResponse);
+
+        response.addCookie(loginResponse.getAccessToken());
+        response.addCookie(loginResponse.getRefreshToken());
+
+        return ResponseEntity.ok().build();
     }
 
     @Authenticated
@@ -47,6 +51,7 @@ public class OauthController {
     @PostMapping("/token/refresh")
     public ResponseEntity<AccessTokenResponse> reissueAccessToken(@AuthenticationPrincipal Long memberId) {
         AccessTokenResponse response = oauthService.reissueAccessToken(memberId);
+
         return ResponseEntity.ok(response);
     }
 }

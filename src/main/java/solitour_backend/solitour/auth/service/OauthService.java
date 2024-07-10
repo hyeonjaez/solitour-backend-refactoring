@@ -1,6 +1,7 @@
 package solitour_backend.solitour.auth.service;
 
 
+import jakarta.servlet.http.Cookie;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
@@ -47,7 +48,18 @@ public class OauthService {
 
     tokenService.synchronizeRefreshToken(user, refreshToken);
 
-    return new LoginResponse(token, refreshToken);
+    Cookie accessCookie = createCookie("access_token", token,60*60*24);
+    Cookie refreshCookie = createCookie("refresh_token", refreshToken,60*60*24*10);
+
+    return new LoginResponse(accessCookie, refreshCookie);
+  }
+
+  private Cookie createCookie(String name, String value, int maxAge) {
+    Cookie cookie = new Cookie(name, value);
+    cookie.setHttpOnly(true);
+    cookie.setMaxAge(maxAge);
+    cookie.setPath("/");
+    return cookie;
   }
 
   private User checkAndSaveUser(String type, String code, String redirectUrl) {

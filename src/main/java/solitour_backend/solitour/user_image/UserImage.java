@@ -20,7 +20,7 @@ import solitour_backend.solitour.user.entity.User;
 @NoArgsConstructor
 public class UserImage {
     @Id
-    @Column(name = "image_id")
+    @Column(name = "user_image_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
