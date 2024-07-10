@@ -16,11 +16,11 @@ import solitour_backend.solitour.user.entity.User;
 
 @Entity
 @Getter
-@Table(name = "image")
+@Table(name = "user_image")
 @NoArgsConstructor
 public class UserImage {
     @Id
-    @Column(name = "image_id")
+    @Column(name = "user_image_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -28,10 +28,10 @@ public class UserImage {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @Column(name = "image_address")
+    @Column(name = "user_image_address")
     private String address;
 
-    @Column(name = "image_created_date")
+    @Column(name = "user_image_created_date")
     private LocalDate createdDate;
 
     public UserImage(User user, String address, LocalDate createdDate) {
