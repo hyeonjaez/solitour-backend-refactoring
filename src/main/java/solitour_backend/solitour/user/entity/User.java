@@ -34,7 +34,7 @@ public class User {
     private String provider;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "image_id")
+    @JoinColumn(name = "user_image_id")
     private UserImage userImage;
 
     @Column(name = "user_nickname")
