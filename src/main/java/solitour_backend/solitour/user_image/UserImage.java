@@ -24,9 +24,6 @@ public class UserImage {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
 
     @Column(name = "image_address")
     private String address;
@@ -34,8 +31,7 @@ public class UserImage {
     @Column(name = "image_created_date")
     private LocalDate createdDate;
 
-    public UserImage(User user, String address, LocalDate createdDate) {
-        this.user = user;
+    public UserImage(String address, LocalDate createdDate) {
         this.address = address;
         this.createdDate = createdDate;
     }

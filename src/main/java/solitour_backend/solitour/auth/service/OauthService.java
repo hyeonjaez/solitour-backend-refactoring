@@ -2,6 +2,7 @@ package solitour_backend.solitour.auth.service;
 
 
 import jakarta.servlet.http.Cookie;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,8 @@ import solitour_backend.solitour.auth.support.kakao.dto.KakaoUserResponse;
 import solitour_backend.solitour.user.entity.User;
 import solitour_backend.solitour.user.entity.UserRepository;
 import solitour_backend.solitour.user.user_status.UserStatus;
+import solitour_backend.solitour.user_image.UserImage;
+import solitour_backend.solitour.user_image.UserImageRepository;
 
 @RequiredArgsConstructor
 @Service
@@ -33,6 +36,7 @@ public class OauthService {
   private final KakaoProvider kakaoProvider;
   private final GoogleConnector googleConnector;
   private final GoogleProvider googleProvider;
+  private final UserImageRepository userImageRepository;
 
   public OauthLinkResponse generateAuthUrl(String type, String redirectUrl) {
     String oauthLink = getAuthLink(type, redirectUrl);
@@ -94,11 +98,15 @@ public class OauthService {
   }
 
   private User saveKakaoUser(KakaoUserResponse response) {
+    String userImage = getUserImage(response);
+    UserImage savedUserImage = userImageRepository.save(new UserImage(userImage, LocalDate.now()));
+
     User user = User.builder()
         .userStatus(UserStatus.ACTIVATE)
         .oauthId(String.valueOf(response.getId()))
         .provider("kakao")
         .isAdmin(false)
+        .userImage(savedUserImage)
         .name(response.getKakaoAccount().getName())
         .nickname(response.getKakaoAccount().getProfile().getNickName())
         .age(Integer.valueOf(response.getKakaoAccount().getBirthYear()))
@@ -107,6 +115,18 @@ public class OauthService {
         .createdAt(LocalDateTime.now())
         .build();
     return userRepository.save(user);
+  }
+
+  private String getUserImage(KakaoUserResponse response) {
+    String gender = response.getKakaoAccount().getGender();
+    String userProfile = response.getKakaoAccount().getProfile().getProfileImageUrl();
+    if(Objects.equals(gender, "male")){
+      return "male";
+    }
+    if(Objects.equals(gender, "female")){
+      return "female";
+    }
+    return userProfile;
   }
 
   private String getAuthLink(String type, String redirectUrl) {

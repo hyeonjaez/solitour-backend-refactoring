@@ -33,8 +33,8 @@ public class User {
     @Column(name = "provider")
     private String provider;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "image_id")
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_image_id",referencedColumnName = "user_image_id")
     private UserImage userImage;
 
     @Column(name = "user_nickname")
