@@ -9,7 +9,7 @@ import solitour_backend.solitour.user.user_status.UserStatus;
 import solitour_backend.solitour.user.user_status.UserStatusConverter;
 
 import java.time.LocalDateTime;
-import solitour_backend.solitour.user_image.UserImage;
+import solitour_backend.solitour.user_image.entity.UserImage;
 
 @Entity
 @Getter

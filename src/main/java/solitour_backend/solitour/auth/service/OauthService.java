@@ -1,6 +1,7 @@
 package solitour_backend.solitour.auth.service;
 
 
+import jakarta.servlet.http.Cookie;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,8 @@ import solitour_backend.solitour.auth.support.kakao.dto.KakaoUserResponse;
 import solitour_backend.solitour.user.entity.User;
 import solitour_backend.solitour.user.entity.UserRepository;
 import solitour_backend.solitour.user.user_status.UserStatus;
+import solitour_backend.solitour.user_image.entity.UserImage;
+import solitour_backend.solitour.user_image.service.UserImageService;
 
 @RequiredArgsConstructor
 @Service
@@ -32,6 +35,8 @@ public class OauthService {
   private final KakaoProvider kakaoProvider;
   private final GoogleConnector googleConnector;
   private final GoogleProvider googleProvider;
+  private final UserImageService userImageService;
+
 
   public OauthLinkResponse generateAuthUrl(String type, String redirectUrl) {
     String oauthLink = getAuthLink(type, redirectUrl);
@@ -47,7 +52,18 @@ public class OauthService {
 
     tokenService.synchronizeRefreshToken(user, refreshToken);
 
-    return new LoginResponse(token, refreshToken);
+    Cookie accessCookie = createCookie("access_token", token,60*60*24);
+    Cookie refreshCookie = createCookie("refresh_token", refreshToken,60*60*24*10);
+
+    return new LoginResponse(accessCookie, refreshCookie);
+  }
+
+  private Cookie createCookie(String name, String value, int maxAge) {
+    Cookie cookie = new Cookie(name, value);
+    cookie.setHttpOnly(true);
+    cookie.setMaxAge(maxAge);
+    cookie.setPath("/");
+    return cookie;
   }
 
   private User checkAndSaveUser(String type, String code, String redirectUrl) {
@@ -67,6 +83,7 @@ public class OauthService {
       throw new RuntimeException("지원하지 않는 oauth 타입입니다.");
     }
   }
+
   private User saveGoogleUser(GoogleUserResponse response) {
     User user = User.builder()
         .userStatus(UserStatus.ACTIVATE)
@@ -82,11 +99,15 @@ public class OauthService {
   }
 
   private User saveKakaoUser(KakaoUserResponse response) {
+    String imageUrl = getUserImage(response);
+    UserImage savedUserImage = userImageService.saveUserImage(imageUrl);
+
     User user = User.builder()
         .userStatus(UserStatus.ACTIVATE)
         .oauthId(String.valueOf(response.getId()))
         .provider("kakao")
         .isAdmin(false)
+        .userImage(savedUserImage)
         .name(response.getKakaoAccount().getName())
         .nickname(response.getKakaoAccount().getProfile().getNickName())
         .age(Integer.valueOf(response.getKakaoAccount().getBirthYear()))
@@ -95,6 +116,18 @@ public class OauthService {
         .createdAt(LocalDateTime.now())
         .build();
     return userRepository.save(user);
+  }
+
+  private String getUserImage(KakaoUserResponse response) {
+    String gender = response.getKakaoAccount().getGender();
+    String userProfile = response.getKakaoAccount().getProfile().getProfileImageUrl();
+    if(Objects.equals(gender, "male")){
+      return "male";
+    }
+    if(Objects.equals(gender, "female")){
+      return "female";
+    }
+    return userProfile;
   }
 
   private String getAuthLink(String type, String redirectUrl) {
@@ -111,7 +144,9 @@ public class OauthService {
       throw new RuntimeException("유효하지 않은 토큰입니다.");
     }
     String accessToken = jwtTokenProvider.createAccessToken(userId);
-    return new AccessTokenResponse(accessToken);
+    Cookie accessCookie = createCookie("access_token", accessToken,60*60*24);
+
+    return new AccessTokenResponse(accessCookie);
   }
 
   @Transactional
