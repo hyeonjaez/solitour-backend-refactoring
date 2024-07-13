@@ -7,6 +7,7 @@ import org.springframework.web.multipart.MultipartFile;
 import solitour_backend.solitour.category.entity.Category;
 import solitour_backend.solitour.category.exception.CategoryNotExistsException;
 import solitour_backend.solitour.category.repository.CategoryRepository;
+import solitour_backend.solitour.great_information.repository.GreatInformationRepository;
 import solitour_backend.solitour.image.dto.mapper.ImageMapper;
 import solitour_backend.solitour.image.dto.response.ImageResponse;
 import solitour_backend.solitour.image.entity.Image;
@@ -64,6 +65,7 @@ public class InformationService {
     private final ZoneCategoryMapper zoneCategoryMapper;
     private final ImageMapper imageMapper;
     private final UserMapper userMapper;
+    private final GreatInformationRepository greatInformationRepository;
 
     public static final String IMAGE_PATH = "information";
     private final ImageRepository imageRepository;
@@ -74,10 +76,13 @@ public class InformationService {
         Category category = categoryRepository.findById(informationRegisterRequest.getCategoryId())
                 .orElseThrow(
                         () -> new CategoryNotExistsException("해당하는 id의 category 가 없습니다"));
+        ZoneCategory parentZoneCategory = zoneCategoryRepository.findByName(
+                        informationRegisterRequest.getZoneCategoryNameParent())
+                .orElseThrow(() -> new ZoneCategoryNotExistsException("해당하는 name의 ZoneCategory 없습니다"));
 
-        ZoneCategory zoneCategory = zoneCategoryRepository.findById(informationRegisterRequest.getZoneCategoryId())
-                .orElseThrow(
-                        () -> new ZoneCategoryNotExistsException("해당하는 id의 ZoneCategory 없습니다"));
+        ZoneCategory childZoneCategory = zoneCategoryRepository.findByParentZoneCategoryIdAndName(
+                        parentZoneCategory.getId(), informationRegisterRequest.getZoneCategoryNameChild())
+                .orElseThrow(() -> new ZoneCategoryNotExistsException("해당하는 ParentZoneCategoryId 와 name의 ZoneCategory 없습니다"));
 
         Place savePlace = placeRepository.save(
                 new Place(
@@ -95,7 +100,7 @@ public class InformationService {
         Information information =
                 new Information(
                         category,
-                        zoneCategory,
+                        childZoneCategory,
                         user,
                         savePlace,
                         informationRegisterRequest.getInformationTitle(),
@@ -151,6 +156,8 @@ public class InformationService {
 
         List<ImageResponse> imageResponseList = imageMapper.toImageResponseList(images);
 
+        int likeCount = greatInformationRepository.countByInformationId(information.getId());
+
         return new InformationDetailResponse(
                 information.getTitle(),
                 information.getAddress(),
@@ -162,6 +169,7 @@ public class InformationService {
                 tagResponses,
                 placeResponse,
                 zoneCategoryResponse,
-                imageResponseList);
+                imageResponseList,
+                likeCount);
     }
 }

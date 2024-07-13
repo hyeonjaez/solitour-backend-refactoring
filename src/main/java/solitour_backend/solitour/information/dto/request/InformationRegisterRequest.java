@@ -37,9 +37,13 @@ public class InformationRegisterRequest {
     @Min(1)
     private Long categoryId;
 
-    @NotNull
-    @Min(1)
-    private Long zoneCategoryId;
+    @NotBlank
+    @Size(min = 1, max = 20)
+    private String zoneCategoryNameParent;
+
+    @NotBlank
+    @Size(min = 1, max = 20)
+    private String zoneCategoryNameChild;
 
     private List<TagRegisterRequest> tagRegisterRequests;
 
