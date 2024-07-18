@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface InfoTagRepository extends JpaRepository<InfoTag, Long> {
     List<InfoTag> findAllByInformationId(Long informationId);
+
+    void deleteAllByInformationId(Long informationId);
 }
