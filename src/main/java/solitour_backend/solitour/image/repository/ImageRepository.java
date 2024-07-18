@@ -6,5 +6,9 @@ import solitour_backend.solitour.image.entity.Image;
 
 public interface ImageRepository extends JpaRepository<Image, Long> {
 
-  List<Image> findAllByInformationId(Long informationId);
+
+    List<Image> findAllByInformationId(Long informationId);
+
+    void deleteAllByInformationId(Long informationId);
+
 }

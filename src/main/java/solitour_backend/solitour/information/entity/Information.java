@@ -12,6 +12,7 @@ import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import solitour_backend.solitour.category.entity.Category;
 import solitour_backend.solitour.place.entity.Place;
 import solitour_backend.solitour.user.entity.User;
@@ -19,6 +20,7 @@ import solitour_backend.solitour.zone_category.entity.ZoneCategory;
 
 @Entity
 @Getter
+@Setter
 @Table(name = "information")
 @NoArgsConstructor
 public class Information {
@@ -40,9 +42,10 @@ public class Information {
   @JoinColumn(name = "user_id")
   private User user;
 
-  @ManyToOne(fetch = FetchType.LAZY)
+  @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
   @JoinColumn(name = "place_id")
   private Place place;
+
 
   @Column(name = "information_title")
   private String title;
