@@ -4,6 +4,9 @@ import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+import solitour_backend.solitour.image.s3.S3Uploader;
+import solitour_backend.solitour.user_image.dto.UserImageResponse;
 import solitour_backend.solitour.user_image.entity.UserImage;
 import solitour_backend.solitour.user_image.entity.UserImageRepository;
 
@@ -13,6 +16,8 @@ import solitour_backend.solitour.user_image.entity.UserImageRepository;
 public class UserImageService {
 
   private final UserImageRepository userImageRepository;
+  private final S3Uploader s3Uploader;
+  public static final String IMAGE_PATH = "user";
 
   @Transactional
   public UserImage saveUserImage(String imageUrl) {
@@ -21,6 +26,14 @@ public class UserImageService {
     userImageRepository.save(userImage);
 
     return userImage;
+  }
+
+  @Transactional
+  public UserImageResponse registerInformation(Long userId, MultipartFile userImage) {
+
+    String userImageUrl = s3Uploader.upload(userImage, IMAGE_PATH, userId);
+
+    return new UserImageResponse(userImageUrl);
   }
 
 }

@@ -1,6 +1,7 @@
 package solitour_backend.solitour.information.controller;
 
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -8,7 +9,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import solitour_backend.solitour.auth.config.AuthenticationPrincipal;
 import solitour_backend.solitour.error.Utils;
@@ -19,8 +25,6 @@ import solitour_backend.solitour.information.dto.response.InformationDetailRespo
 import solitour_backend.solitour.information.dto.response.InformationRankResponse;
 import solitour_backend.solitour.information.dto.response.InformationResponse;
 import solitour_backend.solitour.information.service.InformationService;
-
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -127,3 +131,4 @@ public class InformationController {
                 .body(rankInformation);
     }
 }
+

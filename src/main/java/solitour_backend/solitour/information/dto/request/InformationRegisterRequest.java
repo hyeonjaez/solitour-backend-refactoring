@@ -4,47 +4,47 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import java.util.List;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import solitour_backend.solitour.place.dto.request.PlaceRegisterRequest;
 import solitour_backend.solitour.tag.dto.request.TagRegisterRequest;
 
-import java.util.List;
-
 @Getter
 @NoArgsConstructor
 public class InformationRegisterRequest {
-    @NotBlank
-    @Size(min = 1, max = 50)
-    private String informationTitle;
 
-    @NotBlank
-    @Size(min = 1, max = 20)
-    private String informationAddress;
+  @NotBlank
+  @Size(min = 1, max = 50)
+  private String informationTitle;
 
-    private String informationContent;
+  @NotBlank
+  @Size(min = 1, max = 20)
+  private String informationAddress;
 
-    private String informationTips;
+  private String informationContent;
 
-    @NotNull
-    @Min(1)
-    private Long userId;
+  private String informationTips;
 
-    @NotNull
-    private PlaceRegisterRequest placeRegisterRequest;
+  @NotNull
+  @Min(1)
+  private Long userId;
 
-    @NotNull
-    @Min(1)
-    private Long categoryId;
+  @NotNull
+  private PlaceRegisterRequest placeRegisterRequest;
 
-    @NotBlank
-    @Size(min = 1, max = 20)
-    private String zoneCategoryNameParent;
+  @NotNull
+  @Min(1)
+  private Long categoryId;
 
-    @NotBlank
-    @Size(min = 1, max = 20)
-    private String zoneCategoryNameChild;
+  @NotBlank
+  @Size(min = 1, max = 20)
+  private String zoneCategoryNameParent;
 
-    private List<TagRegisterRequest> tagRegisterRequests;
+  @NotBlank
+  @Size(min = 1, max = 20)
+  private String zoneCategoryNameChild;
+
+  private List<TagRegisterRequest> tagRegisterRequests;
 
 }
