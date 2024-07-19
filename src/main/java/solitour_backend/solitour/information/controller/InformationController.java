@@ -1,7 +1,9 @@
 package solitour_backend.solitour.information.controller;
 
 import jakarta.validation.Valid;
+
 import java.util.List;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -11,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import solitour_backend.solitour.auth.config.AuthenticationPrincipal;
 import solitour_backend.solitour.error.Utils;
 import solitour_backend.solitour.information.dto.request.InformationModifyRequest;
 import solitour_backend.solitour.information.dto.request.InformationRegisterRequest;
@@ -75,48 +76,63 @@ public class InformationController {
                 .build();
     }
 
-
+    //default
     @GetMapping("/parent-category/{parentCategoryId}")
     public ResponseEntity<Page<InformationBriefResponse>> pageInformationByParentCategory(@RequestParam(defaultValue = "0") int page,
-                                                                                          @PathVariable("parentCategoryId") Long categoryId) {
-        Pageable pageable = PageRequest.of(page, PAGE_SIZE);
-        Page<InformationBriefResponse> briefInformationPage = informationService.getBriefInformationPageByParentCategory(pageable, categoryId);
-
-        return ResponseEntity.status(HttpStatus.OK).body(briefInformationPage);
-    }
-
-    @GetMapping("/users/parent-category/{parentCategoryId}")
-    public ResponseEntity<Page<InformationBriefResponse>> pageInformationByParentCategory(@RequestParam(defaultValue = "0") int page,
                                                                                           @PathVariable("parentCategoryId") Long categoryId,
-                                                                                          @AuthenticationPrincipal Long userId) {
+                                                                                          @RequestParam(defaultValue = "0") Long userId) {
         Pageable pageable = PageRequest.of(page, PAGE_SIZE);
-        Page<InformationBriefResponse> briefInformationPage = informationService.getBriefInformationPageFromUserByParentCategory(pageable, categoryId, userId);
+        Page<InformationBriefResponse> briefInformationPage = informationService.getBriefInformationPageByParentCategory(pageable, categoryId, userId);
 
-        return ResponseEntity.status(HttpStatus.OK).body(briefInformationPage);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(briefInformationPage);
     }
 
     @GetMapping("/child-category/{childCategoryId}")
     public ResponseEntity<Page<InformationBriefResponse>> pageInformationByChildCategory(@RequestParam(defaultValue = "0") int page,
-                                                                                         @PathVariable("childCategoryId") Long categoryId) {
-        Pageable pageable = PageRequest.of(page, PAGE_SIZE);
-        Page<InformationBriefResponse> briefInformationPage = informationService.getBriefInformationPageByChildCategory(pageable, categoryId);
-
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(briefInformationPage);
-    }
-
-    @GetMapping("/users/child-category/{childCategoryId}")
-    public ResponseEntity<Page<InformationBriefResponse>> pageInformationByChildCategory(@RequestParam(defaultValue = "0") int page,
                                                                                          @PathVariable("childCategoryId") Long categoryId,
-                                                                                         @AuthenticationPrincipal Long userId) {
+                                                                                         @RequestParam(defaultValue = "0") Long userId) {
         Pageable pageable = PageRequest.of(page, PAGE_SIZE);
-        Page<InformationBriefResponse> briefInformationPage = informationService.getBriefInformationPageFromUserByChildCategory(pageable, categoryId, userId);
+        Page<InformationBriefResponse> briefInformationPage = informationService.getBriefInformationPageByChildCategory(pageable, categoryId, userId);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(briefInformationPage);
     }
+
+
+    //좋아요순
+    @GetMapping("/parent-category/{parentCategoryId}/like-count")
+    public ResponseEntity<Page<InformationBriefResponse>> pageInformationByParentCategoryFilterLikeCount(@RequestParam(defaultValue = "0") int page,
+                                                                                                         @RequestParam(defaultValue = "0") Long userId,
+                                                                                                         @PathVariable("parentCategoryId") Long categoryId) {
+        Pageable pageable = PageRequest.of(page, PAGE_SIZE);
+        Page<InformationBriefResponse> briefInformationPage = informationService.getBriefInformationPageByParentCategoryFilterLikeCount(pageable, categoryId, userId);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(briefInformationPage);
+    }
+
+    @GetMapping("/child-category/{childCategoryId}/like-count")
+    public ResponseEntity<Page<InformationBriefResponse>> pageInformationByChildCategoryFilterLikeCount(@RequestParam(defaultValue = "0") int page,
+                                                                                                        @RequestParam(defaultValue = "0") Long userId,
+                                                                                                        @PathVariable("childCategoryId") Long categoryId) {
+        Pageable pageable = PageRequest.of(page, PAGE_SIZE);
+        Page<InformationBriefResponse> briefInformationPage = informationService.getBriefInformationPageByChildCategoryFilterLikeCount(pageable, categoryId, userId);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(briefInformationPage);
+    }
+
+
+    //조회순
+
+
+    //지역카테고리별
+
 
     @GetMapping("/ranks")
     public ResponseEntity<List<InformationRankResponse>> rankInformation() {
