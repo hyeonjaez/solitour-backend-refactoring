@@ -234,36 +234,38 @@ public class InformationService {
 
 
     }
-
-
-    public Page<InformationBriefResponse> getBriefInformationPageFromUserByParentCategory(Pageable pageable, Long parentCategoryId, Long userId) {
+    //default
+    public Page<InformationBriefResponse> getBriefInformationPageByParentCategory(Pageable pageable, Long parentCategoryId, Long userId) {
         if (!categoryRepository.existsById(parentCategoryId)) {
             throw new CategoryNotExistsException("해당하는 id의 category는 없습니다");
         }
         return informationRepository.getInformationByParentCategory(pageable, parentCategoryId, userId);
     }
 
-    public Page<InformationBriefResponse> getBriefInformationPageByParentCategory(Pageable pageable, Long parentCategoryId) {
-        if (!categoryRepository.existsById(parentCategoryId)) {
-            throw new CategoryNotExistsException("해당하는 id의 category는 없습니다");
-        }
-        return informationRepository.getInformationByParentCategory(pageable, parentCategoryId, 0L);
-    }
-
-
-    public Page<InformationBriefResponse> getBriefInformationPageFromUserByChildCategory(Pageable pageable, Long childCategoryId, Long userId) {
+    public Page<InformationBriefResponse> getBriefInformationPageByChildCategory(Pageable pageable, Long childCategoryId, Long userId) {
         if (!categoryRepository.existsById(childCategoryId)) {
             throw new CategoryNotExistsException("해당하는 id의 category는 없습니다");
         }
         return informationRepository.getInformationByChildCategory(pageable, childCategoryId, userId);
     }
 
-    public Page<InformationBriefResponse> getBriefInformationPageByChildCategory(Pageable pageable, Long childCategoryId) {
+    //좋아요순
+    public Page<InformationBriefResponse> getBriefInformationPageByParentCategoryFilterLikeCount(Pageable pageable, Long parentCategoryId, Long userId) {
+        if (!categoryRepository.existsById(parentCategoryId)) {
+            throw new CategoryNotExistsException("해당하는 id의 category는 없습니다");
+        }
+
+        return informationRepository.getInformationByParentCategoryFilterLikeCount(pageable, parentCategoryId, userId);
+    }
+
+    public Page<InformationBriefResponse> getBriefInformationPageByChildCategoryFilterLikeCount(Pageable pageable, Long childCategoryId, Long userId) {
         if (!categoryRepository.existsById(childCategoryId)) {
             throw new CategoryNotExistsException("해당하는 id의 category는 없습니다");
         }
-        return informationRepository.getInformationByChildCategory(pageable, childCategoryId, 0L);
+        return informationRepository.getInformationByChildCategoryFilterLikeCount(pageable, childCategoryId, userId);
     }
+
+
 
 
     public List<InformationRankResponse> getRankInformation() {
