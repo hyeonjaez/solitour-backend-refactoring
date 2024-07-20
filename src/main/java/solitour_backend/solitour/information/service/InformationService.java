@@ -234,6 +234,7 @@ public class InformationService {
 
 
     }
+
     //default
     public Page<InformationBriefResponse> getBriefInformationPageByParentCategory(Pageable pageable, Long parentCategoryId, Long userId) {
         if (!categoryRepository.existsById(parentCategoryId)) {
@@ -265,7 +266,45 @@ public class InformationService {
         return informationRepository.getInformationByChildCategoryFilterLikeCount(pageable, childCategoryId, userId);
     }
 
+    //조회순
+    public Page<InformationBriefResponse> getBriefInformationPageByParentCategoryFilterViewCount(Pageable pageable, Long parentCategoryId, Long userId) {
+        if (!categoryRepository.existsById(parentCategoryId)) {
+            throw new CategoryNotExistsException("해당하는 id의 category는 없습니다");
+        }
+        return informationRepository.getInformationByParentCategoryFilterViewCount(pageable, parentCategoryId, userId);
+    }
 
+    public Page<InformationBriefResponse> getBriefInformationPageByChildCategoryFilterViewCount(Pageable pageable, Long childCategoryId, Long userId) {
+        if (!categoryRepository.existsById(childCategoryId)) {
+            throw new CategoryNotExistsException("해당하는 id의 category는 없습니다");
+        }
+        return informationRepository.getInformationByChildCategoryFilterViewCount(pageable, childCategoryId, userId);
+    }
+
+    //zoneCategory 별
+    public Page<InformationBriefResponse> getBriefInformationPageByParentCategoryAndZoneCategory(Pageable pageable, Long parentCategoryId, Long userId, Long zoneCategoryId) {
+        if (!categoryRepository.existsById(parentCategoryId)) {
+            throw new CategoryNotExistsException("해당하는 id의 category는 없습니다");
+        }
+
+        if (!zoneCategoryRepository.existsById(zoneCategoryId)) {
+            throw new ZoneCategoryNotExistsException("해당하는 id의 zoneCategory는 없습니다");
+        }
+
+        return informationRepository.getInformationByParentCategoryFilterZoneCategory(pageable, parentCategoryId, userId, zoneCategoryId);
+    }
+
+    public Page<InformationBriefResponse> getBriefInformationPageByChildCategoryAndZoneCategory(Pageable pageable, Long childCategoryId, Long userId, Long zoneCategoryId) {
+        if (!categoryRepository.existsById(childCategoryId)) {
+            throw new CategoryNotExistsException("해당하는 id의 category는 없습니다");
+        }
+
+        if (!zoneCategoryRepository.existsById(zoneCategoryId)) {
+            throw new ZoneCategoryNotExistsException("해당하는 id의 zoneCategory는 없습니다");
+        }
+
+        return informationRepository.getInformationByChildCategoryFilterZoneCategory(pageable, childCategoryId, userId, zoneCategoryId);
+    }
 
 
     public List<InformationRankResponse> getRankInformation() {
