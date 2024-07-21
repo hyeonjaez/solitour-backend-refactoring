@@ -243,12 +243,13 @@ public class InformationService {
                 throw new ImageAlreadyExistsException("썸네일 이미지가 없습니다");
             }
         }
-
-        for (MultipartFile multipartFile : contentImages) {
-            String upload = s3Uploader.upload(multipartFile, IMAGE_PATH, information.getId());
-            Image contentImage = new Image(ImageStatus.CONTENT, information, upload,
-                LocalDate.now());
-            imageRepository.save(contentImage);
+        if (Objects.nonNull(contentImages)) {
+            for (MultipartFile multipartFile : contentImages) {
+                String upload = s3Uploader.upload(multipartFile, IMAGE_PATH, information.getId());
+                Image contentImage = new Image(ImageStatus.CONTENT, information, upload,
+                    LocalDate.now());
+                imageRepository.save(contentImage);
+            }
         }
 
         List<InfoTag> infoTags = infoTagRepository.findAllByInformationId(information.getId());
