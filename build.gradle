@@ -3,7 +3,6 @@ plugins {
     id 'org.springframework.boot' version '3.3.0'
     id 'io.spring.dependency-management' version '1.1.5'
     id 'org.asciidoctor.jvm.convert' version '3.3.2'
-    id 'com.diffplug.spotless' version '7.0.0.BETA1'
 }
 
 group = 'solitour-backend'
@@ -27,21 +26,6 @@ repositories {
 
 ext {
     set('snippetsDir', file("build/generated-snippets"))
-}
-
-spotless {
-    ratchetFrom 'origin/main'
-
-    format 'misc', {
-        target '*.gradle', '.gitattributes', '.gitignore'
-
-        trimTrailingWhitespace()
-        indentWithTabs()
-        endWithNewline()
-    }
-    java {
-        googleJavaFormat()
-    }
 }
 
 dependencies {
