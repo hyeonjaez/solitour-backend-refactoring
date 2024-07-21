@@ -7,8 +7,8 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface BookMarkInformationRepository extends JpaRepository<BookMarkInformation, Long> {
 
-  @Query("SELECT b FROM BookMarkInformation b JOIN FETCH b.user u JOIN FETCH b.information i WHERE u.id = :userId")
-  List<BookMarkInformation> findByUserId(Long userId);
+    @Query("SELECT b FROM BookMarkInformation b JOIN FETCH b.user u JOIN FETCH b.information i WHERE u.id = :userId")
+    List<BookMarkInformation> findByUserId(Long userId);
 
-  Optional<BookMarkInformation> findByIdAndUserId(Long bookMarkId, Long userId);
+    Optional<BookMarkInformation> findByIdAndUserId(Long bookMarkId, Long userId);
 }

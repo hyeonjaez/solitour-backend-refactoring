@@ -56,6 +56,7 @@ import java.util.List;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class InformationService {
+
     private final InformationRepository informationRepository;
     private final CategoryRepository categoryRepository;
     private final ZoneCategoryRepository zoneCategoryRepository;
@@ -77,50 +78,55 @@ public class InformationService {
 
 
     @Transactional
-    public InformationResponse registerInformation(InformationRegisterRequest informationRegisterRequest, MultipartFile thumbnail, List<MultipartFile> contentImages) {
+    public InformationResponse registerInformation(
+        InformationRegisterRequest informationRegisterRequest, MultipartFile thumbnail,
+        List<MultipartFile> contentImages) {
         Category category = categoryRepository.findById(informationRegisterRequest.getCategoryId())
-                .orElseThrow(
-                        () -> new CategoryNotExistsException("해당하는 id의 category 가 없습니다"));
+            .orElseThrow(
+                () -> new CategoryNotExistsException("해당하는 id의 category 가 없습니다"));
         ZoneCategory parentZoneCategory = zoneCategoryRepository.findByName(
-                        informationRegisterRequest.getZoneCategoryNameParent())
-                .orElseThrow(() -> new ZoneCategoryNotExistsException("해당하는 name의 ZoneCategory 없습니다"));
+                informationRegisterRequest.getZoneCategoryNameParent())
+            .orElseThrow(() -> new ZoneCategoryNotExistsException("해당하는 name의 ZoneCategory 없습니다"));
 
         ZoneCategory childZoneCategory = zoneCategoryRepository.findByParentZoneCategoryIdAndName(
-                        parentZoneCategory.getId(), informationRegisterRequest.getZoneCategoryNameChild())
-                .orElseThrow(() -> new ZoneCategoryNotExistsException("해당하는 ParentZoneCategoryId 와 name의 ZoneCategory 없습니다"));
+                parentZoneCategory.getId(), informationRegisterRequest.getZoneCategoryNameChild())
+            .orElseThrow(() -> new ZoneCategoryNotExistsException(
+                "해당하는 ParentZoneCategoryId 와 name의 ZoneCategory 없습니다"));
 
         Place savePlace = placeRepository.save(
-                new Place(
-                        informationRegisterRequest.getPlaceRegisterRequest().getSearchId(),
-                        informationRegisterRequest.getPlaceRegisterRequest().getName(),
-                        informationRegisterRequest.getPlaceRegisterRequest().getXAxis(),
-                        informationRegisterRequest.getPlaceRegisterRequest().getYAxis(),
-                        informationRegisterRequest.getPlaceRegisterRequest().getAddress())
+            new Place(
+                informationRegisterRequest.getPlaceRegisterRequest().getSearchId(),
+                informationRegisterRequest.getPlaceRegisterRequest().getName(),
+                informationRegisterRequest.getPlaceRegisterRequest().getXAxis(),
+                informationRegisterRequest.getPlaceRegisterRequest().getYAxis(),
+                informationRegisterRequest.getPlaceRegisterRequest().getAddress())
         );
 
         User user = userRepository.findById(informationRegisterRequest.getUserId())
-                .orElseThrow(
-                        () -> new UserNotExistsException("해당하는 id의 User 가 없습니다"));
+            .orElseThrow(
+                () -> new UserNotExistsException("해당하는 id의 User 가 없습니다"));
 
         Information information =
-                new Information(
-                        category,
-                        childZoneCategory,
-                        user,
-                        savePlace,
-                        informationRegisterRequest.getInformationTitle(),
-                        informationRegisterRequest.getInformationAddress(),
-                        LocalDateTime.now(),
-                        0,
-                        informationRegisterRequest.getInformationContent(),
-                        informationRegisterRequest.getInformationTips()
-                );
+            new Information(
+                category,
+                childZoneCategory,
+                user,
+                savePlace,
+                informationRegisterRequest.getInformationTitle(),
+                informationRegisterRequest.getInformationAddress(),
+                LocalDateTime.now(),
+                0,
+                informationRegisterRequest.getInformationContent(),
+                informationRegisterRequest.getInformationTips()
+            );
 
         Information saveInformation = informationRepository.save(information);
         LocalDate localDate = LocalDate.now();
 
-        String thumbNailImageUrl = s3Uploader.upload(thumbnail, IMAGE_PATH, saveInformation.getId());
-        Image thumbImage = new Image(ImageStatus.THUMBNAIL, saveInformation, thumbNailImageUrl, localDate);
+        String thumbNailImageUrl = s3Uploader.upload(thumbnail, IMAGE_PATH,
+            saveInformation.getId());
+        Image thumbImage = new Image(ImageStatus.THUMBNAIL, saveInformation, thumbNailImageUrl,
+            localDate);
         imageRepository.save(thumbImage);
 
         for (MultipartFile multipartFile : contentImages) {
@@ -136,26 +142,28 @@ public class InformationService {
             infoTagRepository.save(new InfoTag(tag, saveInformation));
         }
 
-
         return informationMapper.mapToInformationResponse(information);
     }
 
 
     public InformationDetailResponse getDetailInformation(Long informationId) {
-        Information information = informationRepository.findById(informationId).orElseThrow(() -> new InformationNotExistsException("해당하는 id의 information이 존재하지 않습니다."));
+        Information information = informationRepository.findById(informationId).orElseThrow(
+            () -> new InformationNotExistsException("해당하는 id의 information이 존재하지 않습니다."));
         List<InfoTag> infoTags = infoTagRepository.findAllByInformationId(information.getId());
 
-        UserPostingResponse userPostingResponse = userMapper.mapToUserPostingResponse(information.getUser());
+        UserPostingResponse userPostingResponse = userMapper.mapToUserPostingResponse(
+            information.getUser());
 
         List<TagResponse> tagResponses = new ArrayList<>();
         if (!infoTags.isEmpty()) {
             tagResponses = infoTags.stream()
-                    .map(data ->
-                            tagMapper.mapToTagResponse(data.getTag()))
-                    .toList();
+                .map(data ->
+                    tagMapper.mapToTagResponse(data.getTag()))
+                .toList();
         }
         PlaceResponse placeResponse = placeMapper.mapToPlaceResponse(information.getPlace());
-        ZoneCategoryResponse zoneCategoryResponse = zoneCategoryMapper.mapToZoneCategoryResponse(information.getZoneCategory());
+        ZoneCategoryResponse zoneCategoryResponse = zoneCategoryMapper.mapToZoneCategoryResponse(
+            information.getZoneCategory());
 
         List<Image> images = imageRepository.findAllByInformationId(information.getId());
 
@@ -164,31 +172,34 @@ public class InformationService {
         int likeCount = greatInformationRepository.countByInformationId(information.getId());
 
         return new InformationDetailResponse(
-                information.getTitle(),
-                information.getAddress(),
-                information.getCreatedDate(),
-                information.getViewCount(),
-                information.getContent(),
-                information.getTip(),
-                userPostingResponse,
-                tagResponses,
-                placeResponse,
-                zoneCategoryResponse,
-                imageResponseList,
-                likeCount);
+            information.getTitle(),
+            information.getAddress(),
+            information.getCreatedDate(),
+            information.getViewCount(),
+            information.getContent(),
+            information.getTip(),
+            userPostingResponse,
+            tagResponses,
+            placeResponse,
+            zoneCategoryResponse,
+            imageResponseList,
+            likeCount);
     }
 
 
     @Transactional
-    public InformationResponse modifyInformation(Long id, InformationModifyRequest informationModifyRequest, MultipartFile thumbNail, List<MultipartFile> contentImages) {
-        Information information = informationRepository.findById(id).orElseThrow(() -> new InformationNotExistsException("해당하는 id의 information이 존재하지 않습니다."));
+    public InformationResponse modifyInformation(Long id,
+        InformationModifyRequest informationModifyRequest, MultipartFile thumbNail,
+        List<MultipartFile> contentImages) {
+        Information information = informationRepository.findById(id).orElseThrow(
+            () -> new InformationNotExistsException("해당하는 id의 information이 존재하지 않습니다."));
         information.setTitle(informationModifyRequest.getTitle());
         information.setAddress(informationModifyRequest.getAddress());
         information.setContent(informationModifyRequest.getContent());
         information.setTip(informationModifyRequest.getTips());
 
-
-        List<Image> allByInformationId = imageRepository.findAllByInformationId(information.getId());
+        List<Image> allByInformationId = imageRepository.findAllByInformationId(
+            information.getId());
 
         for (Image image : allByInformationId) {
             s3Uploader.deleteImage(image.getAddress());
@@ -198,7 +209,8 @@ public class InformationService {
         LocalDate localDate = LocalDate.now();
 
         String thumbNailImageUrl = s3Uploader.upload(thumbNail, IMAGE_PATH, information.getId());
-        Image thumbImage = new Image(ImageStatus.THUMBNAIL, information, thumbNailImageUrl, localDate);
+        Image thumbImage = new Image(ImageStatus.THUMBNAIL, information, thumbNailImageUrl,
+            localDate);
         imageRepository.save(thumbImage);
 
         for (MultipartFile multipartFile : contentImages) {
@@ -206,7 +218,6 @@ public class InformationService {
             Image contentImage = new Image(ImageStatus.CONTENT, information, upload, localDate);
             imageRepository.save(contentImage);
         }
-
 
         List<InfoTag> infoTags = infoTagRepository.findAllByInformationId(information.getId());
 
@@ -217,33 +228,36 @@ public class InformationService {
         }
 
         List<Tag> saveTags = tagRepository.saveAll(
-                tagMapper.mapToTags(
-                        informationModifyRequest.getTagRegisterRequests()));
+            tagMapper.mapToTags(
+                informationModifyRequest.getTagRegisterRequests()));
 
         for (Tag tag : saveTags) {
             infoTagRepository.save(new InfoTag(tag, information));
         }
-
 
         return informationMapper.mapToInformationResponse(information);
     }
 
     @Transactional
     public void deleteInformation(Long id) {
-        Information information = informationRepository.findById(id).orElseThrow(() -> new InformationNotExistsException("해당하는 id의 information이 존재하지 않습니다."));
+        Information information = informationRepository.findById(id).orElseThrow(
+            () -> new InformationNotExistsException("해당하는 id의 information이 존재하지 않습니다."));
 
 
     }
 
 
-    public Page<InformationBriefResponse> getBriefInformationPageFromUserByParentCategory(Pageable pageable, Long parentCategoryId, Long userId) {
+    public Page<InformationBriefResponse> getBriefInformationPageFromUserByParentCategory(
+        Pageable pageable, Long parentCategoryId, Long userId) {
         if (!categoryRepository.existsById(parentCategoryId)) {
             throw new CategoryNotExistsException("해당하는 id의 category는 없습니다");
         }
-        return informationRepository.getInformationByParentCategory(pageable, parentCategoryId, userId);
+        return informationRepository.getInformationByParentCategory(pageable, parentCategoryId,
+            userId);
     }
 
-    public Page<InformationBriefResponse> getBriefInformationPageByParentCategory(Pageable pageable, Long parentCategoryId) {
+    public Page<InformationBriefResponse> getBriefInformationPageByParentCategory(Pageable pageable,
+        Long parentCategoryId) {
         if (!categoryRepository.existsById(parentCategoryId)) {
             throw new CategoryNotExistsException("해당하는 id의 category는 없습니다");
         }
@@ -251,14 +265,17 @@ public class InformationService {
     }
 
 
-    public Page<InformationBriefResponse> getBriefInformationPageFromUserByChildCategory(Pageable pageable, Long childCategoryId, Long userId) {
+    public Page<InformationBriefResponse> getBriefInformationPageFromUserByChildCategory(
+        Pageable pageable, Long childCategoryId, Long userId) {
         if (!categoryRepository.existsById(childCategoryId)) {
             throw new CategoryNotExistsException("해당하는 id의 category는 없습니다");
         }
-        return informationRepository.getInformationByChildCategory(pageable, childCategoryId, userId);
+        return informationRepository.getInformationByChildCategory(pageable, childCategoryId,
+            userId);
     }
 
-    public Page<InformationBriefResponse> getBriefInformationPageByChildCategory(Pageable pageable, Long childCategoryId) {
+    public Page<InformationBriefResponse> getBriefInformationPageByChildCategory(Pageable pageable,
+        Long childCategoryId) {
         if (!categoryRepository.existsById(childCategoryId)) {
             throw new CategoryNotExistsException("해당하는 id의 category는 없습니다");
         }

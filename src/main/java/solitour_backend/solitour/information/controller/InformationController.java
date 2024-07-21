@@ -25,45 +25,50 @@ import solitour_backend.solitour.information.service.InformationService;
 @RequiredArgsConstructor
 @RequestMapping("/api/informations")
 public class InformationController {
+
     private final InformationService informationService;
     public static final int PAGE_SIZE = 12;
 
     @PostMapping
-    public ResponseEntity<InformationResponse> createInformation(@Valid @RequestPart("request") InformationRegisterRequest informationRegisterRequest,
-                                                                 @RequestPart("thumbNailImage") MultipartFile thumbnail,
-                                                                 @RequestPart("contentImages") List<MultipartFile> contentImages,
-                                                                 BindingResult bindingResult) {
+    public ResponseEntity<InformationResponse> createInformation(
+        @Valid @RequestPart("request") InformationRegisterRequest informationRegisterRequest,
+        @RequestPart("thumbNailImage") MultipartFile thumbnail,
+        @RequestPart("contentImages") List<MultipartFile> contentImages,
+        BindingResult bindingResult) {
         Utils.validationRequest(bindingResult);
-        InformationResponse informationResponse = informationService.registerInformation(informationRegisterRequest, thumbnail, contentImages);
-
+        InformationResponse informationResponse = informationService.registerInformation(
+            informationRegisterRequest, thumbnail, contentImages);
 
         return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(informationResponse);
+            .status(HttpStatus.CREATED)
+            .body(informationResponse);
     }
 
     @GetMapping("/{informationId}")
-    public ResponseEntity<InformationDetailResponse> getDetailInformation(@PathVariable Long informationId) {
-        InformationDetailResponse informationDetailResponse = informationService.getDetailInformation(informationId);
+    public ResponseEntity<InformationDetailResponse> getDetailInformation(
+        @PathVariable Long informationId) {
+        InformationDetailResponse informationDetailResponse = informationService.getDetailInformation(
+            informationId);
 
         return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(informationDetailResponse);
+            .status(HttpStatus.OK)
+            .body(informationDetailResponse);
     }
 
     @PutMapping("/{informationId}")
     public ResponseEntity<InformationResponse> modifyInformation(@PathVariable Long informationId,
-                                                                 @RequestPart("thumbNailImage") MultipartFile thumbnail,
-                                                                 @RequestPart("contentImages") List<MultipartFile> contentImages,
-                                                                 @Valid @RequestPart("request") InformationModifyRequest informationModifyRequest,
-                                                                 BindingResult bindingResult) {
+        @RequestPart("thumbNailImage") MultipartFile thumbnail,
+        @RequestPart("contentImages") List<MultipartFile> contentImages,
+        @Valid @RequestPart("request") InformationModifyRequest informationModifyRequest,
+        BindingResult bindingResult) {
         Utils.validationRequest(bindingResult);
 
-        InformationResponse informationResponse = informationService.modifyInformation(informationId, informationModifyRequest, thumbnail, contentImages);
+        InformationResponse informationResponse = informationService.modifyInformation(
+            informationId, informationModifyRequest, thumbnail, contentImages);
 
         return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(informationResponse);
+            .status(HttpStatus.CREATED)
+            .body(informationResponse);
     }
 
     @DeleteMapping("/{informationId}")
@@ -71,59 +76,67 @@ public class InformationController {
         informationService.deleteInformation(informationId);
 
         return ResponseEntity
-                .status(HttpStatus.NO_CONTENT)
-                .build();
+            .status(HttpStatus.NO_CONTENT)
+            .build();
     }
 
 
     @GetMapping("/parent-category/{parentCategoryId}")
-    public ResponseEntity<Page<InformationBriefResponse>> pageInformationByParentCategory(@RequestParam(defaultValue = "0") int page,
-                                                                                          @PathVariable("parentCategoryId") Long categoryId) {
+    public ResponseEntity<Page<InformationBriefResponse>> pageInformationByParentCategory(
+        @RequestParam(defaultValue = "0") int page,
+        @PathVariable("parentCategoryId") Long categoryId) {
         Pageable pageable = PageRequest.of(page, PAGE_SIZE);
-        Page<InformationBriefResponse> briefInformationPage = informationService.getBriefInformationPageByParentCategory(pageable, categoryId);
+        Page<InformationBriefResponse> briefInformationPage = informationService.getBriefInformationPageByParentCategory(
+            pageable, categoryId);
 
         return ResponseEntity.status(HttpStatus.OK).body(briefInformationPage);
     }
 
     @GetMapping("/users/parent-category/{parentCategoryId}")
-    public ResponseEntity<Page<InformationBriefResponse>> pageInformationByParentCategory(@RequestParam(defaultValue = "0") int page,
-                                                                                          @PathVariable("parentCategoryId") Long categoryId,
-                                                                                          @AuthenticationPrincipal Long userId) {
+    public ResponseEntity<Page<InformationBriefResponse>> pageInformationByParentCategory(
+        @RequestParam(defaultValue = "0") int page,
+        @PathVariable("parentCategoryId") Long categoryId,
+        @AuthenticationPrincipal Long userId) {
         Pageable pageable = PageRequest.of(page, PAGE_SIZE);
-        Page<InformationBriefResponse> briefInformationPage = informationService.getBriefInformationPageFromUserByParentCategory(pageable, categoryId, userId);
+        Page<InformationBriefResponse> briefInformationPage = informationService.getBriefInformationPageFromUserByParentCategory(
+            pageable, categoryId, userId);
 
         return ResponseEntity.status(HttpStatus.OK).body(briefInformationPage);
     }
 
     @GetMapping("/child-category/{childCategoryId}")
-    public ResponseEntity<Page<InformationBriefResponse>> pageInformationByChildCategory(@RequestParam(defaultValue = "0") int page,
-                                                                                         @PathVariable("childCategoryId") Long categoryId) {
+    public ResponseEntity<Page<InformationBriefResponse>> pageInformationByChildCategory(
+        @RequestParam(defaultValue = "0") int page,
+        @PathVariable("childCategoryId") Long categoryId) {
         Pageable pageable = PageRequest.of(page, PAGE_SIZE);
-        Page<InformationBriefResponse> briefInformationPage = informationService.getBriefInformationPageByChildCategory(pageable, categoryId);
+        Page<InformationBriefResponse> briefInformationPage = informationService.getBriefInformationPageByChildCategory(
+            pageable, categoryId);
 
         return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(briefInformationPage);
+            .status(HttpStatus.OK)
+            .body(briefInformationPage);
     }
 
     @GetMapping("/users/child-category/{childCategoryId}")
-    public ResponseEntity<Page<InformationBriefResponse>> pageInformationByChildCategory(@RequestParam(defaultValue = "0") int page,
-                                                                                         @PathVariable("childCategoryId") Long categoryId,
-                                                                                         @AuthenticationPrincipal Long userId) {
+    public ResponseEntity<Page<InformationBriefResponse>> pageInformationByChildCategory(
+        @RequestParam(defaultValue = "0") int page,
+        @PathVariable("childCategoryId") Long categoryId,
+        @AuthenticationPrincipal Long userId) {
         Pageable pageable = PageRequest.of(page, PAGE_SIZE);
-        Page<InformationBriefResponse> briefInformationPage = informationService.getBriefInformationPageFromUserByChildCategory(pageable, categoryId, userId);
+        Page<InformationBriefResponse> briefInformationPage = informationService.getBriefInformationPageFromUserByChildCategory(
+            pageable, categoryId, userId);
 
         return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(briefInformationPage);
+            .status(HttpStatus.OK)
+            .body(briefInformationPage);
     }
 
     @GetMapping("/ranks")
     public ResponseEntity<List<InformationRankResponse>> rankInformation() {
         List<InformationRankResponse> rankInformation = informationService.getRankInformation();
         return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(rankInformation);
+            .status(HttpStatus.OK)
+            .body(rankInformation);
     }
 }
 

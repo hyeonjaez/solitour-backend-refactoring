@@ -11,9 +11,12 @@ import java.util.List;
 
 @NoRepositoryBean
 public interface InformationRepositoryCustom {
-    Page<InformationBriefResponse> getInformationByParentCategory(Pageable pageable, Long categoryId, Long userId);
 
-    Page<InformationBriefResponse> getInformationByChildCategory(Pageable pageable, Long categoryId, Long userId);
+    Page<InformationBriefResponse> getInformationByParentCategory(Pageable pageable,
+        Long categoryId, Long userId);
+
+    Page<InformationBriefResponse> getInformationByChildCategory(Pageable pageable, Long categoryId,
+        Long userId);
 
     List<InformationRankResponse> getInformationRank();
 }

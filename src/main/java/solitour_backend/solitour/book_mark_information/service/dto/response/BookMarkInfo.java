@@ -7,5 +7,5 @@ import lombok.Getter;
 @Getter
 public class BookMarkInfo {
 
-  private Long bookMarkId;
+    private Long bookMarkId;
 }
