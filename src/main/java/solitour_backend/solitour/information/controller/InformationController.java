@@ -53,8 +53,8 @@ public class InformationController {
 
     @PutMapping("/{informationId}")
     public ResponseEntity<InformationResponse> modifyInformation(@PathVariable Long informationId,
-                                                                 @RequestPart("thumbNailImage") MultipartFile thumbnail,
-                                                                 @RequestPart("contentImages") List<MultipartFile> contentImages,
+                                                                 @RequestPart(value = "thumbNailImage", required = false) MultipartFile thumbnail,
+                                                                 @RequestPart(value = "contentImages", required = false) List<MultipartFile> contentImages,
                                                                  @Valid @RequestPart("request") InformationModifyRequest informationModifyRequest,
                                                                  BindingResult bindingResult) {
         Utils.validationRequest(bindingResult);
