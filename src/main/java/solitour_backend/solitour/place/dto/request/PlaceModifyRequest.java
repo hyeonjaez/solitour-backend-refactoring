@@ -12,39 +12,39 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class PlaceModifyRequest {
 
-  @Nullable
-  @Size(min = 1, max = 30)
-  private String searchId;
+    @Nullable
+    @Size(min = 1, max = 30)
+    private String searchId;
 
-  @NotBlank
-  @Size(min = 1, max = 30)
-  private String name;
+    @NotBlank
+    @Size(min = 1, max = 30)
+    private String name;
 
-  @Nullable
-  @Digits(integer = 10, fraction = 6)
-  private BigDecimal xAxis;
+    @Nullable
+    @Digits(integer = 10, fraction = 6)
+    private BigDecimal xAxis;
 
-  @Nullable
-  @Digits(integer = 10, fraction = 6)
-  private BigDecimal yAxis;
+    @Nullable
+    @Digits(integer = 10, fraction = 6)
+    private BigDecimal yAxis;
 
-  @NotBlank
-  @Size(min = 1, max = 50)
-  private String address;
+    @NotBlank
+    @Size(min = 1, max = 50)
+    private String address;
 
-  public boolean validate() {
-    boolean searchIdIsNull = this.searchId == null;
-    boolean xAxisIsNull = this.xAxis == null;
-    boolean yAxisIsNull = this.yAxis == null;
+    public boolean validate() {
+        boolean searchIdIsNull = this.searchId == null;
+        boolean xAxisIsNull = this.xAxis == null;
+        boolean yAxisIsNull = this.yAxis == null;
 
-    if (searchIdIsNull && (xAxisIsNull || yAxisIsNull)) {
-      return true;
+        if (searchIdIsNull && (xAxisIsNull || yAxisIsNull)) {
+            return true;
+        }
+
+        if (!searchIdIsNull && (!xAxisIsNull || !yAxisIsNull)) {
+            return true;
+        }
+
+        return false;
     }
-
-    if (!searchIdIsNull && (!xAxisIsNull || !yAxisIsNull)) {
-      return true;
-    }
-
-    return false;
-  }
 }

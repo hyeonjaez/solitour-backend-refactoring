@@ -6,6 +6,7 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class InformationBriefResponse {
+
     private Long informationId;
     private String title;
     private String zoneCategoryParentName;

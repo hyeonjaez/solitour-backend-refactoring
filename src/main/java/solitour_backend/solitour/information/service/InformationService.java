@@ -56,6 +56,7 @@ import java.util.List;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class InformationService {
+
     private final InformationRepository informationRepository;
     private final CategoryRepository categoryRepository;
     private final ZoneCategoryRepository zoneCategoryRepository;

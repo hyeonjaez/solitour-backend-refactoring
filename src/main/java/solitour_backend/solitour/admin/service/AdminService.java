@@ -18,32 +18,33 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 public class AdminService {
+
     private final AdminRepository adminRepository;
 
     public UserListWithPage getUserInfoList(String nickname, int page) {
         Pageable pageable = PageRequest.of(page - 1, 10);
         UserListWithPage reponseUserListWithPage = new UserListWithPage();
         Page<User> users;
-        if(StringUtils.hasText(nickname)) {
+        if (StringUtils.hasText(nickname)) {
             users = adminRepository.findAllByNicknameContainingIgnoreCase(nickname, pageable);
-        }else {
+        } else {
             users = adminRepository.findAll(pageable);
         }
         List<UserListResponseDTO> userListResponse = users.map(user -> new UserListResponseDTO(
-                user.getId(),
-                user.getUserStatus(),
-                user.getOauthId(),
-                user.getProvider(),
-                user.getNickname(),
-                user.getName(),
-                user.getAge(),
-                user.getSex(),
-                user.getEmail(),
-                user.getPhoneNumber(),
-                user.getIsAdmin(),
-                user.getLatestLoginAt(),
-                user.getCreatedAt(),
-                user.getDeletedAt()
+            user.getId(),
+            user.getUserStatus(),
+            user.getOauthId(),
+            user.getProvider(),
+            user.getNickname(),
+            user.getName(),
+            user.getAge(),
+            user.getSex(),
+            user.getEmail(),
+            user.getPhoneNumber(),
+            user.getIsAdmin(),
+            user.getLatestLoginAt(),
+            user.getCreatedAt(),
+            user.getDeletedAt()
         )).toList();
         reponseUserListWithPage.setUsers(userListResponse);
         reponseUserListWithPage.setCount(adminRepository.count());

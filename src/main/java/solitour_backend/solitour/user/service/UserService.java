@@ -12,12 +12,12 @@ import solitour_backend.solitour.user.service.dto.response.UserInfoResponse;
 @Transactional(readOnly = true)
 public class UserService {
 
-  private final UserRepository userRepository;
+    private final UserRepository userRepository;
 
-  public UserInfoResponse retrieveUserInfo(Long userId) {
-    User user = userRepository.findByUserId(userId);
+    public UserInfoResponse retrieveUserInfo(Long userId) {
+        User user = userRepository.findByUserId(userId);
 
-    return new UserInfoResponse(user);
-  }
+        return new UserInfoResponse(user);
+    }
 
 }

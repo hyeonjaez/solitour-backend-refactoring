@@ -17,7 +17,8 @@ import solitour_backend.solitour.zone_category.entity.QZoneCategory;
 
 import java.util.List;
 
-public class InformationRepositoryImpl extends QuerydslRepositorySupport implements InformationRepositoryCustom {
+public class InformationRepositoryImpl extends QuerydslRepositorySupport implements
+    InformationRepositoryCustom {
 
     public InformationRepositoryImpl() {
         super(Information.class);
@@ -32,31 +33,34 @@ public class InformationRepositoryImpl extends QuerydslRepositorySupport impleme
 
 
     @Override
-    public Page<InformationBriefResponse> getInformationByParentCategory(Pageable pageable, Long categoryId, Long userId) {
+    public Page<InformationBriefResponse> getInformationByParentCategory(Pageable pageable,
+        Long categoryId, Long userId) {
         List<InformationBriefResponse> list = from(information)
-                .join(zoneCategoryChild).on(zoneCategoryChild.id.eq(information.zoneCategory.id))
-                .leftJoin(zoneCategoryParent).on(zoneCategoryParent.id.eq(zoneCategoryChild.parentZoneCategory.id))
-                .leftJoin(bookMarkInformation).on(bookMarkInformation.information.id.eq(information.id).and(bookMarkInformation.user.id.eq(userId)))
-                .leftJoin(image).on(image.information.id.eq(information.id)
-                        .and(image.imageStatus.eq(ImageStatus.THUMBNAIL)))
-                .leftJoin(greatInformation).on(greatInformation.information.id.eq(information.id))
-                .where(information.category.parentCategory.id.eq(categoryId))
-                .groupBy(information.id, zoneCategoryChild.id, zoneCategoryParent.id, image.id)
-                .orderBy(information.createdDate.desc())
-                .select(Projections.constructor(
-                        InformationBriefResponse.class,
-                        information.id,
-                        information.title,
-                        zoneCategoryParent.name,
-                        zoneCategoryChild.name,
-                        information.viewCount,
-                        bookMarkInformation.user.id.isNotNull(),
-                        image.address,
-                        greatInformation.information.count().coalesce(0L).intValue()
-                ))
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .fetch();
+            .join(zoneCategoryChild).on(zoneCategoryChild.id.eq(information.zoneCategory.id))
+            .leftJoin(zoneCategoryParent)
+            .on(zoneCategoryParent.id.eq(zoneCategoryChild.parentZoneCategory.id))
+            .leftJoin(bookMarkInformation).on(bookMarkInformation.information.id.eq(information.id)
+                .and(bookMarkInformation.user.id.eq(userId)))
+            .leftJoin(image).on(image.information.id.eq(information.id)
+                .and(image.imageStatus.eq(ImageStatus.THUMBNAIL)))
+            .leftJoin(greatInformation).on(greatInformation.information.id.eq(information.id))
+            .where(information.category.parentCategory.id.eq(categoryId))
+            .groupBy(information.id, zoneCategoryChild.id, zoneCategoryParent.id, image.id)
+            .orderBy(information.createdDate.desc())
+            .select(Projections.constructor(
+                InformationBriefResponse.class,
+                information.id,
+                information.title,
+                zoneCategoryParent.name,
+                zoneCategoryChild.name,
+                information.viewCount,
+                bookMarkInformation.user.id.isNotNull(),
+                image.address,
+                greatInformation.information.count().coalesce(0L).intValue()
+            ))
+            .offset(pageable.getOffset())
+            .limit(pageable.getPageSize())
+            .fetch();
 
         long total = from(information).where(information.category.id.eq(categoryId)).fetchCount();
 
@@ -64,31 +68,34 @@ public class InformationRepositoryImpl extends QuerydslRepositorySupport impleme
     }
 
     @Override
-    public Page<InformationBriefResponse> getInformationByChildCategory(Pageable pageable, Long categoryId, Long userId) {
+    public Page<InformationBriefResponse> getInformationByChildCategory(Pageable pageable,
+        Long categoryId, Long userId) {
         List<InformationBriefResponse> list = from(information)
-                .join(zoneCategoryChild).on(zoneCategoryChild.id.eq(information.zoneCategory.id))
-                .leftJoin(zoneCategoryParent).on(zoneCategoryParent.id.eq(zoneCategoryChild.parentZoneCategory.id))
-                .leftJoin(bookMarkInformation).on(bookMarkInformation.information.id.eq(information.id).and(bookMarkInformation.user.id.eq(userId)))
-                .leftJoin(image).on(image.information.id.eq(information.id)
-                        .and(image.imageStatus.eq(ImageStatus.THUMBNAIL)))
-                .leftJoin(greatInformation).on(greatInformation.information.id.eq(information.id))
-                .where(information.category.id.eq(categoryId))
-                .groupBy(information.id, zoneCategoryChild.id, zoneCategoryParent.id, image.id)
-                .orderBy(information.createdDate.desc())
-                .select(Projections.constructor(
-                        InformationBriefResponse.class,
-                        information.id,
-                        information.title,
-                        zoneCategoryParent.name,
-                        zoneCategoryChild.name,
-                        information.viewCount,
-                        bookMarkInformation.user.id.isNotNull(),
-                        image.address,
-                        greatInformation.information.count().coalesce(0L).intValue()
-                ))
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .fetch();
+            .join(zoneCategoryChild).on(zoneCategoryChild.id.eq(information.zoneCategory.id))
+            .leftJoin(zoneCategoryParent)
+            .on(zoneCategoryParent.id.eq(zoneCategoryChild.parentZoneCategory.id))
+            .leftJoin(bookMarkInformation).on(bookMarkInformation.information.id.eq(information.id)
+                .and(bookMarkInformation.user.id.eq(userId)))
+            .leftJoin(image).on(image.information.id.eq(information.id)
+                .and(image.imageStatus.eq(ImageStatus.THUMBNAIL)))
+            .leftJoin(greatInformation).on(greatInformation.information.id.eq(information.id))
+            .where(information.category.id.eq(categoryId))
+            .groupBy(information.id, zoneCategoryChild.id, zoneCategoryParent.id, image.id)
+            .orderBy(information.createdDate.desc())
+            .select(Projections.constructor(
+                InformationBriefResponse.class,
+                information.id,
+                information.title,
+                zoneCategoryParent.name,
+                zoneCategoryChild.name,
+                information.viewCount,
+                bookMarkInformation.user.id.isNotNull(),
+                image.address,
+                greatInformation.information.count().coalesce(0L).intValue()
+            ))
+            .offset(pageable.getOffset())
+            .limit(pageable.getPageSize())
+            .fetch();
 
         long total = from(information).where(information.category.id.eq(categoryId)).fetchCount();
 
@@ -291,15 +298,15 @@ public class InformationRepositoryImpl extends QuerydslRepositorySupport impleme
     @Override
     public List<InformationRankResponse> getInformationRank() {
         return from(information)
-                .leftJoin(greatInformation)
-                .on(greatInformation.information.id.eq(information.id))
-                .groupBy(information.id, information.title)
-                .orderBy(greatInformation.information.id.count().desc())
-                .limit(5)
-                .select(Projections.constructor(
-                        InformationRankResponse.class,
-                        information.id,
-                        information.title
-                )).fetch();
+            .leftJoin(greatInformation)
+            .on(greatInformation.information.id.eq(information.id))
+            .groupBy(information.id, information.title)
+            .orderBy(greatInformation.information.id.count().desc())
+            .limit(5)
+            .select(Projections.constructor(
+                InformationRankResponse.class,
+                information.id,
+                information.title
+            )).fetch();
     }
 }

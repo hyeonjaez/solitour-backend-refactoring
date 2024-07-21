@@ -12,18 +12,19 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserListResponseDTO {
-        private Long id;
-        private UserStatus userStatus;
-        private String oauthId;
-        private String provider;
-        private String nickname;
-        private String name;
-        private Integer age;
-        private String sex;
-        private String email;
-        private String phoneNumber;
-        private Boolean isAdmin;
-        private LocalDateTime latestLoginAt;
-        private LocalDateTime createdAt;
-        private LocalDateTime deletedAt;
+
+    private Long id;
+    private UserStatus userStatus;
+    private String oauthId;
+    private String provider;
+    private String nickname;
+    private String name;
+    private Integer age;
+    private String sex;
+    private String email;
+    private String phoneNumber;
+    private Boolean isAdmin;
+    private LocalDateTime latestLoginAt;
+    private LocalDateTime createdAt;
+    private LocalDateTime deletedAt;
 }

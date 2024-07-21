@@ -11,6 +11,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 public class InformationModifyRequest {
+
     @NotBlank
     @Size(min = 1, max = 50)
     private String title;
