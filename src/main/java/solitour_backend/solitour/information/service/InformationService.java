@@ -11,8 +11,12 @@ import solitour_backend.solitour.category.exception.CategoryNotExistsException;
 import solitour_backend.solitour.category.repository.CategoryRepository;
 import solitour_backend.solitour.great_information.repository.GreatInformationRepository;
 import solitour_backend.solitour.image.dto.mapper.ImageMapper;
+import solitour_backend.solitour.image.dto.request.ImageDeleteRequest;
+import solitour_backend.solitour.image.dto.request.ImageUseRequest;
 import solitour_backend.solitour.image.dto.response.ImageResponse;
 import solitour_backend.solitour.image.entity.Image;
+import solitour_backend.solitour.image.exception.ImageAlreadyExistsException;
+import solitour_backend.solitour.image.exception.ImageNotExistsException;
 import solitour_backend.solitour.image.image_status.ImageStatus;
 import solitour_backend.solitour.image.repository.ImageRepository;
 import solitour_backend.solitour.image.s3.S3Uploader;
@@ -51,11 +55,13 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class InformationService {
+
     private final InformationRepository informationRepository;
     private final CategoryRepository categoryRepository;
     private final ZoneCategoryRepository zoneCategoryRepository;
@@ -77,50 +83,55 @@ public class InformationService {
 
 
     @Transactional
-    public InformationResponse registerInformation(InformationRegisterRequest informationRegisterRequest, MultipartFile thumbnail, List<MultipartFile> contentImages) {
+    public InformationResponse registerInformation(
+        InformationRegisterRequest informationRegisterRequest, MultipartFile thumbnail,
+        List<MultipartFile> contentImages) {
         Category category = categoryRepository.findById(informationRegisterRequest.getCategoryId())
-                .orElseThrow(
-                        () -> new CategoryNotExistsException("해당하는 id의 category 가 없습니다"));
+            .orElseThrow(
+                () -> new CategoryNotExistsException("해당하는 id의 category 가 없습니다"));
         ZoneCategory parentZoneCategory = zoneCategoryRepository.findByName(
-                        informationRegisterRequest.getZoneCategoryNameParent())
-                .orElseThrow(() -> new ZoneCategoryNotExistsException("해당하는 name의 ZoneCategory 없습니다"));
+                informationRegisterRequest.getZoneCategoryNameParent())
+            .orElseThrow(() -> new ZoneCategoryNotExistsException("해당하는 name의 ZoneCategory 없습니다"));
 
         ZoneCategory childZoneCategory = zoneCategoryRepository.findByParentZoneCategoryIdAndName(
-                        parentZoneCategory.getId(), informationRegisterRequest.getZoneCategoryNameChild())
-                .orElseThrow(() -> new ZoneCategoryNotExistsException("해당하는 ParentZoneCategoryId 와 name의 ZoneCategory 없습니다"));
+                parentZoneCategory.getId(), informationRegisterRequest.getZoneCategoryNameChild())
+            .orElseThrow(() -> new ZoneCategoryNotExistsException(
+                "해당하는 ParentZoneCategoryId 와 name의 ZoneCategory 없습니다"));
 
         Place savePlace = placeRepository.save(
-                new Place(
-                        informationRegisterRequest.getPlaceRegisterRequest().getSearchId(),
-                        informationRegisterRequest.getPlaceRegisterRequest().getName(),
-                        informationRegisterRequest.getPlaceRegisterRequest().getXAxis(),
-                        informationRegisterRequest.getPlaceRegisterRequest().getYAxis(),
-                        informationRegisterRequest.getPlaceRegisterRequest().getAddress())
+            new Place(
+                informationRegisterRequest.getPlaceRegisterRequest().getSearchId(),
+                informationRegisterRequest.getPlaceRegisterRequest().getName(),
+                informationRegisterRequest.getPlaceRegisterRequest().getXAxis(),
+                informationRegisterRequest.getPlaceRegisterRequest().getYAxis(),
+                informationRegisterRequest.getPlaceRegisterRequest().getAddress())
         );
 
         User user = userRepository.findById(informationRegisterRequest.getUserId())
-                .orElseThrow(
-                        () -> new UserNotExistsException("해당하는 id의 User 가 없습니다"));
+            .orElseThrow(
+                () -> new UserNotExistsException("해당하는 id의 User 가 없습니다"));
 
         Information information =
-                new Information(
-                        category,
-                        childZoneCategory,
-                        user,
-                        savePlace,
-                        informationRegisterRequest.getInformationTitle(),
-                        informationRegisterRequest.getInformationAddress(),
-                        LocalDateTime.now(),
-                        0,
-                        informationRegisterRequest.getInformationContent(),
-                        informationRegisterRequest.getInformationTips()
-                );
+            new Information(
+                category,
+                childZoneCategory,
+                user,
+                savePlace,
+                informationRegisterRequest.getInformationTitle(),
+                informationRegisterRequest.getInformationAddress(),
+                LocalDateTime.now(),
+                0,
+                informationRegisterRequest.getInformationContent(),
+                informationRegisterRequest.getInformationTips()
+            );
 
         Information saveInformation = informationRepository.save(information);
         LocalDate localDate = LocalDate.now();
 
-        String thumbNailImageUrl = s3Uploader.upload(thumbnail, IMAGE_PATH, saveInformation.getId());
-        Image thumbImage = new Image(ImageStatus.THUMBNAIL, saveInformation, thumbNailImageUrl, localDate);
+        String thumbNailImageUrl = s3Uploader.upload(thumbnail, IMAGE_PATH,
+            saveInformation.getId());
+        Image thumbImage = new Image(ImageStatus.THUMBNAIL, saveInformation, thumbNailImageUrl,
+            localDate);
         imageRepository.save(thumbImage);
 
         for (MultipartFile multipartFile : contentImages) {
@@ -136,26 +147,28 @@ public class InformationService {
             infoTagRepository.save(new InfoTag(tag, saveInformation));
         }
 
-
         return informationMapper.mapToInformationResponse(information);
     }
 
 
     public InformationDetailResponse getDetailInformation(Long informationId) {
-        Information information = informationRepository.findById(informationId).orElseThrow(() -> new InformationNotExistsException("해당하는 id의 information이 존재하지 않습니다."));
+        Information information = informationRepository.findById(informationId).orElseThrow(
+            () -> new InformationNotExistsException("해당하는 id의 information이 존재하지 않습니다."));
         List<InfoTag> infoTags = infoTagRepository.findAllByInformationId(information.getId());
 
-        UserPostingResponse userPostingResponse = userMapper.mapToUserPostingResponse(information.getUser());
+        UserPostingResponse userPostingResponse = userMapper.mapToUserPostingResponse(
+            information.getUser());
 
         List<TagResponse> tagResponses = new ArrayList<>();
         if (!infoTags.isEmpty()) {
             tagResponses = infoTags.stream()
-                    .map(data ->
-                            tagMapper.mapToTagResponse(data.getTag()))
-                    .toList();
+                .map(data ->
+                    tagMapper.mapToTagResponse(data.getTag()))
+                .toList();
         }
         PlaceResponse placeResponse = placeMapper.mapToPlaceResponse(information.getPlace());
-        ZoneCategoryResponse zoneCategoryResponse = zoneCategoryMapper.mapToZoneCategoryResponse(information.getZoneCategory());
+        ZoneCategoryResponse zoneCategoryResponse = zoneCategoryMapper.mapToZoneCategoryResponse(
+            information.getZoneCategory());
 
         List<Image> images = imageRepository.findAllByInformationId(information.getId());
 
@@ -164,103 +177,139 @@ public class InformationService {
         int likeCount = greatInformationRepository.countByInformationId(information.getId());
 
         return new InformationDetailResponse(
-                information.getTitle(),
-                information.getAddress(),
-                information.getCreatedDate(),
-                information.getViewCount(),
-                information.getContent(),
-                information.getTip(),
-                userPostingResponse,
-                tagResponses,
-                placeResponse,
-                zoneCategoryResponse,
-                imageResponseList,
-                likeCount);
+            information.getTitle(),
+            information.getAddress(),
+            information.getCreatedDate(),
+            information.getViewCount(),
+            information.getContent(),
+            information.getTip(),
+            userPostingResponse,
+            tagResponses,
+            placeResponse,
+            zoneCategoryResponse,
+            imageResponseList,
+            likeCount);
     }
 
 
     @Transactional
     public InformationResponse modifyInformation(Long id, InformationModifyRequest informationModifyRequest, MultipartFile thumbNail, List<MultipartFile> contentImages) {
-        Information information = informationRepository.findById(id).orElseThrow(() -> new InformationNotExistsException("해당하는 id의 information이 존재하지 않습니다."));
+        Information information = informationRepository.findById(id).orElseThrow(
+            () -> new InformationNotExistsException("해당하는 id의 information이 존재하지 않습니다."));
         information.setTitle(informationModifyRequest.getTitle());
         information.setAddress(informationModifyRequest.getAddress());
         information.setContent(informationModifyRequest.getContent());
         information.setTip(informationModifyRequest.getTips());
 
+        List<ImageUseRequest> useImages = informationModifyRequest.getUseImages();
 
-        List<Image> allByInformationId = imageRepository.findAllByInformationId(information.getId());
+        for (ImageUseRequest imageUseRequest : useImages) {
+            if (!imageRepository.existsImageByAddress(imageUseRequest.getAddress())) {
+                throw new ImageNotExistsException("계속 사용하려는 주소의 이미지는 없습니다.");
+            }
+        }
+
+        List<ImageDeleteRequest> deleteImages = informationModifyRequest.getDeleteImages();
+
+        for (ImageDeleteRequest imageDeleteRequest : deleteImages) {
+            if (!imageRepository.existsImageByAddress(imageDeleteRequest.getAddress())) {
+                throw new ImageNotExistsException("삭제하려는 주소의 이미지가 없습니다.");
+            }
+            s3Uploader.deleteImage(imageDeleteRequest.getAddress());
+            imageRepository.deleteByAddress(imageDeleteRequest.getAddress());
+        }
+
+        List<Image> allByInformationId = imageRepository.findAllByInformationId(
+            information.getId());
 
         for (Image image : allByInformationId) {
             s3Uploader.deleteImage(image.getAddress());
         }
 
-        imageRepository.deleteAllByInformationId(information.getId());
-        LocalDate localDate = LocalDate.now();
-
-        String thumbNailImageUrl = s3Uploader.upload(thumbNail, IMAGE_PATH, information.getId());
-        Image thumbImage = new Image(ImageStatus.THUMBNAIL, information, thumbNailImageUrl, localDate);
-        imageRepository.save(thumbImage);
+        if (!Objects.isNull(thumbNail)) {
+            if (imageRepository.existsByInformationIdAndImageStatus(information.getId(),
+                ImageStatus.THUMBNAIL)) {
+                throw new ImageAlreadyExistsException("이미 썸네일 이미지가 있습니다");
+            } else {
+                String thumbNailImageUrl = s3Uploader.upload(thumbNail, IMAGE_PATH,
+                    information.getId());
+                Image thumbImage = new Image(ImageStatus.THUMBNAIL, information, thumbNailImageUrl,
+                    LocalDate.now());
+                imageRepository.save(thumbImage);
+            }
+        } else {
+            if (!imageRepository.existsByInformationIdAndImageStatus(information.getId(),
+                ImageStatus.THUMBNAIL)) {
+                throw new ImageAlreadyExistsException("썸네일 이미지가 없습니다");
+            }
+        }
 
         for (MultipartFile multipartFile : contentImages) {
             String upload = s3Uploader.upload(multipartFile, IMAGE_PATH, information.getId());
-            Image contentImage = new Image(ImageStatus.CONTENT, information, upload, localDate);
+            Image contentImage = new Image(ImageStatus.CONTENT, information, upload,
+                LocalDate.now());
             imageRepository.save(contentImage);
         }
-
 
         List<InfoTag> infoTags = infoTagRepository.findAllByInformationId(information.getId());
 
         infoTagRepository.deleteAllByInformationId(information.getId());
 
         for (InfoTag infoTag : infoTags) {
-            tagRepository.deleteById(infoTag.getId());
+            tagRepository.deleteById(infoTag.getTag().getTagId());
         }
 
         List<Tag> saveTags = tagRepository.saveAll(
-                tagMapper.mapToTags(
-                        informationModifyRequest.getTagRegisterRequests()));
+            tagMapper.mapToTags(
+                informationModifyRequest.getTagRegisterRequests()));
 
         for (Tag tag : saveTags) {
             infoTagRepository.save(new InfoTag(tag, information));
         }
-
 
         return informationMapper.mapToInformationResponse(information);
     }
 
     @Transactional
     public void deleteInformation(Long id) {
-        Information information = informationRepository.findById(id).orElseThrow(() -> new InformationNotExistsException("해당하는 id의 information이 존재하지 않습니다."));
+        Information information = informationRepository.findById(id).orElseThrow(
+            () -> new InformationNotExistsException("해당하는 id의 information이 존재하지 않습니다."));
 
 
     }
 
 
-    public Page<InformationBriefResponse> getBriefInformationPageFromUserByParentCategory(Pageable pageable, Long parentCategoryId, Long userId) {
+    public Page<InformationBriefResponse> getBriefInformationPageFromUserByParentCategory(
+        Pageable pageable, Long parentCategoryId, Long userId) {
         if (!categoryRepository.existsById(parentCategoryId)) {
-            throw new CategoryNotExistsException("해당하는 id의 category는 없습니다");
+            throw new CategoryNotExistsException("해당하는 id의 category 는 없습니다");
         }
-        return informationRepository.getInformationByParentCategory(pageable, parentCategoryId, userId);
+        return informationRepository.getInformationByParentCategory(pageable, parentCategoryId,
+            userId);
     }
 
-    public Page<InformationBriefResponse> getBriefInformationPageByParentCategory(Pageable pageable, Long parentCategoryId) {
+    public Page<InformationBriefResponse> getBriefInformationPageByParentCategory(Pageable pageable,
+        Long parentCategoryId) {
         if (!categoryRepository.existsById(parentCategoryId)) {
-            throw new CategoryNotExistsException("해당하는 id의 category는 없습니다");
+            throw new CategoryNotExistsException("해당하는 id의 category 는 없습니다");
         }
         return informationRepository.getInformationByParentCategory(pageable, parentCategoryId, 0L);
     }
 
 
-    public Page<InformationBriefResponse> getBriefInformationPageFromUserByChildCategory(Pageable pageable, Long childCategoryId, Long userId) {
+    public Page<InformationBriefResponse> getBriefInformationPageFromUserByChildCategory(
+        Pageable pageable, Long childCategoryId, Long userId) {
         if (!categoryRepository.existsById(childCategoryId)) {
-            throw new CategoryNotExistsException("해당하는 id의 category는 없습니다");
+            throw new CategoryNotExistsException("해당하는 id의 category 는 없습니다");
         }
-        return informationRepository.getInformationByChildCategory(pageable, childCategoryId, userId);
+        return informationRepository.getInformationByChildCategory(pageable, childCategoryId,
+            userId);
     }
 
-    public Page<InformationBriefResponse> getBriefInformationPageByChildCategory(Pageable pageable, Long childCategoryId) {
+    public Page<InformationBriefResponse> getBriefInformationPageByChildCategory(Pageable pageable,
+        Long childCategoryId) {
         if (!categoryRepository.existsById(childCategoryId)) {
-            throw new CategoryNotExistsException("해당하는 id의 category는 없습니다");
+            throw new CategoryNotExistsException("해당하는 id의 category 는 없습니다");
         }
         return informationRepository.getInformationByChildCategory(pageable, childCategoryId, 0L);
     }
