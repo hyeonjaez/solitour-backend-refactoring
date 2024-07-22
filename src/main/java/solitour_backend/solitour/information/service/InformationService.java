@@ -15,8 +15,8 @@ import solitour_backend.solitour.image.dto.request.ImageDeleteRequest;
 import solitour_backend.solitour.image.dto.request.ImageUseRequest;
 import solitour_backend.solitour.image.dto.response.ImageResponse;
 import solitour_backend.solitour.image.entity.Image;
-import solitour_backend.solitour.image.exception.ImageAlreadyExistsException;
 import solitour_backend.solitour.image.exception.ImageNotExistsException;
+import solitour_backend.solitour.image.exception.ImageRequestValidationFailedException;
 import solitour_backend.solitour.image.image_status.ImageStatus;
 import solitour_backend.solitour.image.repository.ImageRepository;
 import solitour_backend.solitour.image.s3.S3Uploader;
@@ -229,7 +229,7 @@ public class InformationService {
         if (!Objects.isNull(thumbNail)) {
             if (imageRepository.existsByInformationIdAndImageStatus(information.getId(),
                 ImageStatus.THUMBNAIL)) {
-                throw new ImageAlreadyExistsException("이미 썸네일 이미지가 있습니다");
+                throw new ImageRequestValidationFailedException("이미 썸네일 이미지가 있습니다");
             } else {
                 String thumbNailImageUrl = s3Uploader.upload(thumbNail, IMAGE_PATH,
                     information.getId());
@@ -240,7 +240,7 @@ public class InformationService {
         } else {
             if (!imageRepository.existsByInformationIdAndImageStatus(information.getId(),
                 ImageStatus.THUMBNAIL)) {
-                throw new ImageAlreadyExistsException("썸네일 이미지가 없습니다");
+                throw new ImageRequestValidationFailedException("썸네일 이미지가 없습니다");
             }
         }
         if (Objects.nonNull(contentImages)) {
