@@ -1,6 +1,6 @@
 package solitour_backend.solitour.information.controller;
 
-import jakarta.servlet.http.Cookie;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -19,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import solitour_backend.solitour.auth.support.CookieExtractor;
 import solitour_backend.solitour.auth.support.JwtTokenProvider;
+import solitour_backend.solitour.auth.config.Authenticated;
 import solitour_backend.solitour.error.Utils;
 import solitour_backend.solitour.information.dto.request.InformationModifyRequest;
 import solitour_backend.solitour.information.dto.request.InformationRegisterRequest;
@@ -39,6 +39,7 @@ public class InformationController {
 
 
     @PostMapping
+    @Authenticated
     public ResponseEntity<InformationResponse> createInformation(
         @Valid @RequestPart("request") InformationRegisterRequest informationRegisterRequest,
         @RequestPart("thumbNailImage") MultipartFile thumbnail,
@@ -64,6 +65,7 @@ public class InformationController {
             .body(informationDetailResponse);
     }
 
+    @Authenticated
     @PutMapping("/{informationId}")
     public ResponseEntity<InformationResponse> modifyInformation(@PathVariable Long informationId,
                                                                 @RequestPart(value = "thumbNailImage", required = false) MultipartFile thumbnail,
@@ -80,6 +82,7 @@ public class InformationController {
             .body(informationResponse);
     }
 
+    @Authenticated
     @DeleteMapping("/{informationId}")
     public ResponseEntity<Void> deleteInformation(@PathVariable Long informationId) {
         informationService.deleteInformation(informationId);
