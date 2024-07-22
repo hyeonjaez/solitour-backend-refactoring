@@ -10,6 +10,7 @@ import java.util.List;
 @Setter
 @Builder
 public class UserListWithPage {
+
     private Long count;
     private List<UserListResponseDTO> users;
 }

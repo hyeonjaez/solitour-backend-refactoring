@@ -7,6 +7,6 @@ import solitour_backend.solitour.user.entity.User;
 
 public interface AdminRepository extends JpaRepository<User, Long> {
 
-  Page<User> findAllByNicknameContainingIgnoreCase(String nickname, Pageable pageable);
+    Page<User> findAllByNicknameContainingIgnoreCase(String nickname, Pageable pageable);
 
 }

@@ -21,34 +21,34 @@ import solitour_backend.solitour.zone_category.entity.ZoneCategory;
 @NoArgsConstructor
 public class Gathering {
 
-  @Id
-  @Column(name = "gathering_id")
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+    @Id
+    @Column(name = "gathering_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "user_id")
-  private User user;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "zone_category_id")
-  private ZoneCategory zoneCategory;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "zone_category_id")
+    private ZoneCategory zoneCategory;
 
-  @Column(name = "gathering_title")
-  private String title;
+    @Column(name = "gathering_title")
+    private String title;
 
-  @Column(name = "gathering_person_count")
-  private Integer personCount;
+    @Column(name = "gathering_person_count")
+    private Integer personCount;
 
-  @Column(name = "gathering_view_count")
-  private Integer viewCount;
+    @Column(name = "gathering_view_count")
+    private Integer viewCount;
 
-  @Column(name = "gathering_recent_date")
-  private LocalDateTime recentDate;
+    @Column(name = "gathering_recent_date")
+    private LocalDateTime recentDate;
 
-  @Column(name = "gathering_is_edited")
-  private Boolean isEdited;
+    @Column(name = "gathering_is_edited")
+    private Boolean isEdited;
 
-  @Column(name = "gathering_content")
-  private String content;
+    @Column(name = "gathering_content")
+    private String content;
 }

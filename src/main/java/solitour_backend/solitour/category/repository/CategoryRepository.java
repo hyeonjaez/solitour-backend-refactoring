@@ -6,5 +6,5 @@ import solitour_backend.solitour.category.entity.Category;
 
 public interface CategoryRepository extends JpaRepository<Category, Long> {
 
-  List<Category> findAllByParentCategoryId(Long parentCategoryId);
+    List<Category> findAllByParentCategoryId(Long parentCategoryId);
 }

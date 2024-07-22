@@ -6,6 +6,7 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class InformationRankResponse {
+
     private Long id;
     private String title;
 }

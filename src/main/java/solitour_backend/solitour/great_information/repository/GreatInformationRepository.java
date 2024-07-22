@@ -7,8 +7,8 @@ import solitour_backend.solitour.great_information.entity.GreatInformation;
 
 public interface GreatInformationRepository extends JpaRepository<GreatInformation, Long> {
 
-  @Query("SELECT COUNT(g) FROM GreatInformation g WHERE g.information.id = :informationId")
-  int countByInformationId(Long informationId);
+    @Query("SELECT COUNT(g) FROM GreatInformation g WHERE g.information.id = :informationId")
+    int countByInformationId(Long informationId);
 
-  Optional<GreatInformation> findByIdAndUserId(Long greatInformationId, Long userId);
+    Optional<GreatInformation> findByIdAndUserId(Long greatInformationId, Long userId);
 }

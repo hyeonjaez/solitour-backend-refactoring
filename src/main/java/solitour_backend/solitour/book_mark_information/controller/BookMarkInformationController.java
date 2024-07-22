@@ -18,31 +18,31 @@ import solitour_backend.solitour.book_mark_information.service.dto.response.Book
 @RequestMapping("/api/bookmark/information")
 public class BookMarkInformationController {
 
-  private final BookMarkInformationService service;
+    private final BookMarkInformationService service;
 
-  @GetMapping()
-  public ResponseEntity<BookMarkInformationResponse> getUserBookmark(
-      @AuthenticationPrincipal Long userId) {
-    BookMarkInformationResponse response = service.getUserBookmark(userId);
+    @GetMapping()
+    public ResponseEntity<BookMarkInformationResponse> getUserBookmark(
+        @AuthenticationPrincipal Long userId) {
+        BookMarkInformationResponse response = service.getUserBookmark(userId);
 
-    return ResponseEntity.ok(response);
-  }
+        return ResponseEntity.ok(response);
+    }
 
-  @Transactional
-  @PostMapping()
-  public ResponseEntity<BookMarkInformationResponse> createUserBookmark(
-      @AuthenticationPrincipal Long userId, @RequestParam Long infoId) {
-    service.createUserBookmark(userId, infoId);
+    @Transactional
+    @PostMapping()
+    public ResponseEntity<BookMarkInformationResponse> createUserBookmark(
+        @AuthenticationPrincipal Long userId, @RequestParam Long infoId) {
+        service.createUserBookmark(userId, infoId);
 
-    return ResponseEntity.ok().build();
-  }
+        return ResponseEntity.ok().build();
+    }
 
-  @Transactional
-  @DeleteMapping()
-  public ResponseEntity<Void> deleteUserBookmark(@AuthenticationPrincipal Long userId,
-      @RequestParam Long bookMarkId) {
-    service.deleteUserBookmark(userId, bookMarkId);
+    @Transactional
+    @DeleteMapping()
+    public ResponseEntity<Void> deleteUserBookmark(@AuthenticationPrincipal Long userId,
+        @RequestParam Long bookMarkId) {
+        service.deleteUserBookmark(userId, bookMarkId);
 
-    return ResponseEntity.ok().build();
-  }
+        return ResponseEntity.ok().build();
+    }
 }
