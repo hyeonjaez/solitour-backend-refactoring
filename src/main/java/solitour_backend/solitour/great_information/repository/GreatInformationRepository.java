@@ -11,4 +11,6 @@ public interface GreatInformationRepository extends JpaRepository<GreatInformati
     int countByInformationId(Long informationId);
 
     Optional<GreatInformation> findByIdAndUserId(Long greatInformationId, Long userId);
+
+    void deleteAllByInformationId(Long informationId);
 }
