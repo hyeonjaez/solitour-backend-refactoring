@@ -11,4 +11,6 @@ public interface BookMarkInformationRepository extends JpaRepository<BookMarkInf
     List<BookMarkInformation> findByUserId(Long userId);
 
     Optional<BookMarkInformation> findByIdAndUserId(Long bookMarkId, Long userId);
+
+    void deleteAllByInformationId(Long informationId);
 }

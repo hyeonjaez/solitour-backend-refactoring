@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import solitour_backend.solitour.book_mark_information.entity.BookMarkInformationRepository;
 import solitour_backend.solitour.category.entity.Category;
 import solitour_backend.solitour.category.exception.CategoryNotExistsException;
 import solitour_backend.solitour.category.repository.CategoryRepository;
@@ -77,6 +78,7 @@ public class InformationService {
     private final ImageMapper imageMapper;
     private final UserMapper userMapper;
     private final GreatInformationRepository greatInformationRepository;
+    private final BookMarkInformationRepository bookMarkInformationRepository;
 
     public static final String IMAGE_PATH = "information";
     private final ImageRepository imageRepository;
@@ -276,6 +278,26 @@ public class InformationService {
         Information information = informationRepository.findById(id).orElseThrow(
             () -> new InformationNotExistsException("해당하는 id의 information이 존재하지 않습니다."));
 
+        List<InfoTag> infoTags = infoTagRepository.findAllByInformationId(information.getId());
+        infoTagRepository.deleteAllByInformationId(information.getId());
+
+        for (InfoTag infoTag : infoTags) {
+            tagRepository.deleteById(infoTag.getTag().getTagId());
+        }
+
+        greatInformationRepository.deleteAllByInformationId(information.getId());
+
+        bookMarkInformationRepository.deleteAllByInformationId(information.getId());
+
+        List<Image> allByInformationId = imageRepository.findAllByInformationId(
+            information.getId());
+
+        for (Image image : allByInformationId) {
+            s3Uploader.deleteImage(image.getAddress());
+        }
+
+        imageRepository.deleteAllByInformationId(information.getId());
+        informationRepository.deleteById(id);
 
     }
 
