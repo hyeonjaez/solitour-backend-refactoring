@@ -17,8 +17,7 @@ public class RefreshTokenAuthInterceptor implements HandlerInterceptor {
     private final TokenRepository tokenRepository;
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response,
-        Object handler) {
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         String refreshToken = CookieExtractor.findToken("refresh_token", request.getCookies());
 
         if (jwtTokenProvider.validateTokenNotUsable(refreshToken)) {
@@ -27,7 +26,7 @@ public class RefreshTokenAuthInterceptor implements HandlerInterceptor {
 
         Long userId = jwtTokenProvider.getPayload(refreshToken);
         Token token = tokenRepository.findByUserId(userId)
-            .orElseThrow(() -> new RuntimeException("토큰이 존재하지 않습니다."));
+                .orElseThrow(() -> new RuntimeException("토큰이 존재하지 않습니다."));
 
         if (token.isDifferentRefreshToken(refreshToken)) {
             throw new RuntimeException("토큰이 일치하지 않습니다.");

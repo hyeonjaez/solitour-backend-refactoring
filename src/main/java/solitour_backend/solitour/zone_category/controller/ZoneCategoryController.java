@@ -32,38 +32,37 @@ public class ZoneCategoryController {
         ZoneCategoryResponse zoneCategoryResponse = zoneCategoryService.getZoneCategoryById(id);
 
         return ResponseEntity
-            .status(HttpStatus.OK)
-            .body(zoneCategoryResponse);
+                .status(HttpStatus.OK)
+                .body(zoneCategoryResponse);
     }
 
     @PostMapping
-    public ResponseEntity<ZoneCategoryResponse> registerZoneCategory(
-        @Valid @RequestBody ZoneCategoryRegisterRequest zoneCategoryRegisterRequest,
-        BindingResult bindingResult) {
+    public ResponseEntity<ZoneCategoryResponse> registerZoneCategory(@Valid @RequestBody ZoneCategoryRegisterRequest zoneCategoryRegisterRequest,
+                                                                     BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             throw new RequestValidationFailedException(bindingResult);
         }
         ZoneCategoryResponse zoneCategoryResponse = zoneCategoryService.registerZoneCategory(
-            zoneCategoryRegisterRequest);
+                zoneCategoryRegisterRequest);
 
         return ResponseEntity
-            .status(HttpStatus.CREATED)
-            .body(zoneCategoryResponse);
+                .status(HttpStatus.CREATED)
+                .body(zoneCategoryResponse);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<ZoneCategoryResponse> modifyZoneCategory(@PathVariable Long id,
-        @Valid @RequestBody ZoneCategoryModifyRequest zoneCategoryModifyRequest,
-        BindingResult bindingResult) {
+                                                                   @Valid @RequestBody ZoneCategoryModifyRequest zoneCategoryModifyRequest,
+                                                                   BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             throw new RequestValidationFailedException(bindingResult);
         }
         ZoneCategoryResponse zoneCategoryResponse = zoneCategoryService.modifyZoneCategory(id,
-            zoneCategoryModifyRequest);
+                zoneCategoryModifyRequest);
 
         return ResponseEntity
-            .status(HttpStatus.CREATED)
-            .body(zoneCategoryResponse);
+                .status(HttpStatus.CREATED)
+                .body(zoneCategoryResponse);
     }
 
     @DeleteMapping("/{id}")
@@ -71,8 +70,8 @@ public class ZoneCategoryController {
         zoneCategoryService.deleteZoneCategory(id);
 
         return ResponseEntity
-            .status(HttpStatus.NO_CONTENT)
-            .build();
+                .status(HttpStatus.NO_CONTENT)
+                .build();
     }
 
 

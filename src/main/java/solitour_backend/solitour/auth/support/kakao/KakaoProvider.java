@@ -3,6 +3,7 @@ package solitour_backend.solitour.auth.support.kakao;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
+
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -21,12 +22,12 @@ public class KakaoProvider {
 
 
     public KakaoProvider(@Value("${oauth2.kakao.client.id}") String clientId,
-        @Value("${oauth2.kakao.client.secret}") String clientSecret,
-        @Value("${oauth2.kakao.url.auth}") String authUrl,
-        @Value("${oauth2.kakao.url.token}") String accessTokenUrl,
-        @Value("${oauth2.kakao.url.userinfo}") String userInfoUrl,
-        @Value("${oauth2.kakao.grant-type}") String grantType,
-        @Value("${oauth2.kakao.scope}") String scope) {
+                         @Value("${oauth2.kakao.client.secret}") String clientSecret,
+                         @Value("${oauth2.kakao.url.auth}") String authUrl,
+                         @Value("${oauth2.kakao.url.token}") String accessTokenUrl,
+                         @Value("${oauth2.kakao.url.userinfo}") String userInfoUrl,
+                         @Value("${oauth2.kakao.grant-type}") String grantType,
+                         @Value("${oauth2.kakao.scope}") String scope) {
         this.clientId = clientId;
         this.clientSecret = clientSecret;
         this.authUrl = authUrl;
@@ -46,8 +47,8 @@ public class KakaoProvider {
 
     private String concatParams(Map<String, String> params) {
         return params.entrySet()
-            .stream()
-            .map(entry -> entry.getKey() + "=" + entry.getValue())
-            .collect(Collectors.joining("&"));
+                .stream()
+                .map(entry -> entry.getKey() + "=" + entry.getValue())
+                .collect(Collectors.joining("&"));
     }
 }

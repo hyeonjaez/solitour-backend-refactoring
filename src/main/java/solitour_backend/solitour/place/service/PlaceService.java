@@ -22,7 +22,7 @@ public class PlaceService {
     @Transactional(readOnly = true)
     public PlaceResponse getPlace(Long id) {
         Place place = placeRepository.findById(id)
-            .orElseThrow(() -> new PlaceNotExistsException("해당 하는 id의 Place가 존재하지 않습니다"));
+                .orElseThrow(() -> new PlaceNotExistsException("해당 하는 id의 Place가 존재하지 않습니다"));
 
         return placeMapper.mapToPlaceResponse(place);
     }
@@ -30,11 +30,11 @@ public class PlaceService {
 
     public PlaceResponse savePlace(PlaceRegisterRequest placeRegisterRequest) {
         Place place = new Place(
-            placeRegisterRequest.getSearchId(),
-            placeRegisterRequest.getName(),
-            placeRegisterRequest.getXAxis(),
-            placeRegisterRequest.getYAxis(),
-            placeRegisterRequest.getAddress()
+                placeRegisterRequest.getSearchId(),
+                placeRegisterRequest.getName(),
+                placeRegisterRequest.getXAxis(),
+                placeRegisterRequest.getYAxis(),
+                placeRegisterRequest.getAddress()
         );
 
         Place savedPlace = placeRepository.save(place);
@@ -45,7 +45,7 @@ public class PlaceService {
 
     public PlaceResponse updatePlace(Long id, PlaceModifyRequest placeModifyRequest) {
         Place savedPlace = placeRepository.findById(id)
-            .orElseThrow(() -> new PlaceNotExistsException("해당 하는 id의 Place가 존재하지 않습니다"));
+                .orElseThrow(() -> new PlaceNotExistsException("해당 하는 id의 Place가 존재하지 않습니다"));
 
         savedPlace.setSearchId(placeModifyRequest.getSearchId());
         savedPlace.setName(placeModifyRequest.getName());

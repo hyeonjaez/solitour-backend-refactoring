@@ -31,20 +31,20 @@ public class AdminService {
             users = adminRepository.findAll(pageable);
         }
         List<UserListResponseDTO> userListResponse = users.map(user -> new UserListResponseDTO(
-            user.getId(),
-            user.getUserStatus(),
-            user.getOauthId(),
-            user.getProvider(),
-            user.getNickname(),
-            user.getName(),
-            user.getAge(),
-            user.getSex(),
-            user.getEmail(),
-            user.getPhoneNumber(),
-            user.getIsAdmin(),
-            user.getLatestLoginAt(),
-            user.getCreatedAt(),
-            user.getDeletedAt()
+                user.getId(),
+                user.getUserStatus(),
+                user.getOauthId(),
+                user.getProvider(),
+                user.getNickname(),
+                user.getName(),
+                user.getAge(),
+                user.getSex(),
+                user.getEmail(),
+                user.getPhoneNumber(),
+                user.getIsAdmin(),
+                user.getLatestLoginAt(),
+                user.getCreatedAt(),
+                user.getDeletedAt()
         )).toList();
         reponseUserListWithPage.setUsers(userListResponse);
         reponseUserListWithPage.setCount(adminRepository.count());

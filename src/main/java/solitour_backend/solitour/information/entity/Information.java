@@ -3,6 +3,7 @@ package solitour_backend.solitour.information.entity;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -59,8 +60,8 @@ public class Information {
     private String tip;
 
     public Information(Category category, ZoneCategory zoneCategory, User user, Place place,
-        String title, String address, LocalDateTime createdDate, Integer viewCount, String content,
-        String tip) {
+                       String title, String address, LocalDateTime createdDate, Integer viewCount, String content,
+                       String tip) {
         this.category = category;
         this.zoneCategory = zoneCategory;
         this.user = user;

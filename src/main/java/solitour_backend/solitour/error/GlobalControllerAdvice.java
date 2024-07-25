@@ -17,25 +17,25 @@ import solitour_backend.solitour.zone_category.exception.ZoneCategoryNotExistsEx
 @RestControllerAdvice
 public class GlobalControllerAdvice {
 
-  @ExceptionHandler({RequestValidationFailedException.class, ImageRequestValidationFailedException.class})
-  public ResponseEntity<String> validationException(Exception exception) {
-    return ResponseEntity
-        .status(HttpStatus.BAD_REQUEST)
-        .body(exception.getMessage());
-  }
+    @ExceptionHandler({RequestValidationFailedException.class, ImageRequestValidationFailedException.class})
+    public ResponseEntity<String> validationException(Exception exception) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(exception.getMessage());
+    }
 
-  @ExceptionHandler({ZoneCategoryAlreadyExistsException.class, ImageAlreadyExistsException.class})
-  public ResponseEntity<String> conflictException(Exception exception) {
-    return ResponseEntity
-        .status(HttpStatus.CONFLICT)
-        .body(exception.getMessage());
-  }
+    @ExceptionHandler({ZoneCategoryAlreadyExistsException.class, ImageAlreadyExistsException.class})
+    public ResponseEntity<String> conflictException(Exception exception) {
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(exception.getMessage());
+    }
 
-  @ExceptionHandler({ZoneCategoryNotExistsException.class, ImageNotExistsException.class,
-      CategoryNotExistsException.class, InformationNotExistsException.class, UserNotExistsException.class,})
-  public ResponseEntity<String> exception(Exception exception) {
-    return ResponseEntity
-        .status(HttpStatus.NOT_FOUND)
-        .body(exception.getMessage());
-  }
+    @ExceptionHandler({ZoneCategoryNotExistsException.class, ImageNotExistsException.class,
+            CategoryNotExistsException.class, InformationNotExistsException.class, UserNotExistsException.class,})
+    public ResponseEntity<String> exception(Exception exception) {
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(exception.getMessage());
+    }
 }

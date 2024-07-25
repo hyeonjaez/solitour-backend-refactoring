@@ -36,8 +36,8 @@ public class PlaceController {
 
     @PostMapping
     public ResponseEntity<PlaceResponse> registerPlace(
-        @Valid @RequestBody PlaceRegisterRequest placeRegisterRequest,
-        BindingResult bindingResult) {
+            @Valid @RequestBody PlaceRegisterRequest placeRegisterRequest,
+            BindingResult bindingResult) {
         Utils.validationRequest(bindingResult);
         PlaceResponse placeResponse = placeService.savePlace(placeRegisterRequest);
 
@@ -46,7 +46,8 @@ public class PlaceController {
 
     @PutMapping("/{id}")
     public ResponseEntity<PlaceResponse> modifyPlace(@PathVariable("id") Long id,
-        @Valid @RequestBody PlaceModifyRequest placeModifyRequest, BindingResult bindingResult) {
+                                                     @Valid @RequestBody PlaceModifyRequest placeModifyRequest,
+                                                     BindingResult bindingResult) {
         Utils.validationRequest(bindingResult);
         PlaceResponse placeResponse = placeService.updatePlace(id, placeModifyRequest);
 

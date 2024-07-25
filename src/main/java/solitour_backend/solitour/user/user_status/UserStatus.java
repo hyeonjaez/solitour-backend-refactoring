@@ -1,6 +1,7 @@
 package solitour_backend.solitour.user.user_status;
 
 import java.util.Arrays;
+
 import lombok.Getter;
 
 @Getter
@@ -18,8 +19,8 @@ public enum UserStatus {
 
     public static UserStatus fromName(String name) {
         return Arrays.stream(UserStatus.values())
-            .filter(e -> e.getName().equals(name))
-            .findAny()
-            .orElse(null);
+                .filter(e -> e.getName().equals(name))
+                .findAny()
+                .orElse(null);
     }
 }

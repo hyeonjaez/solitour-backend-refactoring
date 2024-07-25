@@ -17,10 +17,10 @@ public class TokenService {
     @Transactional
     public void synchronizeRefreshToken(User user, String refreshToken) {
         tokenRepository.findByUserId(user.getId())
-            .ifPresentOrElse(
-                token -> token.updateRefreshToken(refreshToken),
-                () -> tokenRepository.save(new Token(user, refreshToken))
-            );
+                .ifPresentOrElse(
+                        token -> token.updateRefreshToken(refreshToken),
+                        () -> tokenRepository.save(new Token(user, refreshToken))
+                );
     }
 
     @Transactional

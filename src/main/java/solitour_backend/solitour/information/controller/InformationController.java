@@ -40,46 +40,44 @@ public class InformationController {
 
     @PostMapping
     @Authenticated
-    public ResponseEntity<InformationResponse> createInformation(
-        @Valid @RequestPart("request") InformationRegisterRequest informationRegisterRequest,
-        @RequestPart("thumbNailImage") MultipartFile thumbnail,
-        @RequestPart("contentImages") List<MultipartFile> contentImages,
-        BindingResult bindingResult) {
+    public ResponseEntity<InformationResponse> createInformation(@Valid @RequestPart("request") InformationRegisterRequest informationRegisterRequest,
+                                                                 @RequestPart("thumbNailImage") MultipartFile thumbnail,
+                                                                 @RequestPart("contentImages") List<MultipartFile> contentImages,
+                                                                 BindingResult bindingResult) {
         Utils.validationRequest(bindingResult);
         InformationResponse informationResponse = informationService.registerInformation(
-            informationRegisterRequest, thumbnail, contentImages);
+                informationRegisterRequest, thumbnail, contentImages);
 
         return ResponseEntity
-            .status(HttpStatus.CREATED)
-            .body(informationResponse);
+                .status(HttpStatus.CREATED)
+                .body(informationResponse);
     }
 
     @GetMapping("/{informationId}")
-    public ResponseEntity<InformationDetailResponse> getDetailInformation(
-        @PathVariable Long informationId) {
+    public ResponseEntity<InformationDetailResponse> getDetailInformation(@PathVariable Long informationId) {
         InformationDetailResponse informationDetailResponse = informationService.getDetailInformation(
-            informationId);
+                informationId);
 
         return ResponseEntity
-            .status(HttpStatus.OK)
-            .body(informationDetailResponse);
+                .status(HttpStatus.OK)
+                .body(informationDetailResponse);
     }
 
     @Authenticated
     @PutMapping("/{informationId}")
     public ResponseEntity<InformationResponse> modifyInformation(@PathVariable Long informationId,
-                                                                @RequestPart(value = "thumbNailImage", required = false) MultipartFile thumbnail,
-                                                                @RequestPart(value = "contentImages", required = false) List<MultipartFile> contentImages,
-                                                                @Valid @RequestPart("request") InformationModifyRequest informationModifyRequest,
-                                                                BindingResult bindingResult) {
+                                                                 @RequestPart(value = "thumbNailImage", required = false) MultipartFile thumbnail,
+                                                                 @RequestPart(value = "contentImages", required = false) List<MultipartFile> contentImages,
+                                                                 @Valid @RequestPart("request") InformationModifyRequest informationModifyRequest,
+                                                                 BindingResult bindingResult) {
         Utils.validationRequest(bindingResult);
 
         InformationResponse informationResponse = informationService.modifyInformation(
-            informationId, informationModifyRequest, thumbnail, contentImages);
+                informationId, informationModifyRequest, thumbnail, contentImages);
 
         return ResponseEntity
-            .status(HttpStatus.CREATED)
-            .body(informationResponse);
+                .status(HttpStatus.CREATED)
+                .body(informationResponse);
     }
 
     @Authenticated
@@ -88,8 +86,8 @@ public class InformationController {
         informationService.deleteInformation(informationId);
 
         return ResponseEntity
-            .status(HttpStatus.NO_CONTENT)
-            .build();
+                .status(HttpStatus.NO_CONTENT)
+                .build();
     }
 
     //default
@@ -118,8 +116,8 @@ public class InformationController {
         Page<InformationBriefResponse> briefInformationPage = informationService.getBriefInformationPageByChildCategory(pageable, categoryId, userId);
 
         return ResponseEntity
-            .status(HttpStatus.OK)
-            .body(briefInformationPage);
+                .status(HttpStatus.OK)
+                .body(briefInformationPage);
     }
 
 
@@ -203,8 +201,8 @@ public class InformationController {
         Pageable pageable = PageRequest.of(page, PAGE_SIZE);
         Page<InformationBriefResponse> briefInformationPage = informationService.getBriefInformationPageByChildCategoryAndZoneCategory(pageable, categoryId, userId, zoneCategoryId);
         return ResponseEntity
-            .status(HttpStatus.OK)
-            .body(briefInformationPage);
+                .status(HttpStatus.OK)
+                .body(briefInformationPage);
     }
 
 
@@ -212,8 +210,8 @@ public class InformationController {
     public ResponseEntity<List<InformationRankResponse>> rankInformation() {
         List<InformationRankResponse> rankInformation = informationService.getRankInformation();
         return ResponseEntity
-            .status(HttpStatus.OK)
-            .body(rankInformation);
+                .status(HttpStatus.OK)
+                .body(rankInformation);
     }
 
 

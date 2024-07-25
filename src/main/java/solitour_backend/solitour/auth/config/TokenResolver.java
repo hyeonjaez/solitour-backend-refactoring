@@ -25,8 +25,7 @@ public class TokenResolver implements HandlerMethodArgumentResolver {
     }
 
     @Override
-    public Long resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer,
-        NativeWebRequest webRequest, WebDataBinderFactory binderFactory) {
+    public Long resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory) {
         String token = "";
         HttpServletRequest request = webRequest.getNativeRequest(HttpServletRequest.class);
 

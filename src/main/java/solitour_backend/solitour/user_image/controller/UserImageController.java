@@ -23,17 +23,16 @@ public class UserImageController {
 
 
     @PostMapping
-    public ResponseEntity<UserImageResponse> createUserImage(
-        @RequestPart("request") UserImageRequest imageRequest,
-        @RequestPart("userImage") MultipartFile userImage,
-        BindingResult bindingResult) {
+    public ResponseEntity<UserImageResponse> createUserImage(@RequestPart("request") UserImageRequest imageRequest,
+                                                             @RequestPart("userImage") MultipartFile userImage,
+                                                             BindingResult bindingResult) {
         Utils.validationRequest(bindingResult);
         UserImageResponse informationResponse = userImageService.registerInformation(
-            imageRequest.getUserId(), userImage);
+                imageRequest.getUserId(), userImage);
 
         return ResponseEntity
-            .status(HttpStatus.CREATED)
-            .body(informationResponse);
+                .status(HttpStatus.CREATED)
+                .body(informationResponse);
     }
 
 }
