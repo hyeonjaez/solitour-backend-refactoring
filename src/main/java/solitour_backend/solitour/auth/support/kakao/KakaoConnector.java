@@ -3,6 +3,7 @@ package solitour_backend.solitour.auth.support.kakao;
 
 import java.util.Collections;
 import java.util.Optional;
+
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
@@ -35,16 +36,16 @@ public class KakaoConnector {
         HttpEntity<Void> entity = new HttpEntity<>(headers);
 
         return REST_TEMPLATE.exchange(provider.getUserInfoUrl(), HttpMethod.GET, entity,
-            KakaoUserResponse.class);
+                KakaoUserResponse.class);
     }
 
     private String requestAccessToken(String code, String redirectUrl) {
         HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(
-            createBody(code, redirectUrl), createHeaders());
+                createBody(code, redirectUrl), createHeaders());
 
         ResponseEntity<KakaoTokenResponse> response = REST_TEMPLATE.postForEntity(
-            provider.getAccessTokenUrl(),
-            entity, KakaoTokenResponse.class);
+                provider.getAccessTokenUrl(),
+                entity, KakaoTokenResponse.class);
 
         return extractAccessToken(response);
     }
@@ -68,7 +69,7 @@ public class KakaoConnector {
 
     private String extractAccessToken(ResponseEntity<KakaoTokenResponse> responseEntity) {
         KakaoTokenResponse response = Optional.ofNullable(responseEntity.getBody())
-            .orElseThrow(() -> new RuntimeException("카카오 토큰을 가져오는데 실패했습니다."));
+                .orElseThrow(() -> new RuntimeException("카카오 토큰을 가져오는데 실패했습니다."));
 
         return response.getAccessToken();
     }

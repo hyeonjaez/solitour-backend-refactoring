@@ -1,6 +1,7 @@
 package solitour_backend.solitour.category.dto.mapper;
 
 import java.util.List;
+
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
 import solitour_backend.solitour.category.dto.response.CategoryResponse;

@@ -1,6 +1,7 @@
 package solitour_backend.solitour.image.image_status;
 
 import java.util.Arrays;
+
 import lombok.Getter;
 
 @Getter
@@ -17,8 +18,8 @@ public enum ImageStatus {
 
     public static ImageStatus fromName(String name) {
         return Arrays.stream(ImageStatus.values())
-            .filter(e -> e.name.equals(name))
-            .findAny()
-            .orElse(null);
+                .filter(e -> e.name.equals(name))
+                .findAny()
+                .orElse(null);
     }
 }

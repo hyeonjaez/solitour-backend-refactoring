@@ -3,6 +3,7 @@ package solitour_backend.solitour.auth.support.google;
 
 import java.util.Collections;
 import java.util.Optional;
+
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
@@ -28,8 +29,7 @@ public class GoogleConnector {
     private final GoogleProvider provider;
 
 
-    public ResponseEntity<GoogleUserResponse> requestGoogleUserInfo(String code,
-        String redirectUrl) {
+    public ResponseEntity<GoogleUserResponse> requestGoogleUserInfo(String code, String redirectUrl) {
         String googleToken = requestAccessToken(code, redirectUrl);
 
         HttpHeaders headers = new HttpHeaders();
@@ -37,16 +37,16 @@ public class GoogleConnector {
         HttpEntity<Void> entity = new HttpEntity<>(headers);
 
         return REST_TEMPLATE.exchange(provider.getUserInfoUrl(), HttpMethod.GET, entity,
-            GoogleUserResponse.class);
+                GoogleUserResponse.class);
     }
 
     private String requestAccessToken(String code, String redirectUrl) {
         HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(
-            createBody(code, redirectUrl), createHeaders());
+                createBody(code, redirectUrl), createHeaders());
 
         ResponseEntity<GoogleTokenResponse> response = REST_TEMPLATE.postForEntity(
-            provider.getAccessTokenUrl(),
-            entity, GoogleTokenResponse.class);
+                provider.getAccessTokenUrl(),
+                entity, GoogleTokenResponse.class);
 
         return extractAccessToken(response);
     }
@@ -70,7 +70,7 @@ public class GoogleConnector {
 
     private String extractAccessToken(ResponseEntity<GoogleTokenResponse> responseEntity) {
         GoogleTokenResponse response = Optional.ofNullable(responseEntity.getBody())
-            .orElseThrow(() -> new RuntimeException("구글 토큰을 가져오는데 실패했습니다."));
+                .orElseThrow(() -> new RuntimeException("구글 토큰을 가져오는데 실패했습니다."));
 
         return response.getAccessToken();
     }

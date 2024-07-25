@@ -26,15 +26,13 @@ public class OauthController {
     private final OauthService oauthService;
 
     @GetMapping(value = "/login", params = {"type", "redirectUrl"})
-    public ResponseEntity<OauthLinkResponse> access(@RequestParam String type,
-        @RequestParam String redirectUrl) {
+    public ResponseEntity<OauthLinkResponse> access(@RequestParam String type, @RequestParam String redirectUrl) {
         OauthLinkResponse response = oauthService.generateAuthUrl(type, redirectUrl);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping(value = "/login", params = {"type", "code", "redirectUrl"})
-    public ResponseEntity<LoginResponse> login(HttpServletResponse response,
-        @RequestParam String type, @RequestParam String code, @RequestParam String redirectUrl) {
+    public ResponseEntity<LoginResponse> login(HttpServletResponse response, @RequestParam String type, @RequestParam String code, @RequestParam String redirectUrl) {
         LoginResponse loginResponse = oauthService.requestAccessToken(type, code, redirectUrl);
 
         response.addCookie(loginResponse.getAccessToken());
@@ -53,8 +51,7 @@ public class OauthController {
 
 
     @PostMapping("/token/refresh")
-    public ResponseEntity<Void> reissueAccessToken(HttpServletResponse response,
-        @AuthenticationRefreshPrincipal Long memberId) {
+    public ResponseEntity<Void> reissueAccessToken(HttpServletResponse response, @AuthenticationRefreshPrincipal Long memberId) {
         AccessTokenResponse accessToken = oauthService.reissueAccessToken(memberId);
         response.addCookie(accessToken.getAccessToken());
 

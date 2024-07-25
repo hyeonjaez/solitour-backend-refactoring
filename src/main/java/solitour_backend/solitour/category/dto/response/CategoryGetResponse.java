@@ -1,6 +1,7 @@
 package solitour_backend.solitour.category.dto.response;
 
 import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

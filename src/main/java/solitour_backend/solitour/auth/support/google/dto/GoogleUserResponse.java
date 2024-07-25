@@ -1,7 +1,9 @@
 package solitour_backend.solitour.auth.support.google.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;

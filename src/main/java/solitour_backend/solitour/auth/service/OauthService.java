@@ -2,9 +2,11 @@ package solitour_backend.solitour.auth.service;
 
 
 import jakarta.servlet.http.Cookie;
+
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -74,17 +76,17 @@ public class OauthService {
     private User checkAndSaveUser(String type, String code, String redirectUrl) {
         if (Objects.equals(type, "kakao")) {
             KakaoUserResponse response = kakaoConnector.requestKakaoUserInfo(code, redirectUrl)
-                .getBody();
+                    .getBody();
             String nickname = response.getKakaoAccount().getProfile().getNickName();
             return userRepository.findByNickname(nickname)
-                .orElseGet(() -> saveKakaoUser(response));
+                    .orElseGet(() -> saveKakaoUser(response));
         }
         if (Objects.equals(type, "google")) {
             GoogleUserResponse response = googleConnector.requestGoogleUserInfo(code, redirectUrl)
-                .getBody();
+                    .getBody();
             String email = response.getEmailAddresses().get(0).getValue();
             return userRepository.findByEmail(email)
-                .orElseGet(() -> saveGoogleUser(response));
+                    .orElseGet(() -> saveGoogleUser(response));
         } else {
             throw new RuntimeException("지원하지 않는 oauth 타입입니다.");
         }
@@ -95,18 +97,18 @@ public class OauthService {
         UserImage savedUserImage = userImageService.saveUserImage(imageUrl);
 
         User user = User.builder()
-            .userStatus(UserStatus.ACTIVATE)
-            .oauthId(response.getResourceName())
-            .provider("google")
-            .isAdmin(false)
-            .userImage(savedUserImage)
-            .nickname(RandomNickName.generateRandomNickname())
-            .name(response.getNames().get(0).getDisplayName())
-            .age(response.getBirthdays().get(0).getDate().getYear())
-            .sex(response.getGenders().get(0).getValue())
-            .email(response.getEmailAddresses().get(0).getValue())
-            .createdAt(LocalDateTime.now())
-            .build();
+                .userStatus(UserStatus.ACTIVATE)
+                .oauthId(response.getResourceName())
+                .provider("google")
+                .isAdmin(false)
+                .userImage(savedUserImage)
+                .nickname(RandomNickName.generateRandomNickname())
+                .name(response.getNames().get(0).getDisplayName())
+                .age(response.getBirthdays().get(0).getDate().getYear())
+                .sex(response.getGenders().get(0).getValue())
+                .email(response.getEmailAddresses().get(0).getValue())
+                .createdAt(LocalDateTime.now())
+                .build();
         return userRepository.save(user);
     }
 
@@ -126,18 +128,18 @@ public class OauthService {
         UserImage savedUserImage = userImageService.saveUserImage(imageUrl);
 
         User user = User.builder()
-            .userStatus(UserStatus.ACTIVATE)
-            .oauthId(String.valueOf(response.getId()))
-            .provider("kakao")
-            .isAdmin(false)
-            .userImage(savedUserImage)
-            .name(response.getKakaoAccount().getName())
-            .nickname(response.getKakaoAccount().getProfile().getNickName())
-            .age(Integer.valueOf(response.getKakaoAccount().getBirthYear()))
-            .sex(response.getKakaoAccount().getGender())
-            .email(response.getKakaoAccount().getEmail())
-            .createdAt(LocalDateTime.now())
-            .build();
+                .userStatus(UserStatus.ACTIVATE)
+                .oauthId(String.valueOf(response.getId()))
+                .provider("kakao")
+                .isAdmin(false)
+                .userImage(savedUserImage)
+                .name(response.getKakaoAccount().getName())
+                .nickname(response.getKakaoAccount().getProfile().getNickName())
+                .age(Integer.valueOf(response.getKakaoAccount().getBirthYear()))
+                .sex(response.getKakaoAccount().getGender())
+                .email(response.getKakaoAccount().getEmail())
+                .createdAt(LocalDateTime.now())
+                .build();
         return userRepository.save(user);
     }
 

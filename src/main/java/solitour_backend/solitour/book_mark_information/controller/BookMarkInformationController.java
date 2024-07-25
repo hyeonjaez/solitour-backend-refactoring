@@ -22,7 +22,7 @@ public class BookMarkInformationController {
 
     @GetMapping()
     public ResponseEntity<BookMarkInformationResponse> getUserBookmark(
-        @AuthenticationPrincipal Long userId) {
+            @AuthenticationPrincipal Long userId) {
         BookMarkInformationResponse response = service.getUserBookmark(userId);
 
         return ResponseEntity.ok(response);
@@ -31,7 +31,7 @@ public class BookMarkInformationController {
     @Transactional
     @PostMapping()
     public ResponseEntity<BookMarkInformationResponse> createUserBookmark(
-        @AuthenticationPrincipal Long userId, @RequestParam Long infoId) {
+            @AuthenticationPrincipal Long userId, @RequestParam Long infoId) {
         service.createUserBookmark(userId, infoId);
 
         return ResponseEntity.ok().build();
@@ -40,7 +40,7 @@ public class BookMarkInformationController {
     @Transactional
     @DeleteMapping()
     public ResponseEntity<Void> deleteUserBookmark(@AuthenticationPrincipal Long userId,
-        @RequestParam Long bookMarkId) {
+                                                   @RequestParam Long bookMarkId) {
         service.deleteUserBookmark(userId, bookMarkId);
 
         return ResponseEntity.ok().build();

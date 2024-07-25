@@ -4,9 +4,11 @@ import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.UUID;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -28,8 +30,7 @@ public class S3Uploader {
 
     public String upload(MultipartFile multipartFile, String dirName, Long id) {
 
-        String fileName =
-            dirName + "/" + id + "/" + createFileName(multipartFile.getOriginalFilename());
+        String fileName = dirName + "/" + id + "/" + createFileName(multipartFile.getOriginalFilename());
         ObjectMetadata metadata = new ObjectMetadata();
         metadata.setContentLength(multipartFile.getSize());
         metadata.setContentType(multipartFile.getContentType());

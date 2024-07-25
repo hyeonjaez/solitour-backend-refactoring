@@ -10,7 +10,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+
 import java.time.LocalDate;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import solitour_backend.solitour.image.image_status.ImageStatus;
@@ -42,8 +44,7 @@ public class Image {
     @Column(name = "image_created_date")
     private LocalDate createdDate;
 
-    public Image(ImageStatus imageStatus, Information information, String address,
-        LocalDate createdDate) {
+    public Image(ImageStatus imageStatus, Information information, String address, LocalDate createdDate) {
         this.imageStatus = imageStatus;
         this.information = information;
         this.address = address;

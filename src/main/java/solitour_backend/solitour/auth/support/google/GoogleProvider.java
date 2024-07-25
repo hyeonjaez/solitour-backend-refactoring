@@ -3,6 +3,7 @@ package solitour_backend.solitour.auth.support.google;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
+
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -20,12 +21,12 @@ public class GoogleProvider {
     private final String scope;
 
     public GoogleProvider(@Value("${oauth2.google.client.id}") String clientId,
-        @Value("${oauth2.google.client.secret}") String clientSecret,
-        @Value("${oauth2.google.url.auth}") String authUrl,
-        @Value("${oauth2.google.url.token}") String accessTokenUrl,
-        @Value("${oauth2.google.url.userinfo}") String userInfoUrl,
-        @Value("${oauth2.google.grant-type}") String grantType,
-        @Value("${oauth2.google.scope}") String scope) {
+                          @Value("${oauth2.google.client.secret}") String clientSecret,
+                          @Value("${oauth2.google.url.auth}") String authUrl,
+                          @Value("${oauth2.google.url.token}") String accessTokenUrl,
+                          @Value("${oauth2.google.url.userinfo}") String userInfoUrl,
+                          @Value("${oauth2.google.grant-type}") String grantType,
+                          @Value("${oauth2.google.scope}") String scope) {
         this.clientId = clientId;
         this.clientSecret = clientSecret;
         this.authUrl = authUrl;
@@ -46,8 +47,8 @@ public class GoogleProvider {
 
     private String concatParams(Map<String, String> params) {
         return params.entrySet()
-            .stream()
-            .map(entry -> entry.getKey() + "=" + entry.getValue())
-            .collect(Collectors.joining("&"));
+                .stream()
+                .map(entry -> entry.getKey() + "=" + entry.getValue())
+                .collect(Collectors.joining("&"));
     }
 }

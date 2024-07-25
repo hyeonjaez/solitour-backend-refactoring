@@ -1,7 +1,9 @@
 package solitour_backend.solitour.category.controller;
 
 import jakarta.validation.Valid;
+
 import java.util.List;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,8 +34,8 @@ public class CategoryController {
         List<CategoryGetResponse> parentCategories = categoryService.getParentCategories();
 
         return ResponseEntity
-            .status(HttpStatus.OK)
-            .body(parentCategories);
+                .status(HttpStatus.OK)
+                .body(parentCategories);
     }
 
     @GetMapping("/{id}")
@@ -41,39 +43,37 @@ public class CategoryController {
         CategoryResponse category = categoryService.getCategory(id);
 
         return ResponseEntity
-            .status(HttpStatus.OK)
-            .body(category);
+                .status(HttpStatus.OK)
+                .body(category);
     }
 
     @PostMapping
-    public ResponseEntity<CategoryResponse> registerCategory(
-        @Valid @RequestBody CategoryRegisterRequest categoryRegisterRequest,
-        BindingResult bindingResult) {
+    public ResponseEntity<CategoryResponse> registerCategory(@Valid @RequestBody CategoryRegisterRequest categoryRegisterRequest,
+                                                             BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             throw new RequestValidationFailedException(bindingResult);
         }
         CategoryResponse categoryResponse = categoryService.registerCategory(
-            categoryRegisterRequest);
+                categoryRegisterRequest);
         return ResponseEntity
-            .status(HttpStatus.CREATED)
-            .body(categoryResponse);
+                .status(HttpStatus.CREATED)
+                .body(categoryResponse);
 
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CategoryResponse> modifyCategory(
-        @Valid @RequestBody CategoryModifyRequest categoryModifyRequest,
-        BindingResult bindingResult,
-        @PathVariable Long id) {
+    public ResponseEntity<CategoryResponse> modifyCategory(@Valid @RequestBody CategoryModifyRequest categoryModifyRequest,
+                                                           BindingResult bindingResult,
+                                                           @PathVariable Long id) {
         if (bindingResult.hasErrors()) {
             throw new RequestValidationFailedException(bindingResult);
         }
         CategoryResponse categoryResponse = categoryService.modifyCategory(id,
-            categoryModifyRequest);
+                categoryModifyRequest);
 
         return ResponseEntity
-            .status(HttpStatus.CREATED)
-            .body(categoryResponse);
+                .status(HttpStatus.CREATED)
+                .body(categoryResponse);
     }
 
 

@@ -1,6 +1,7 @@
 package solitour_backend.solitour.place.dto.response;
 
 import java.math.BigDecimal;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

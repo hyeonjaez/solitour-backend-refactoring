@@ -22,16 +22,16 @@ public class AuthConfiguration implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new AuthInterceptor(jwtTokenProvider))
-            .addPathPatterns("/api/**");
+                .addPathPatterns("/api/**");
 
         registry.addInterceptor(new RefreshTokenAuthInterceptor(jwtTokenProvider, tokenRepository))
-            .addPathPatterns("/api/auth/oauth2/token/refresh");
+                .addPathPatterns("/api/auth/oauth2/token/refresh");
     }
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/*")
-            .addResourceLocations("classpath:/static/");
+                .addResourceLocations("classpath:/static/");
     }
 
     @Override
@@ -45,9 +45,9 @@ public class AuthConfiguration implements WebMvcConfigurer {
         final String ALLOWED_URL = "https://solitour.ssssksss.xyz";
 
         registry.addMapping("/**")
-            .allowedOrigins(LOCAL_URL, ALLOWED_URL)
-            .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-            .allowedHeaders("*")
-            .allowCredentials(true);
+                .allowedOrigins(LOCAL_URL, ALLOWED_URL)
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                .allowedHeaders("*")
+                .allowCredentials(true);
     }
 }
