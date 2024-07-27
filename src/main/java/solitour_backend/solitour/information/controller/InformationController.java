@@ -22,10 +22,7 @@ import solitour_backend.solitour.auth.config.Authenticated;
 import solitour_backend.solitour.error.Utils;
 import solitour_backend.solitour.information.dto.request.InformationModifyRequest;
 import solitour_backend.solitour.information.dto.request.InformationRegisterRequest;
-import solitour_backend.solitour.information.dto.response.InformationBriefResponse;
-import solitour_backend.solitour.information.dto.response.InformationDetailResponse;
-import solitour_backend.solitour.information.dto.response.InformationRankResponse;
-import solitour_backend.solitour.information.dto.response.InformationResponse;
+import solitour_backend.solitour.information.dto.response.*;
 import solitour_backend.solitour.information.service.InformationService;
 
 @RestController
@@ -212,6 +209,17 @@ public class InformationController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(rankInformation);
+    }
+
+    @GetMapping("/main-page")
+    public ResponseEntity<List<InformationMainResponse>> mainPageInformation() {
+//        Long userId = findUser(request);
+
+        List<InformationMainResponse> informationList = informationService.getMainPageInformation(1L);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(informationList);
     }
 
 
