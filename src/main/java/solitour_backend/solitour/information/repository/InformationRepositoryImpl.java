@@ -320,7 +320,32 @@ public class InformationRepositoryImpl extends QuerydslRepositorySupport impleme
                         bookMarkInformation.user.id.isNotNull(),
                         image.address,
                         greatInformation.information.count().coalesce(0L).intValue()
-                )).fetch();
+                )).limit(6).fetch();
+    }
+
+    @Override
+    public List<InformationBriefResponse> getInformationRecommend(Long informationId, Long childCategoryId, Long userId) {
+        return from(information)
+                .join(zoneCategoryChild).on(zoneCategoryChild.id.eq(information.zoneCategory.id))
+                .leftJoin(zoneCategoryParent).on(zoneCategoryParent.id.eq(zoneCategoryChild.parentZoneCategory.id))
+                .leftJoin(bookMarkInformation).on(bookMarkInformation.information.id.eq(information.id).and(bookMarkInformation.user.id.eq(userId)))
+                .leftJoin(image).on(image.information.id.eq(information.id)
+                        .and(image.imageStatus.eq(ImageStatus.THUMBNAIL)))
+                .leftJoin(greatInformation).on(greatInformation.information.id.eq(information.id))
+                .where(information.category.id.eq(childCategoryId).and(information.id.ne(informationId)))
+                .groupBy(information.id, zoneCategoryChild.id, zoneCategoryParent.id, image.id)
+                .orderBy(information.createdDate.desc())
+                .select(Projections.constructor(
+                        InformationBriefResponse.class,
+                        information.id,
+                        information.title,
+                        zoneCategoryParent.name,
+                        zoneCategoryChild.name,
+                        information.viewCount,
+                        bookMarkInformation.user.id.isNotNull(),
+                        image.address,
+                        greatInformation.information.count().coalesce(0L).intValue()
+                )).limit(3L).fetch();
     }
 
     @Override
