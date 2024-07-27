@@ -32,4 +32,6 @@ public interface InformationRepositoryCustom {
     List<InformationRankResponse> getInformationRank();
 
     List<InformationMainResponse> getInformationLikeCountFromCreatedIn3(Long userId);
+
+    List<InformationBriefResponse> getInformationRecommend(Long informationId, Long childCategoryId, Long userId);
 }
