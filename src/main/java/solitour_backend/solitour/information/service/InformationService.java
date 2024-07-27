@@ -26,10 +26,7 @@ import solitour_backend.solitour.info_tag.repository.InfoTagRepository;
 import solitour_backend.solitour.information.dto.mapper.InformationMapper;
 import solitour_backend.solitour.information.dto.request.InformationModifyRequest;
 import solitour_backend.solitour.information.dto.request.InformationRegisterRequest;
-import solitour_backend.solitour.information.dto.response.InformationBriefResponse;
-import solitour_backend.solitour.information.dto.response.InformationDetailResponse;
-import solitour_backend.solitour.information.dto.response.InformationRankResponse;
-import solitour_backend.solitour.information.dto.response.InformationResponse;
+import solitour_backend.solitour.information.dto.response.*;
 import solitour_backend.solitour.information.entity.Information;
 import solitour_backend.solitour.information.exception.InformationNotExistsException;
 import solitour_backend.solitour.information.repository.InformationRepository;
@@ -373,5 +370,9 @@ public class InformationService {
 
     public List<InformationRankResponse> getRankInformation() {
         return informationRepository.getInformationRank();
+    }
+
+    public List<InformationMainResponse> getMainPageInformation(Long userId){
+        return informationRepository.getInformationLikeCountFromCreatedIn3(userId);
     }
 }
