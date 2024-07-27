@@ -51,9 +51,10 @@ public class InformationController {
     }
 
     @GetMapping("/{informationId}")
-    public ResponseEntity<InformationDetailResponse> getDetailInformation(@PathVariable Long informationId) {
-        InformationDetailResponse informationDetailResponse = informationService.getDetailInformation(
-                informationId);
+    public ResponseEntity<InformationDetailResponse> getDetailInformation(@PathVariable Long informationId,
+                                                                          HttpServletRequest request) {
+        Long userId = findUser(request);
+        InformationDetailResponse informationDetailResponse = informationService.getDetailInformation(userId, informationId);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -212,10 +213,10 @@ public class InformationController {
     }
 
     @GetMapping("/main-page")
-    public ResponseEntity<List<InformationMainResponse>> mainPageInformation() {
-//        Long userId = findUser(request);
+    public ResponseEntity<List<InformationMainResponse>> mainPageInformation(HttpServletRequest request) {
+        Long userId = findUser(request);
 
-        List<InformationMainResponse> informationList = informationService.getMainPageInformation(1L);
+        List<InformationMainResponse> informationList = informationService.getMainPageInformation(userId);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
