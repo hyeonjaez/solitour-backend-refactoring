@@ -148,7 +148,7 @@ public class InformationService {
     }
 
 
-    public InformationDetailResponse getDetailInformation(Long informationId) {
+    public InformationDetailResponse getDetailInformation(Long userId, Long informationId) {
         Information information = informationRepository.findById(informationId).orElseThrow(
                 () -> new InformationNotExistsException("해당하는 id의 information이 존재하지 않습니다."));
         List<InfoTag> infoTags = infoTagRepository.findAllByInformationId(information.getId());
@@ -173,6 +173,8 @@ public class InformationService {
 
         int likeCount = greatInformationRepository.countByInformationId(information.getId());
 
+        List<InformationBriefResponse> informationRecommendList = informationRepository.getInformationRecommend(information.getId(), information.getCategory().getId(), userId);
+
         return new InformationDetailResponse(
                 information.getTitle(),
                 information.getAddress(),
@@ -185,7 +187,8 @@ public class InformationService {
                 placeResponse,
                 zoneCategoryResponse,
                 imageResponseList,
-                likeCount);
+                likeCount,
+                informationRecommendList);
     }
 
 
@@ -372,7 +375,7 @@ public class InformationService {
         return informationRepository.getInformationRank();
     }
 
-    public List<InformationMainResponse> getMainPageInformation(Long userId){
+    public List<InformationMainResponse> getMainPageInformation(Long userId) {
         return informationRepository.getInformationLikeCountFromCreatedIn3(userId);
     }
 }
