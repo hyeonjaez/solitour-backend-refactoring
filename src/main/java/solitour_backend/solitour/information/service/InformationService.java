@@ -33,6 +33,7 @@ import solitour_backend.solitour.information.repository.InformationRepository;
 import solitour_backend.solitour.place.dto.mapper.PlaceMapper;
 import solitour_backend.solitour.place.dto.response.PlaceResponse;
 import solitour_backend.solitour.place.entity.Place;
+import solitour_backend.solitour.place.exception.PlaceNotExistsException;
 import solitour_backend.solitour.place.repository.PlaceRepository;
 import solitour_backend.solitour.tag.dto.mapper.TagMapper;
 import solitour_backend.solitour.tag.dto.response.TagResponse;
@@ -194,12 +195,37 @@ public class InformationService {
 
     @Transactional
     public InformationResponse modifyInformation(Long id, InformationModifyRequest informationModifyRequest, MultipartFile thumbNail, List<MultipartFile> contentImages) {
-        Information information = informationRepository.findById(id).orElseThrow(
-                () -> new InformationNotExistsException("해당하는 id의 information이 존재하지 않습니다."));
+        Information information = informationRepository.findById(id)
+                .orElseThrow(
+                        () -> new InformationNotExistsException("해당하는 id의 information이 존재하지 않습니다."));
         information.setTitle(informationModifyRequest.getTitle());
         information.setAddress(informationModifyRequest.getAddress());
         information.setContent(informationModifyRequest.getContent());
         information.setTip(informationModifyRequest.getTips());
+
+        Place placeInformation = placeRepository.findById(information.getPlace().getId())
+                .orElseThrow(
+                        () -> new PlaceNotExistsException("해당하는 information의 place에서의 id가 존재하지 않습니다"));
+        placeInformation.setName(informationModifyRequest.getPlaceModifyRequest().getName());
+        placeInformation.setAddress(informationModifyRequest.getPlaceModifyRequest().getAddress());
+        placeInformation.setXaxis(informationModifyRequest.getPlaceModifyRequest().getXAxis());
+        placeInformation.setYaxis(informationModifyRequest.getPlaceModifyRequest().getYAxis());
+        placeInformation.setSearchId(informationModifyRequest.getPlaceModifyRequest().getSearchId());
+
+        Category categoryInformation = categoryRepository.findById(informationModifyRequest.getCategoryId())
+                .orElseThrow(
+                        () -> new CategoryNotExistsException("해당하는 cateogry Id 가 존재하지 않습니다."));
+        information.setCategory(categoryInformation);
+
+        ZoneCategory parentZoneCategory = zoneCategoryRepository.findByParentZoneCategoryIdAndName(null, informationModifyRequest.getZoneCategoryNameParent())
+                .orElseThrow(
+                        () -> new ZoneCategoryNotExistsException("해당하는 name에 대한 zoneCategory가 존재하지 않습니다"));
+
+        ZoneCategory childZoneCategory = zoneCategoryRepository.findByParentZoneCategoryIdAndName(parentZoneCategory.getId(), informationModifyRequest.getZoneCategoryNameChild())
+                .orElseThrow(
+                        () -> new ZoneCategoryNotExistsException("해당하는 name에 대한 zoneCategory가 존재하지 않습니다"));
+
+        information.setZoneCategory(childZoneCategory);
 
         List<ImageUseRequest> useImages = informationModifyRequest.getUseImages();
 
