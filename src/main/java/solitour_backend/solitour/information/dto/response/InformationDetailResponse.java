@@ -30,4 +30,6 @@ public class InformationDetailResponse {
 
     private List<ImageResponse> imageResponses;
     private int likeCount;
+
+    private List<InformationBriefResponse> recommendInformation;
 }
