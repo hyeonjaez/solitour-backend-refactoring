@@ -26,10 +26,7 @@ import solitour_backend.solitour.info_tag.repository.InfoTagRepository;
 import solitour_backend.solitour.information.dto.mapper.InformationMapper;
 import solitour_backend.solitour.information.dto.request.InformationModifyRequest;
 import solitour_backend.solitour.information.dto.request.InformationRegisterRequest;
-import solitour_backend.solitour.information.dto.response.InformationBriefResponse;
-import solitour_backend.solitour.information.dto.response.InformationDetailResponse;
-import solitour_backend.solitour.information.dto.response.InformationRankResponse;
-import solitour_backend.solitour.information.dto.response.InformationResponse;
+import solitour_backend.solitour.information.dto.response.*;
 import solitour_backend.solitour.information.entity.Information;
 import solitour_backend.solitour.information.exception.InformationNotExistsException;
 import solitour_backend.solitour.information.repository.InformationRepository;
@@ -152,7 +149,7 @@ public class InformationService {
     }
 
 
-    public InformationDetailResponse getDetailInformation(Long informationId) {
+    public InformationDetailResponse getDetailInformation(Long userId, Long informationId) {
         Information information = informationRepository.findById(informationId).orElseThrow(
                 () -> new InformationNotExistsException("해당하는 id의 information이 존재하지 않습니다."));
         List<InfoTag> infoTags = infoTagRepository.findAllByInformationId(information.getId());
@@ -177,6 +174,8 @@ public class InformationService {
 
         int likeCount = greatInformationRepository.countByInformationId(information.getId());
 
+        List<InformationBriefResponse> informationRecommendList = informationRepository.getInformationRecommend(information.getId(), information.getCategory().getId(), userId);
+
         return new InformationDetailResponse(
                 information.getTitle(),
                 information.getAddress(),
@@ -189,7 +188,8 @@ public class InformationService {
                 placeResponse,
                 zoneCategoryResponse,
                 imageResponseList,
-                likeCount);
+                likeCount,
+                informationRecommendList);
     }
 
 
@@ -399,5 +399,9 @@ public class InformationService {
 
     public List<InformationRankResponse> getRankInformation() {
         return informationRepository.getInformationRank();
+    }
+
+    public List<InformationMainResponse> getMainPageInformation(Long userId) {
+        return informationRepository.getInformationLikeCountFromCreatedIn3(userId);
     }
 }

@@ -67,6 +67,7 @@ public class OauthService {
 
     private Cookie createCookie(String name, String value, int maxAge) {
         Cookie cookie = new Cookie(name, value);
+        cookie.setSecure(true);
         cookie.setHttpOnly(true);
         cookie.setMaxAge(maxAge);
         cookie.setPath("/");
@@ -164,11 +165,12 @@ public class OauthService {
 
     public AccessTokenResponse reissueAccessToken(Long userId) {
         boolean isExistMember = userRepository.existsById(userId);
+        int ACCESS_COOKIE_AGE = (int) TimeUnit.MINUTES.toSeconds(15);
         if (!isExistMember) {
             throw new RuntimeException("유효하지 않은 토큰입니다.");
         }
         String accessToken = jwtTokenProvider.createAccessToken(userId);
-        Cookie accessCookie = createCookie("access_token", accessToken, 60 * 60 * 24);
+        Cookie accessCookie = createCookie("access_token", accessToken, ACCESS_COOKIE_AGE);
 
         return new AccessTokenResponse(accessCookie);
     }
