@@ -179,10 +179,11 @@ public class InformationController {
     @GetMapping("/child-category/{childCategoryId}/view-count")
     public ResponseEntity<Page<InformationBriefResponse>> pageInformationByChildCategoryViewCount(@RequestParam(defaultValue = "0") int page,
                                                                                                   @PathVariable("childCategoryId") Long categoryId,
+                                                                                                  @RequestParam(required = false, name = "zoneCategory") Long zoneCategoryId,
                                                                                                   HttpServletRequest request) {
         Long userId = findUser(request);
         Pageable pageable = PageRequest.of(page, PAGE_SIZE);
-        Page<InformationBriefResponse> briefInformationPage = informationService.getBriefInformationPageByChildCategoryFilterViewCount(pageable, categoryId, userId);
+        Page<InformationBriefResponse> briefInformationPage = informationService.getBriefInformationPageByChildCategoryFilterZoneCategoryViewCount(pageable, categoryId, userId, zoneCategoryId);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(briefInformationPage);
