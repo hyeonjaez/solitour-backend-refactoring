@@ -1,6 +1,7 @@
 package solitour_backend.solitour.information.repository;
 
 import com.querydsl.core.types.Projections;
+import com.querydsl.jpa.JPQLQuery;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -19,6 +20,7 @@ import solitour_backend.solitour.zone_category.entity.QZoneCategory;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 public class InformationRepositoryImpl extends QuerydslRepositorySupport implements InformationRepositoryCustom {
 
@@ -104,17 +106,21 @@ public class InformationRepositoryImpl extends QuerydslRepositorySupport impleme
     }
 
     @Override
-    public Page<InformationBriefResponse> getInformationByParentCategoryFilterLikeCount(Pageable pageable, Long categoryId, Long userId) {
-
-        List<InformationBriefResponse> list = from(information)
+    public Page<InformationBriefResponse> getInformationByParentCategoryFilterZoneCategoryLikeCount(Pageable pageable, Long categoryId, Long userId, Long zoneCategoryId) {
+        JPQLQuery<Information> query = from(information)
                 .join(zoneCategoryChild).on(zoneCategoryChild.id.eq(information.zoneCategory.id))
                 .leftJoin(zoneCategoryParent).on(zoneCategoryParent.id.eq(zoneCategoryChild.parentZoneCategory.id))
                 .leftJoin(bookMarkInformation).on(bookMarkInformation.information.id.eq(information.id).and(bookMarkInformation.user.id.eq(userId)))
                 .leftJoin(image).on(image.information.id.eq(information.id)
                         .and(image.imageStatus.eq(ImageStatus.THUMBNAIL)))
                 .leftJoin(greatInformation).on(greatInformation.information.id.eq(information.id))
-                .where(information.category.parentCategory.id.eq(categoryId))
-                .groupBy(information.id, zoneCategoryChild.id, zoneCategoryParent.id, image.id)
+                .where(information.category.parentCategory.id.eq(categoryId));
+
+        if (Objects.nonNull(zoneCategoryId)) {
+            query = query.where(information.zoneCategory.parentZoneCategory.id.eq(zoneCategoryId));
+        }
+
+        List<InformationBriefResponse> list = query.groupBy(information.id, zoneCategoryChild.id, zoneCategoryParent.id, image.id)
                 .orderBy(greatInformation.information.count().desc())
                 .select(Projections.constructor(
                         InformationBriefResponse.class,
