@@ -17,7 +17,7 @@ public interface InformationRepositoryCustom {
 
     Page<InformationBriefResponse> getInformationByChildCategory(Pageable pageable, Long categoryId, Long userId);
 
-    Page<InformationBriefResponse> getInformationByParentCategoryFilterLikeCount(Pageable pageable, Long categoryId, Long userId);
+    Page<InformationBriefResponse> getInformationByParentCategoryFilterZoneCategoryLikeCount(Pageable pageable, Long categoryId, Long userId, Long zoneCategoryId);
 
     Page<InformationBriefResponse> getInformationByChildCategoryFilterLikeCount(Pageable pageable, Long categoryId, Long userId);
 
