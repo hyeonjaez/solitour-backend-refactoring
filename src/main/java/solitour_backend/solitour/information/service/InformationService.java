@@ -352,11 +352,15 @@ public class InformationService {
         return informationRepository.getInformationByParentCategoryFilterZoneCategoryLikeCount(pageable, parentCategoryId, userId, zoneCategoryId);
     }
 
-    public Page<InformationBriefResponse> getBriefInformationPageByChildCategoryFilterLikeCount(Pageable pageable, Long childCategoryId, Long userId) {
+    public Page<InformationBriefResponse> getBriefInformationPageByChildCategoryFilterZoneCategoryLikeCount(Pageable pageable, Long childCategoryId, Long userId, Long zoneCategoryId) {
         if (!categoryRepository.existsById(childCategoryId)) {
             throw new CategoryNotExistsException("해당하는 id의 category는 없습니다");
         }
-        return informationRepository.getInformationByChildCategoryFilterLikeCount(pageable, childCategoryId, userId);
+        if (Objects.nonNull(zoneCategoryId) && !zoneCategoryRepository.existsById(zoneCategoryId)) {
+            throw new ZoneCategoryNotExistsException("해당하는 id의 zoneCategory는 없습니다");
+        }
+
+        return informationRepository.getInformationByChildCategoryFilterZoneCategoryLikeCount(pageable, childCategoryId, userId, zoneCategoryId);
     }
 
     //조회순
