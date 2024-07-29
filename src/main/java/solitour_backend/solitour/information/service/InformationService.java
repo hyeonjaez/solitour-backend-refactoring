@@ -337,76 +337,72 @@ public class InformationService {
     }
 
     //default
-    public Page<InformationBriefResponse> getBriefInformationPageByParentCategory(Pageable pageable, Long parentCategoryId, Long userId) {
+    public Page<InformationBriefResponse> getBriefInformationPageByParentCategoryFilterZoneCategory(Pageable pageable, Long parentCategoryId, Long userId, Long zoneCategoryId) {
         if (!categoryRepository.existsById(parentCategoryId)) {
             throw new CategoryNotExistsException("해당하는 id의 category는 없습니다");
         }
-        return informationRepository.getInformationByParentCategory(pageable, parentCategoryId, userId);
-    }
-
-    public Page<InformationBriefResponse> getBriefInformationPageByChildCategory(Pageable pageable, Long childCategoryId, Long userId) {
-        if (!categoryRepository.existsById(childCategoryId)) {
-            throw new CategoryNotExistsException("해당하는 id의 category는 없습니다");
-        }
-        return informationRepository.getInformationByChildCategory(pageable, childCategoryId, userId);
-    }
-
-    //좋아요순
-    public Page<InformationBriefResponse> getBriefInformationPageByParentCategoryFilterLikeCount(Pageable pageable, Long parentCategoryId, Long userId) {
-        if (!categoryRepository.existsById(parentCategoryId)) {
-            throw new CategoryNotExistsException("해당하는 id의 category는 없습니다");
-        }
-
-        return informationRepository.getInformationByParentCategoryFilterLikeCount(pageable, parentCategoryId, userId);
-    }
-
-    public Page<InformationBriefResponse> getBriefInformationPageByChildCategoryFilterLikeCount(Pageable pageable, Long childCategoryId, Long userId) {
-        if (!categoryRepository.existsById(childCategoryId)) {
-            throw new CategoryNotExistsException("해당하는 id의 category는 없습니다");
-        }
-        return informationRepository.getInformationByChildCategoryFilterLikeCount(pageable, childCategoryId, userId);
-    }
-
-    //조회순
-    public Page<InformationBriefResponse> getBriefInformationPageByParentCategoryFilterViewCount(Pageable pageable, Long parentCategoryId, Long userId) {
-        if (!categoryRepository.existsById(parentCategoryId)) {
-            throw new CategoryNotExistsException("해당하는 id의 category는 없습니다");
-        }
-        return informationRepository.getInformationByParentCategoryFilterViewCount(pageable, parentCategoryId, userId);
-    }
-
-    public Page<InformationBriefResponse> getBriefInformationPageByChildCategoryFilterViewCount(Pageable pageable, Long childCategoryId, Long userId) {
-        if (!categoryRepository.existsById(childCategoryId)) {
-            throw new CategoryNotExistsException("해당하는 id의 category는 없습니다");
-        }
-        return informationRepository.getInformationByChildCategoryFilterViewCount(pageable, childCategoryId, userId);
-    }
-
-    //zoneCategory 별
-    public Page<InformationBriefResponse> getBriefInformationPageByParentCategoryAndZoneCategory(Pageable pageable, Long parentCategoryId, Long userId, Long zoneCategoryId) {
-        if (!categoryRepository.existsById(parentCategoryId)) {
-            throw new CategoryNotExistsException("해당하는 id의 category는 없습니다");
-        }
-
-        if (!zoneCategoryRepository.existsById(zoneCategoryId)) {
+        if (Objects.nonNull(zoneCategoryId) && !zoneCategoryRepository.existsById(zoneCategoryId)) {
             throw new ZoneCategoryNotExistsException("해당하는 id의 zoneCategory는 없습니다");
         }
 
         return informationRepository.getInformationByParentCategoryFilterZoneCategory(pageable, parentCategoryId, userId, zoneCategoryId);
     }
 
-    public Page<InformationBriefResponse> getBriefInformationPageByChildCategoryAndZoneCategory(Pageable pageable, Long childCategoryId, Long userId, Long zoneCategoryId) {
+    public Page<InformationBriefResponse> getBriefInformationPageByChildCategoryFilterZoneCategory(Pageable pageable, Long childCategoryId, Long userId, Long zoneCategoryId) {
         if (!categoryRepository.existsById(childCategoryId)) {
             throw new CategoryNotExistsException("해당하는 id의 category는 없습니다");
         }
-
-        if (!zoneCategoryRepository.existsById(zoneCategoryId)) {
+        if (Objects.nonNull(zoneCategoryId) && !zoneCategoryRepository.existsById(zoneCategoryId)) {
             throw new ZoneCategoryNotExistsException("해당하는 id의 zoneCategory는 없습니다");
         }
-
         return informationRepository.getInformationByChildCategoryFilterZoneCategory(pageable, childCategoryId, userId, zoneCategoryId);
     }
 
+    //지역카테고리별 좋아요순
+    public Page<InformationBriefResponse> getBriefInformationPageByParentCategoryFilterZoneCategoryLikeCount(Pageable pageable, Long parentCategoryId, Long userId, Long zoneCategoryId) {
+        if (!categoryRepository.existsById(parentCategoryId)) {
+            throw new CategoryNotExistsException("해당하는 id의 category는 없습니다");
+        }
+        if (Objects.nonNull(zoneCategoryId) && !zoneCategoryRepository.existsById(zoneCategoryId)) {
+            throw new ZoneCategoryNotExistsException("해당하는 id의 zoneCategory는 없습니다");
+        }
+
+        return informationRepository.getInformationByParentCategoryFilterZoneCategoryLikeCount(pageable, parentCategoryId, userId, zoneCategoryId);
+    }
+
+    public Page<InformationBriefResponse> getBriefInformationPageByChildCategoryFilterZoneCategoryLikeCount(Pageable pageable, Long childCategoryId, Long userId, Long zoneCategoryId) {
+        if (!categoryRepository.existsById(childCategoryId)) {
+            throw new CategoryNotExistsException("해당하는 id의 category는 없습니다");
+        }
+        if (Objects.nonNull(zoneCategoryId) && !zoneCategoryRepository.existsById(zoneCategoryId)) {
+            throw new ZoneCategoryNotExistsException("해당하는 id의 zoneCategory는 없습니다");
+        }
+
+        return informationRepository.getInformationByChildCategoryFilterZoneCategoryLikeCount(pageable, childCategoryId, userId, zoneCategoryId);
+    }
+
+    //지역카테고리별 조회순
+    public Page<InformationBriefResponse> getBriefInformationPageByParentCategoryFilterZoneCategoryViewCount(Pageable pageable, Long parentCategoryId, Long userId, Long zoneCategoryId) {
+        if (!categoryRepository.existsById(parentCategoryId)) {
+            throw new CategoryNotExistsException("해당하는 id의 category는 없습니다");
+        }
+        if (Objects.nonNull(zoneCategoryId) && !zoneCategoryRepository.existsById(zoneCategoryId)) {
+            throw new ZoneCategoryNotExistsException("해당하는 id의 zoneCategory는 없습니다");
+        }
+
+        return informationRepository.getInformationByParentCategoryFilterZoneCategoryViewCount(pageable, parentCategoryId, userId, zoneCategoryId);
+    }
+
+    public Page<InformationBriefResponse> getBriefInformationPageByChildCategoryFilterZoneCategoryViewCount(Pageable pageable, Long childCategoryId, Long userId, Long zoneCategoryId) {
+        if (!categoryRepository.existsById(childCategoryId)) {
+            throw new CategoryNotExistsException("해당하는 id의 category는 없습니다");
+        }
+        if (Objects.nonNull(zoneCategoryId) && !zoneCategoryRepository.existsById(zoneCategoryId)) {
+            throw new ZoneCategoryNotExistsException("해당하는 id의 zoneCategory는 없습니다");
+        }
+
+        return informationRepository.getInformationByChildCategoryFilterZoneCategoryViewCount(pageable, childCategoryId, userId, zoneCategoryId);
+    }
 
     public List<InformationRankResponse> getRankInformation() {
         return informationRepository.getInformationRank();
