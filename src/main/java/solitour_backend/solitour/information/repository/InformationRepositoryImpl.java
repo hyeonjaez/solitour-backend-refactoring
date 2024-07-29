@@ -181,15 +181,21 @@ public class InformationRepositoryImpl extends QuerydslRepositorySupport impleme
     }
 
     @Override
-    public Page<InformationBriefResponse> getInformationByParentCategoryFilterViewCount(Pageable pageable, Long categoryId, Long userId) {
-        List<InformationBriefResponse> list = from(information)
+    public Page<InformationBriefResponse> getInformationByParentCategoryFilterZoneCategoryViewCount(Pageable pageable, Long categoryId, Long userId, Long zoneCategoryId) {
+        JPQLQuery<Information> query = from(information)
                 .join(zoneCategoryChild).on(zoneCategoryChild.id.eq(information.zoneCategory.id))
                 .leftJoin(zoneCategoryParent).on(zoneCategoryParent.id.eq(zoneCategoryChild.parentZoneCategory.id))
                 .leftJoin(bookMarkInformation).on(bookMarkInformation.information.id.eq(information.id).and(bookMarkInformation.user.id.eq(userId)))
                 .leftJoin(image).on(image.information.id.eq(information.id)
                         .and(image.imageStatus.eq(ImageStatus.THUMBNAIL)))
                 .leftJoin(greatInformation).on(greatInformation.information.id.eq(information.id))
-                .where(information.category.parentCategory.id.eq(categoryId))
+                .where(information.category.parentCategory.id.eq(categoryId));
+
+        if (Objects.nonNull(zoneCategoryId)) {
+            query = query.where(information.zoneCategory.parentZoneCategory.id.eq(zoneCategoryId));
+        }
+
+        List<InformationBriefResponse> list = query
                 .groupBy(information.id, zoneCategoryChild.id, zoneCategoryParent.id, image.id)
                 .orderBy(information.viewCount.desc())
                 .select(Projections.constructor(
