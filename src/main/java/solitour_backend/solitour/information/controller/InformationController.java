@@ -61,6 +61,19 @@ public class InformationController {
                 .body(informationDetailResponse);
     }
 
+    @GetMapping("/{informationId}/recommend/{categoryId}")
+    public ResponseEntity<List<InformationBriefResponse>> getRecommendInformation(@PathVariable Long informationId,
+                                                                                  @PathVariable Long categoryId,
+                                                                                  HttpServletRequest request) {
+
+        Long userId = findUser(request);
+        List<InformationBriefResponse> recommendInformation = informationService.getRecommendInformation(categoryId, informationId, userId);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(recommendInformation);
+    }
+
     @Authenticated
     @PutMapping("/{informationId}")
     public ResponseEntity<InformationResponse> modifyInformation(@PathVariable Long informationId,
