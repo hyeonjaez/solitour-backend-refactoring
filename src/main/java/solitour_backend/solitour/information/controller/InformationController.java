@@ -88,7 +88,6 @@ public class InformationController {
                 .build();
     }
 
-    //default
     @GetMapping("/parent-category/{parentCategoryId}")
     public ResponseEntity<Page<InformationBriefResponse>> pageInformationByParentCategoryFilterZoneCategory(@RequestParam(defaultValue = "0") int page,
                                                                                                             @RequestParam(required = false, name = "zoneCategory") Long zoneCategoryId,
@@ -175,34 +174,6 @@ public class InformationController {
                 .status(HttpStatus.OK)
                 .body(briefInformationPage);
     }
-
-    //지역카테고리별
-//    @GetMapping("/parent-category/{parentCategoryId}/zone-category/{zoneCategory}")
-//    public ResponseEntity<Page<InformationBriefResponse>> pageInformationByParentCategoryAndZoneCategory(@RequestParam(defaultValue = "0") int page,
-//                                                                                                         @PathVariable("parentCategoryId") Long categoryId,
-//                                                                                                         @PathVariable("zoneCategory") Long zoneCategoryId,
-//                                                                                                         HttpServletRequest request) {
-//        Long userId = findUser(request);
-//        Pageable pageable = PageRequest.of(page, PAGE_SIZE);
-//        Page<InformationBriefResponse> briefInformationPage = informationService.getBriefInformationPageByParentCategoryAndZoneCategory(pageable, categoryId, userId, zoneCategoryId);
-//        return ResponseEntity
-//                .status(HttpStatus.OK)
-//                .body(briefInformationPage);
-//    }
-
-
-//    @GetMapping("/child-category/{childCategoryId}/zone-category/{zoneCategory}")
-//    public ResponseEntity<Page<InformationBriefResponse>> pageInformationChildCategoryAndZoneCategory(@RequestParam(defaultValue = "0") int page,
-//                                                                                                      @PathVariable("childCategoryId") Long categoryId,
-//                                                                                                      @PathVariable("zoneCategory") Long zoneCategoryId,
-//                                                                                                      HttpServletRequest request) {
-//        Long userId = findUser(request);
-//        Pageable pageable = PageRequest.of(page, PAGE_SIZE);
-//        Page<InformationBriefResponse> briefInformationPage = informationService.getBriefInformationPageByChildCategoryAndZoneCategory(pageable, categoryId, userId, zoneCategoryId);
-//        return ResponseEntity
-//                .status(HttpStatus.OK)
-//                .body(briefInformationPage);
-//    }
 
 
     @GetMapping("/ranks")

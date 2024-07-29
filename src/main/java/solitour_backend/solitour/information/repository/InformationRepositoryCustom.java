@@ -13,14 +13,9 @@ import java.util.List;
 @NoRepositoryBean
 public interface InformationRepositoryCustom {
 
-    Page<InformationBriefResponse> getInformationByParentCategoryFilterZoneCategory(Pageable pageable, Long categoryId, Long userId);
-
-//    Page<InformationBriefResponse> getInformationByChildCategory(Pageable pageable, Long categoryId, Long userId);
-
     Page<InformationBriefResponse> getInformationByParentCategoryFilterZoneCategory(Pageable pageable, Long parentCategoryId, Long userId, Long zoneCategoryId);
 
     Page<InformationBriefResponse> getInformationByChildCategoryFilterZoneCategory(Pageable pageable, Long childCategoryId, Long userId, Long zoneCategoryId);
-
 
     Page<InformationBriefResponse> getInformationByParentCategoryFilterZoneCategoryLikeCount(Pageable pageable, Long categoryId, Long userId, Long zoneCategoryId);
 
@@ -29,7 +24,6 @@ public interface InformationRepositoryCustom {
     Page<InformationBriefResponse> getInformationByParentCategoryFilterZoneCategoryViewCount(Pageable pageable, Long categoryId, Long userId, Long zoneCategoryId);
 
     Page<InformationBriefResponse> getInformationByChildCategoryFilterZoneCategoryViewCount(Pageable pageable, Long categoryId, Long userId, Long zoneCategoryId);
-
 
     List<InformationRankResponse> getInformationRank();
 
