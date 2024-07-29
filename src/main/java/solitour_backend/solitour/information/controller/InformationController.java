@@ -120,10 +120,10 @@ public class InformationController {
 
     //지역 카테고리 별 좋아요순
     @GetMapping("/parent-category/{parentCategory}/like-count")
-    public ResponseEntity<Page<InformationBriefResponse>> pageInformationByParentCategoryAndZoneCategory(@RequestParam(defaultValue = "0") int page,
-                                                                                                         @RequestParam(required = false, name = "zoneCategory") Long zoneCategoryId,
-                                                                                                         @PathVariable("parentCategory") Long categoryId,
-                                                                                                         HttpServletRequest request) {
+    public ResponseEntity<Page<InformationBriefResponse>> pageInformationByParentCategoryFilterZoneCategoryLikeCount(@RequestParam(defaultValue = "0") int page,
+                                                                                                                     @RequestParam(required = false, name = "zoneCategory") Long zoneCategoryId,
+                                                                                                                     @PathVariable("parentCategory") Long categoryId,
+                                                                                                                     HttpServletRequest request) {
         Long userId = findUser(request);
         Pageable pageable = PageRequest.of(page, PAGE_SIZE);
         Page<InformationBriefResponse> briefInformationPage = informationService.getBriefInformationPageByParentCategoryFilterZoneCategoryLikeCount(pageable, categoryId, userId, zoneCategoryId);
