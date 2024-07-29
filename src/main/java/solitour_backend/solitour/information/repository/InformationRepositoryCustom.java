@@ -23,7 +23,7 @@ public interface InformationRepositoryCustom {
 
     Page<InformationBriefResponse> getInformationByParentCategoryFilterZoneCategoryViewCount(Pageable pageable, Long categoryId, Long userId, Long zoneCategoryId);
 
-    Page<InformationBriefResponse> getInformationByChildCategoryFilterViewCount(Pageable pageable, Long categoryId, Long userId);
+    Page<InformationBriefResponse> getInformationByChildCategoryFilterZoneCategoryViewCount(Pageable pageable, Long categoryId, Long userId, Long zoneCategoryId);
 
     Page<InformationBriefResponse> getInformationByParentCategoryFilterZoneCategory(Pageable pageable, Long parentCategoryId, Long userId, Long zoneCategoryId);
 
