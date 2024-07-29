@@ -20,4 +20,9 @@ public class RequestValidationFailedException extends ValidationException {
                         .append(objectError.getCode()))
                 .collect(Collectors.joining("|")));
     }
+
+
+    public RequestValidationFailedException(String message) {
+        super(message);
+    }
 }
