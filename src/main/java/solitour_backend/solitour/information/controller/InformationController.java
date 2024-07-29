@@ -118,17 +118,15 @@ public class InformationController {
                 .body(briefInformationPage);
     }
 
-
-    //좋아요순
-    @GetMapping("/parent-category/{parentCategoryId}/like-count")
-    public ResponseEntity<Page<InformationBriefResponse>> pageInformationByParentCategoryFilterLikeCount(@RequestParam(defaultValue = "0") int page,
-                                                                                                         @PathVariable("parentCategoryId") Long categoryId,
+    //지역 카테고리 별 좋아요순
+    @GetMapping("/parent-category/{parentCategory}/like-count")
+    public ResponseEntity<Page<InformationBriefResponse>> pageInformationByParentCategoryAndZoneCategory(@RequestParam(defaultValue = "0") int page,
+                                                                                                         @RequestParam(required = false, name = "zoneCategory") Long zoneCategoryId,
+                                                                                                         @PathVariable("parentCategory") Long categoryId,
                                                                                                          HttpServletRequest request) {
         Long userId = findUser(request);
-
         Pageable pageable = PageRequest.of(page, PAGE_SIZE);
-        Page<InformationBriefResponse> briefInformationPage = informationService.getBriefInformationPageByParentCategoryFilterLikeCount(pageable, categoryId, userId);
-
+        Page<InformationBriefResponse> briefInformationPage = informationService.getBriefInformationPageByParentCategoryFilterZoneCategoryLikeCount(pageable, categoryId, userId, zoneCategoryId);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(briefInformationPage);
@@ -177,18 +175,18 @@ public class InformationController {
     }
 
     //지역카테고리별
-    @GetMapping("/parent-category/{parentCategoryId}/zone-category/{zoneCategory}")
-    public ResponseEntity<Page<InformationBriefResponse>> pageInformationByParentCategoryAndZoneCategory(@RequestParam(defaultValue = "0") int page,
-                                                                                                         @PathVariable("parentCategoryId") Long categoryId,
-                                                                                                         @PathVariable("zoneCategory") Long zoneCategoryId,
-                                                                                                         HttpServletRequest request) {
-        Long userId = findUser(request);
-        Pageable pageable = PageRequest.of(page, PAGE_SIZE);
-        Page<InformationBriefResponse> briefInformationPage = informationService.getBriefInformationPageByParentCategoryAndZoneCategory(pageable, categoryId, userId, zoneCategoryId);
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(briefInformationPage);
-    }
+//    @GetMapping("/parent-category/{parentCategoryId}/zone-category/{zoneCategory}")
+//    public ResponseEntity<Page<InformationBriefResponse>> pageInformationByParentCategoryAndZoneCategory(@RequestParam(defaultValue = "0") int page,
+//                                                                                                         @PathVariable("parentCategoryId") Long categoryId,
+//                                                                                                         @PathVariable("zoneCategory") Long zoneCategoryId,
+//                                                                                                         HttpServletRequest request) {
+//        Long userId = findUser(request);
+//        Pageable pageable = PageRequest.of(page, PAGE_SIZE);
+//        Page<InformationBriefResponse> briefInformationPage = informationService.getBriefInformationPageByParentCategoryAndZoneCategory(pageable, categoryId, userId, zoneCategoryId);
+//        return ResponseEntity
+//                .status(HttpStatus.OK)
+//                .body(briefInformationPage);
+//    }
 
     @GetMapping("/child-category/{childCategoryId}/zone-category/{zoneCategory}")
     public ResponseEntity<Page<InformationBriefResponse>> pageInformationChildCategoryAndZoneCategory(@RequestParam(defaultValue = "0") int page,
