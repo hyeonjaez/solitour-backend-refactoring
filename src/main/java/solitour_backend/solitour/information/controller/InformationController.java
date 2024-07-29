@@ -106,13 +106,14 @@ public class InformationController {
     }
 
     @GetMapping("/child-category/{childCategoryId}")
-    public ResponseEntity<Page<InformationBriefResponse>> pageInformationByChildCategory(@RequestParam(defaultValue = "0") int page,
-                                                                                         @PathVariable("childCategoryId") Long categoryId,
-                                                                                         HttpServletRequest request) {
+    public ResponseEntity<Page<InformationBriefResponse>> pageInformationByChildCategoryFilterZoneCategory(@RequestParam(defaultValue = "0") int page,
+                                                                                                           @PathVariable("childCategoryId") Long categoryId,
+                                                                                                           @RequestParam(required = false, name = "zoneCategory") Long zoneCategoryId,
+                                                                                                           HttpServletRequest request) {
         Long userId = findUser(request);
 
         Pageable pageable = PageRequest.of(page, PAGE_SIZE);
-        Page<InformationBriefResponse> briefInformationPage = informationService.getBriefInformationPageByChildCategory(pageable, categoryId, userId);
+        Page<InformationBriefResponse> briefInformationPage = informationService.getBriefInformationPageByChildCategoryFilterZoneCategory(pageable, categoryId, userId, zoneCategoryId);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -145,21 +146,6 @@ public class InformationController {
                 .status(HttpStatus.OK)
                 .body(briefInformationPage);
     }
-
-
-//    @GetMapping("/child-category/{childCategoryId}/like-count")
-//    public ResponseEntity<Page<InformationBriefResponse>> pageInformationByChildCategoryFilterLikeCount(@RequestParam(defaultValue = "0") int page,
-//                                                                                                        @PathVariable("childCategoryId") Long categoryId,
-//                                                                                                        HttpServletRequest request) {
-//        Long userId = findUser(request);
-//
-//        Pageable pageable = PageRequest.of(page, PAGE_SIZE);
-//        Page<InformationBriefResponse> briefInformationPage = informationService.getBriefInformationPageByChildCategoryFilterZoneCategoryLikeCount(pageable, categoryId, userId);
-//
-//        return ResponseEntity
-//                .status(HttpStatus.OK)
-//                .body(briefInformationPage);
-//    }
 
 
     //지역 카테고리 별 조회순
