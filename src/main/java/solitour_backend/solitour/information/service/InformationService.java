@@ -340,13 +340,16 @@ public class InformationService {
         return informationRepository.getInformationByChildCategory(pageable, childCategoryId, userId);
     }
 
-    //좋아요순
-    public Page<InformationBriefResponse> getBriefInformationPageByParentCategoryFilterLikeCount(Pageable pageable, Long parentCategoryId, Long userId) {
+    //지역카테고리별 좋아요순
+    public Page<InformationBriefResponse> getBriefInformationPageByParentCategoryFilterZoneCategoryLikeCount(Pageable pageable, Long parentCategoryId, Long userId, Long zoneCategoryId) {
         if (!categoryRepository.existsById(parentCategoryId)) {
             throw new CategoryNotExistsException("해당하는 id의 category는 없습니다");
         }
+        if (Objects.nonNull(zoneCategoryId) && !zoneCategoryRepository.existsById(zoneCategoryId)) {
+            throw new ZoneCategoryNotExistsException("해당하는 id의 zoneCategory는 없습니다");
+        }
 
-        return informationRepository.getInformationByParentCategoryFilterLikeCount(pageable, parentCategoryId, userId);
+        return informationRepository.getInformationByParentCategoryFilterZoneCategoryLikeCount(pageable, parentCategoryId, userId, zoneCategoryId);
     }
 
     public Page<InformationBriefResponse> getBriefInformationPageByChildCategoryFilterLikeCount(Pageable pageable, Long childCategoryId, Long userId) {
