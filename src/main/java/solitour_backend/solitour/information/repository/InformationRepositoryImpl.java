@@ -38,7 +38,7 @@ public class InformationRepositoryImpl extends QuerydslRepositorySupport impleme
 
 
     @Override
-    public Page<InformationBriefResponse> getInformationByParentCategory(Pageable pageable, Long categoryId, Long userId) {
+    public Page<InformationBriefResponse> getInformationByParentCategoryFilterZoneCategory(Pageable pageable, Long categoryId, Long userId) {
         List<InformationBriefResponse> list = from(information)
                 .join(zoneCategoryChild).on(zoneCategoryChild.id.eq(information.zoneCategory.id))
                 .leftJoin(zoneCategoryParent)
@@ -258,14 +258,20 @@ public class InformationRepositoryImpl extends QuerydslRepositorySupport impleme
 
     @Override
     public Page<InformationBriefResponse> getInformationByParentCategoryFilterZoneCategory(Pageable pageable, Long parentCategoryId, Long userId, Long zoneCategoryId) {
-        List<InformationBriefResponse> list = from(information)
+        JPQLQuery<Information> query = from(information)
                 .join(zoneCategoryChild).on(zoneCategoryChild.id.eq(information.zoneCategory.id))
                 .leftJoin(zoneCategoryParent).on(zoneCategoryParent.id.eq(zoneCategoryChild.parentZoneCategory.id))
                 .leftJoin(bookMarkInformation).on(bookMarkInformation.information.id.eq(information.id).and(bookMarkInformation.user.id.eq(userId)))
                 .leftJoin(image).on(image.information.id.eq(information.id)
                         .and(image.imageStatus.eq(ImageStatus.THUMBNAIL)))
                 .leftJoin(greatInformation).on(greatInformation.information.id.eq(information.id))
-                .where(information.category.parentCategory.id.eq(parentCategoryId).and(information.zoneCategory.parentZoneCategory.id.eq(zoneCategoryId)))
+                .where(information.category.parentCategory.id.eq(parentCategoryId));
+
+        if (Objects.nonNull(zoneCategoryId)) {
+            query = query.where(information.zoneCategory.parentZoneCategory.id.eq(zoneCategoryId));
+        }
+
+        List<InformationBriefResponse> list = query
                 .groupBy(information.id, zoneCategoryChild.id, zoneCategoryParent.id, image.id)
                 .orderBy(information.createdDate.desc())
                 .select(Projections.constructor(
