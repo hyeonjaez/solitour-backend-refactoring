@@ -175,6 +175,8 @@ public class InformationService {
 
         int likeCount = greatInformationRepository.countByInformationId(information.getId());
 
+        List<InformationBriefResponse> informationRecommend = informationRepository.getInformationRecommend(information.getId(), information.getCategory().getId(), userId);
+
         return new InformationDetailResponse(
                 information.getTitle(),
                 information.getAddress(),
@@ -187,22 +189,9 @@ public class InformationService {
                 placeResponse,
                 zoneCategoryResponse,
                 imageResponseList,
-                likeCount);
+                likeCount,
+                informationRecommend);
     }
-
-    public List<InformationBriefResponse> getRecommendInformation(Long informationId, Long categoryId, Long userId) {
-        Information information = informationRepository.findById(informationId)
-                .orElseThrow(
-                        () -> new InformationNotExistsException("해당하는 id의 information 이 존재하지 않습니다")
-                );
-
-        if (!information.getCategory().getId().equals(categoryId)) {
-            throw new RequestValidationFailedException("해당하는 정보의 카테고리와 일치하지 않습니다");
-        }
-
-        return informationRepository.getInformationRecommend(informationId, categoryId, userId);
-    }
-
 
     @Transactional
     public InformationResponse modifyInformation(Long id, InformationModifyRequest informationModifyRequest, MultipartFile thumbNail, List<MultipartFile> contentImages) {
