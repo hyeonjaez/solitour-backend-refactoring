@@ -1,3 +1,0 @@
-[submodule "gradle/wrapper/config"]
-	path = gradle/wrapper/config
-	url = https://github.com/TripInfoWeb/config.git
