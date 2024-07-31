@@ -269,16 +269,15 @@ public class InformationRepositoryImpl extends QuerydslRepositorySupport impleme
     @Override
     public List<InformationMainResponse> getInformationLikeCountFromCreatedIn3(Long userId) {
         return from(information)
-                .join(zoneCategoryChild).on(zoneCategoryChild.id.eq(information.zoneCategory.id))
+                .leftJoin(zoneCategoryChild).on(zoneCategoryChild.id.eq(information.zoneCategory.id))
                 .leftJoin(zoneCategoryParent).on(zoneCategoryParent.id.eq(zoneCategoryChild.parentZoneCategory.id))
                 .leftJoin(bookMarkInformation).on(bookMarkInformation.information.id.eq(information.id).and(bookMarkInformation.user.id.eq(userId)))
-                .leftJoin(image).on(image.information.id.eq(information.id)
-                        .and(image.imageStatus.eq(ImageStatus.THUMBNAIL)))
+                .leftJoin(image).on(image.information.id.eq(information.id).and(image.imageStatus.eq(ImageStatus.THUMBNAIL)))
                 .leftJoin(greatInformation).on(greatInformation.information.id.eq(information.id))
-                .join(category).on(category.id.eq(information.id))
+                .leftJoin(category).on(category.id.eq(information.category.id))
                 .where(information.createdDate.after(LocalDateTime.now().minusMonths(3)))
-                .groupBy(information.id, image.id)
-                .orderBy(greatInformation.information.count().desc())
+                .groupBy(information.id, information.title, zoneCategoryParent.name, zoneCategoryChild.name, bookMarkInformation.id, image.address)
+                .orderBy(greatInformation.information.id.count().desc())
                 .select(Projections.constructor(
                         InformationMainResponse.class,
                         information.id,
@@ -291,6 +290,7 @@ public class InformationRepositoryImpl extends QuerydslRepositorySupport impleme
                         image.address,
                         greatInformation.information.count().coalesce(0L).intValue()
                 )).limit(6).fetch();
+
     }
 
     @Override
