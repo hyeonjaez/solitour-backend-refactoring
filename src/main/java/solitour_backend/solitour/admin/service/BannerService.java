@@ -58,7 +58,6 @@ public class BannerService {
     public Banner createBanner(MultipartFile multipartFile, String dirName) {
         String fileName = dirName + "/" + new Date().toString();
         try {
-            System.out.println(fileName);
             ObjectMetadata metadata = new ObjectMetadata();
             metadata.setContentLength(multipartFile.getSize());
             metadata.setContentType(multipartFile.getContentType());
