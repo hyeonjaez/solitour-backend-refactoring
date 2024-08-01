@@ -2,7 +2,7 @@ package solitour_backend.solitour.admin.dto.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
-import solitour_backend.solitour.admin.entity.GatheringCategory;
+import solitour_backend.solitour.gathering_category.entity.GatheringCategory;
 import solitour_backend.solitour.category.dto.response.CategoryResponse;
 
 import java.util.List;
