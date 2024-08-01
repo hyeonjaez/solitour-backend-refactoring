@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import solitour_backend.solitour.auth.config.Authenticated;
 import solitour_backend.solitour.auth.config.AuthenticationPrincipal;
 import solitour_backend.solitour.auth.config.AuthenticationRefreshPrincipal;
 import solitour_backend.solitour.auth.service.OauthService;
@@ -45,7 +44,6 @@ public class OauthController {
         return ResponseEntity.ok().build();
     }
 
-    @Authenticated
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(@AuthenticationPrincipal Long memberId) {
         oauthService.logout(memberId);

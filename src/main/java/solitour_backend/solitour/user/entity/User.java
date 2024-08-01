@@ -77,4 +77,8 @@ public class User {
 
     @Column(name = "user_deleted_at")
     private LocalDateTime deletedAt;
+
+    public void updateNickname(String nickname) {
+        this.nickname = nickname;
+    }
 }
