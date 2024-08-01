@@ -1,11 +1,13 @@
 package solitour_backend.solitour.error.exception;
 
 import jakarta.validation.ValidationException;
-import org.springframework.validation.BindingResult;
 
 import java.util.stream.Collectors;
 
+import org.springframework.validation.BindingResult;
+
 public class RequestValidationFailedException extends ValidationException {
+
     public RequestValidationFailedException(BindingResult bindingResult) {
         super(bindingResult.getAllErrors()
                 .stream()
@@ -17,5 +19,10 @@ public class RequestValidationFailedException extends ValidationException {
                         .append(", error code: ")
                         .append(objectError.getCode()))
                 .collect(Collectors.joining("|")));
+    }
+
+
+    public RequestValidationFailedException(String message) {
+        super(message);
     }
 }

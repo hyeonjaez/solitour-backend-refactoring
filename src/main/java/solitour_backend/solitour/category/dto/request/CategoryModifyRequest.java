@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class CategoryModifyRequest {
+
     @Nullable
     private Long parentCategory;
 

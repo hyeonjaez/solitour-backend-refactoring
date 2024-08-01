@@ -1,5 +1,9 @@
 package solitour_backend.solitour.category.service;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,14 +16,11 @@ import solitour_backend.solitour.category.entity.Category;
 import solitour_backend.solitour.category.exception.CategoryNotExistsException;
 import solitour_backend.solitour.category.repository.CategoryRepository;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class CategoryService {
+
     private final CategoryRepository categoryRepository;
     private final CategoryMapper categoryMapper;
 
@@ -29,7 +30,8 @@ public class CategoryService {
         if (Objects.isNull(categoryRegisterRequest.getParentCategory())) {
             parentCategoryEntity = null;
         } else {
-            parentCategoryEntity = categoryRepository.findById(categoryRegisterRequest.getParentCategory())
+            parentCategoryEntity = categoryRepository.findById(
+                            categoryRegisterRequest.getParentCategory())
                     .orElseThrow(
                             () -> new CategoryNotExistsException("Parent category not found"));
         }
@@ -62,7 +64,8 @@ public class CategoryService {
 
         for (Category category : parentCategories) {
             List<CategoryResponse> childrenCategories = getChildrenCategories(category.getId());
-            categoryGetResponses.add(new CategoryGetResponse(category.getId(), category.getName(), childrenCategories));
+            categoryGetResponses.add(
+                    new CategoryGetResponse(category.getId(), category.getName(), childrenCategories));
         }
 
         return categoryGetResponses;
@@ -74,7 +77,8 @@ public class CategoryService {
         if (Objects.isNull(categoryModifyRequest.getParentCategory())) {
             parentCategoryEntity = null;
         } else {
-            parentCategoryEntity = categoryRepository.findById(categoryModifyRequest.getParentCategory())
+            parentCategoryEntity = categoryRepository.findById(
+                            categoryModifyRequest.getParentCategory())
                     .orElseThrow(
                             () -> new CategoryNotExistsException("Parent category not found"));
         }

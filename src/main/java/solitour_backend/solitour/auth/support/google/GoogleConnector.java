@@ -3,6 +3,7 @@ package solitour_backend.solitour.auth.support.google;
 
 import java.util.Collections;
 import java.util.Optional;
+
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
@@ -35,13 +36,16 @@ public class GoogleConnector {
         headers.set("Authorization", String.join(" ", BEARER_TYPE, googleToken));
         HttpEntity<Void> entity = new HttpEntity<>(headers);
 
-        return REST_TEMPLATE.exchange(provider.getUserInfoUrl(), HttpMethod.GET, entity, GoogleUserResponse.class);
+        return REST_TEMPLATE.exchange(provider.getUserInfoUrl(), HttpMethod.GET, entity,
+                GoogleUserResponse.class);
     }
 
     private String requestAccessToken(String code, String redirectUrl) {
-        HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(createBody(code, redirectUrl), createHeaders());
+        HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(
+                createBody(code, redirectUrl), createHeaders());
 
-        ResponseEntity<GoogleTokenResponse> response = REST_TEMPLATE.postForEntity(provider.getAccessTokenUrl(),
+        ResponseEntity<GoogleTokenResponse> response = REST_TEMPLATE.postForEntity(
+                provider.getAccessTokenUrl(),
                 entity, GoogleTokenResponse.class);
 
         return extractAccessToken(response);

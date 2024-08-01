@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class ZoneCategoryRegisterRequest {
+
     @Min(1)
     @Nullable
     private Long parentId;

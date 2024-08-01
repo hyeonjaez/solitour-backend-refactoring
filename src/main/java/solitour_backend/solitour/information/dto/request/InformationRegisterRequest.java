@@ -4,16 +4,18 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+
+import java.util.List;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import solitour_backend.solitour.place.dto.request.PlaceRegisterRequest;
 import solitour_backend.solitour.tag.dto.request.TagRegisterRequest;
 
-import java.util.List;
-
 @Getter
 @NoArgsConstructor
 public class InformationRegisterRequest {
+
     @NotBlank
     @Size(min = 1, max = 50)
     private String informationTitle;
@@ -37,9 +39,13 @@ public class InformationRegisterRequest {
     @Min(1)
     private Long categoryId;
 
-    @NotNull
-    @Min(1)
-    private Long zoneCategoryId;
+    @NotBlank
+    @Size(min = 1, max = 20)
+    private String zoneCategoryNameParent;
+
+    @NotBlank
+    @Size(min = 1, max = 20)
+    private String zoneCategoryNameChild;
 
     private List<TagRegisterRequest> tagRegisterRequests;
 

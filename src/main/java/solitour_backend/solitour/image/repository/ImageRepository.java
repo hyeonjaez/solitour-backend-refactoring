@@ -1,20 +1,20 @@
 package solitour_backend.solitour.image.repository;
 
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import solitour_backend.solitour.image.entity.Image;
 import solitour_backend.solitour.image.image_status.ImageStatus;
 
-import java.util.List;
-
 public interface ImageRepository extends JpaRepository<Image, Long> {
 
-    boolean existsByInformationId(Long informationId);
+    boolean existsByInformationIdAndImageStatus(Long informationId, ImageStatus imageStatus);
 
-    List<Image> findAllByInformationIdAndImageStatus(Long informationId, ImageStatus imageStatus);
+    List<Image> findAllByInformationId(Long informationId);
 
-    Image findOneByInformationIdAndImageStatus(Long informationId, ImageStatus imageStatus);
+    boolean existsImageByAddress(String address);
 
-    boolean existsByUserId(Long userId);
+    void deleteByAddress(String address);
 
-    Image findOneByUserId(Long userId);
+    void deleteAllByInformationId(Long informationId);
 }

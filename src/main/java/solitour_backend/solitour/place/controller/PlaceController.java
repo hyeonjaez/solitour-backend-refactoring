@@ -5,7 +5,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import solitour_backend.solitour.error.Utils;
 import solitour_backend.solitour.place.dto.request.PlaceModifyRequest;
 import solitour_backend.solitour.place.dto.request.PlaceRegisterRequest;
@@ -16,6 +23,7 @@ import solitour_backend.solitour.place.service.PlaceService;
 @RequiredArgsConstructor
 @RequestMapping("/api/places")
 public class PlaceController {
+
     private final PlaceService placeService;
 
 
@@ -27,7 +35,9 @@ public class PlaceController {
     }
 
     @PostMapping
-    public ResponseEntity<PlaceResponse> registerPlace(@Valid @RequestBody PlaceRegisterRequest placeRegisterRequest, BindingResult bindingResult) {
+    public ResponseEntity<PlaceResponse> registerPlace(
+            @Valid @RequestBody PlaceRegisterRequest placeRegisterRequest,
+            BindingResult bindingResult) {
         Utils.validationRequest(bindingResult);
         PlaceResponse placeResponse = placeService.savePlace(placeRegisterRequest);
 
@@ -35,7 +45,9 @@ public class PlaceController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<PlaceResponse> modifyPlace(@PathVariable("id") Long id, @Valid @RequestBody PlaceModifyRequest placeModifyRequest, BindingResult bindingResult) {
+    public ResponseEntity<PlaceResponse> modifyPlace(@PathVariable("id") Long id,
+                                                     @Valid @RequestBody PlaceModifyRequest placeModifyRequest,
+                                                     BindingResult bindingResult) {
         Utils.validationRequest(bindingResult);
         PlaceResponse placeResponse = placeService.updatePlace(id, placeModifyRequest);
 

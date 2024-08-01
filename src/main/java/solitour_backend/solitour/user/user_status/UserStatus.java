@@ -1,8 +1,8 @@
 package solitour_backend.solitour.user.user_status;
 
-import lombok.Getter;
-
 import java.util.Arrays;
+
+import lombok.Getter;
 
 @Getter
 public enum UserStatus {

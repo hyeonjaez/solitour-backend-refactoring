@@ -1,20 +1,24 @@
 package solitour_backend.solitour.information.entity;
 
 import jakarta.persistence.*;
+
+import java.time.LocalDateTime;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import solitour_backend.solitour.category.entity.Category;
 import solitour_backend.solitour.place.entity.Place;
 import solitour_backend.solitour.user.entity.User;
 import solitour_backend.solitour.zone_category.entity.ZoneCategory;
 
-import java.time.LocalDateTime;
-
 @Entity
 @Getter
+@Setter
 @Table(name = "information")
 @NoArgsConstructor
 public class Information {
+
     @Id
     @Column(name = "information_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,9 +36,10 @@ public class Information {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     @JoinColumn(name = "place_id")
     private Place place;
+
 
     @Column(name = "information_title")
     private String title;
@@ -54,7 +59,9 @@ public class Information {
     @Column(name = "information_tip")
     private String tip;
 
-    public Information(Category category, ZoneCategory zoneCategory, User user, Place place, String title, String address, LocalDateTime createdDate, Integer viewCount, String content, String tip) {
+    public Information(Category category, ZoneCategory zoneCategory, User user, Place place,
+                       String title, String address, LocalDateTime createdDate, Integer viewCount, String content,
+                       String tip) {
         this.category = category;
         this.zoneCategory = zoneCategory;
         this.user = user;
