@@ -28,7 +28,7 @@ public class GatheringApplicants {
     private User user;
 
     @Column(name = "gathering_applicants_state")
-    @Convert(converter = GatheringStatus.class)
+    @Convert(converter = GatheringStatusConverter.class)
     private GatheringStatus gatheringStatus;
 
     public GatheringApplicants(Gathering gathering, User user, GatheringStatus gatheringStatus) {
