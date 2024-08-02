@@ -69,7 +69,7 @@ public class Gathering {
     private LocalDateTime deadline;
 
     @Column(name = "gathering_allowed_sex")
-    @Convert(converter = AllowedSex.class)
+    @Convert(converter = AllowedSexConverter.class)
     private AllowedSex allowedSex;
 
     @Column(name = "gathering_start_age")
