@@ -1,7 +1,7 @@
-package solitour_backend.solitour.admin.repository;
+package solitour_backend.solitour.gathering_category.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import solitour_backend.solitour.admin.entity.GatheringCategory;
+import solitour_backend.solitour.gathering_category.entity.GatheringCategory;
 
 import java.util.List;
 
