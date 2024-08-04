@@ -6,9 +6,9 @@ import java.util.Arrays;
 
 @Getter
 public enum AllowedSex {
-    MALE("남자"),
-    FEMALE("여자"),
-    ALL("성별무관");
+    MALE("male"),
+    FEMALE("female"),
+    ALL("all");
 
     private final String name;
 

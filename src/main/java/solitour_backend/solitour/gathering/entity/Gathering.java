@@ -6,6 +6,9 @@ import java.time.LocalDateTime;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import solitour_backend.solitour.gathering_category.entity.GatheringCategory;
 import solitour_backend.solitour.place.entity.Place;
 import solitour_backend.solitour.user.entity.User;
@@ -15,6 +18,7 @@ import solitour_backend.solitour.zone_category.entity.ZoneCategory;
 @Getter
 @Table(name = "gathering")
 @NoArgsConstructor
+@EntityListeners(AuditingEntityListener.class)
 public class Gathering {
 
     @Id
@@ -50,9 +54,11 @@ public class Gathering {
     @Column(name = "gathering_view_count")
     private Integer viewCount;
 
+    @CreatedDate
     @Column(name = "gathering_created_at")
     private LocalDateTime createdAt;
 
+    @LastModifiedDate
     @Column(name = "gathering_edited_at")
     private LocalDateTime editedAt;
 
@@ -78,7 +84,7 @@ public class Gathering {
     @Column(name = "gathering_end_age")
     private Integer endAge;
 
-    public Gathering(User user, ZoneCategory zoneCategory, GatheringCategory gatheringCategory, Place place, String title, String content, Integer personCount, Integer viewCount, LocalDateTime createdAt, LocalDateTime editedAt, LocalDateTime scheduleStartDate, LocalDateTime scheduleEndDate, Boolean isFinish, LocalDateTime deadline, AllowedSex allowedSex, Integer startAge, Integer endAge) {
+    public Gathering(User user, ZoneCategory zoneCategory, GatheringCategory gatheringCategory, Place place, String title, String content, Integer personCount, Integer viewCount, LocalDateTime scheduleStartDate, LocalDateTime scheduleEndDate, Boolean isFinish, LocalDateTime deadline, AllowedSex allowedSex, Integer startAge, Integer endAge) {
         this.user = user;
         this.zoneCategory = zoneCategory;
         this.gatheringCategory = gatheringCategory;
@@ -87,8 +93,6 @@ public class Gathering {
         this.content = content;
         this.personCount = personCount;
         this.viewCount = viewCount;
-        this.createdAt = createdAt;
-        this.editedAt = editedAt;
         this.scheduleStartDate = scheduleStartDate;
         this.scheduleEndDate = scheduleEndDate;
         this.isFinish = isFinish;

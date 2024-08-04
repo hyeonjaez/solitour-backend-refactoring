@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import solitour_backend.solitour.category.exception.CategoryNotExistsException;
 import solitour_backend.solitour.error.exception.RequestValidationFailedException;
+import solitour_backend.solitour.gathering.exception.GatheringCategoryNotExistsException;
 import solitour_backend.solitour.image.exception.ImageAlreadyExistsException;
 import solitour_backend.solitour.image.exception.ImageNotExistsException;
 import solitour_backend.solitour.image.exception.ImageRequestValidationFailedException;
@@ -32,8 +33,8 @@ public class GlobalControllerAdvice {
     }
 
     @ExceptionHandler({ZoneCategoryNotExistsException.class, ImageNotExistsException.class,
-            CategoryNotExistsException.class, InformationNotExistsException.class, UserNotExistsException.class,})
-    public ResponseEntity<String> exception(Exception exception) {
+            CategoryNotExistsException.class, InformationNotExistsException.class, UserNotExistsException.class, GatheringCategoryNotExistsException.class})
+    public ResponseEntity<String> notFoundException(Exception exception) {
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
                 .body(exception.getMessage());
