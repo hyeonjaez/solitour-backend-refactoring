@@ -1,28 +1,31 @@
 package solitour_backend.solitour.gathering.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import solitour_backend.solitour.auth.config.AuthenticationPrincipal;
+import solitour_backend.solitour.auth.support.CookieExtractor;
+import solitour_backend.solitour.auth.support.JwtTokenProvider;
 import solitour_backend.solitour.error.Utils;
 import solitour_backend.solitour.error.exception.RequestValidationFailedException;
 import solitour_backend.solitour.gathering.dto.request.GatheringRegisterRequest;
+import solitour_backend.solitour.gathering.dto.response.GatheringDetailResponse;
 import solitour_backend.solitour.gathering.dto.response.GatheringResponse;
 import solitour_backend.solitour.gathering.service.GatheringService;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/gatherings")
 public class GatheringController {
     private final GatheringService gatheringService;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @PostMapping
     public ResponseEntity<GatheringResponse> createGathering(@AuthenticationPrincipal Long userId,
@@ -46,6 +49,31 @@ public class GatheringController {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(gatheringResponse);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<GatheringDetailResponse> getGatheringDetail(@PathVariable Long id,
+                                                                      HttpServletRequest request) {
+        Long userId = findUser(request);
+        GatheringDetailResponse gatheringDetail = gatheringService.getGatheringDetail(userId, id);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(gatheringDetail);
+    }
+
+
+    private Long findUser(HttpServletRequest request) {
+        String token = CookieExtractor.findToken("access_token", request.getCookies());
+
+        if (Objects.isNull(token)) {
+            token = CookieExtractor.findToken("refresh_token", request.getCookies());
+        }
+        if (Objects.isNull(token)) {
+            return (long) 0;
+        }
+
+        return jwtTokenProvider.getPayload(token);
     }
 
 
