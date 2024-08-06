@@ -1,14 +1,21 @@
 package solitour_backend.solitour.auth.support.google;
 
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
-
+import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -40,9 +47,9 @@ public class GoogleConnector {
                 GoogleUserResponse.class);
     }
 
-    private String requestAccessToken(String code, String redirectUrl) {
+    public String requestAccessToken(String code, String redirectUrl) {
         HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(
-                createBody(code, redirectUrl), createHeaders());
+                createLoginBody(code, redirectUrl), createLoginHeaders());
 
         ResponseEntity<GoogleTokenResponse> response = REST_TEMPLATE.postForEntity(
                 provider.getAccessTokenUrl(),
@@ -51,20 +58,41 @@ public class GoogleConnector {
         return extractAccessToken(response);
     }
 
-    private HttpHeaders createHeaders() {
+    public HttpStatusCode requestRevoke(String token) throws IOException {
+        HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(
+                createLogoutBody(token), createLogoutHeaders());
+
+        ResponseEntity<Void> response = REST_TEMPLATE.postForEntity(provider.getRevokeUrl(), entity, Void.class);
+
+        return response.getStatusCode();
+    }
+
+    private HttpHeaders createLoginHeaders() {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
         return headers;
     }
 
-    private MultiValueMap<String, String> createBody(String code, String redirectUrl) {
+    private MultiValueMap<String, String> createLoginBody(String code, String redirectUrl) {
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("code", code);
         body.add("client_id", provider.getClientId());
         body.add("client_secret", provider.getClientSecret());
         body.add("redirect_uri", redirectUrl);
         body.add("grant_type", provider.getGrantType());
+        return body;
+    }
+
+    private HttpHeaders createLogoutHeaders() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        return headers;
+    }
+
+    private MultiValueMap<String, String> createLogoutBody(String token) {
+        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+        body.add("token", token);
         return body;
     }
 

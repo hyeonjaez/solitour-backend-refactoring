@@ -39,7 +39,7 @@ public class KakaoConnector {
                 KakaoUserResponse.class);
     }
 
-    private String requestAccessToken(String code, String redirectUrl) {
+    public String requestAccessToken(String code, String redirectUrl) {
         HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(
                 createBody(code, redirectUrl), createHeaders());
 

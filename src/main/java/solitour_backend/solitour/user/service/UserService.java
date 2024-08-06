@@ -36,4 +36,10 @@ public class UserService {
         user.updateAgeAndSex(age,sex);
     }
 
+
+    @Transactional
+    public void deleteUser(Long userId) {
+        User user = userRepository.findByUserId(userId);
+        user.deleteUser(userId);
+    }
 }

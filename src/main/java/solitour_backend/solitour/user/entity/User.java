@@ -87,4 +87,8 @@ public class User {
         this.sex= sex;
     }
 
+    public void deleteUser(Long userId) {
+        this.userStatus = UserStatus.DELETE;
+        this.deletedAt = LocalDateTime.now();
+    }
 }
