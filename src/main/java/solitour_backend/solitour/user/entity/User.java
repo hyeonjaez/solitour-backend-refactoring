@@ -81,4 +81,10 @@ public class User {
     public void updateNickname(String nickname) {
         this.nickname = nickname;
     }
+
+    public void updateAgeAndSex(String age, String sex) {
+        this.age = Integer.parseInt(age);
+        this.sex= sex;
+    }
+
 }

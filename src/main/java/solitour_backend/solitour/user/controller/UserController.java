@@ -25,7 +25,7 @@ public class UserController {
 
     @GetMapping("/info")
     public ResponseEntity<UserInfoResponse> retrieveUserInfo(@AuthenticationPrincipal Long userId) {
-        UserInfoResponse response = service.retrieveUserInfo(userId);
+        UserInfoResponse response = userService.retrieveUserInfo(userId);
 
         return ResponseEntity.ok(response);
     }
@@ -33,12 +33,25 @@ public class UserController {
     @PutMapping("/nickname")
     public ResponseEntity<String> updateNickname(@AuthenticationPrincipal Long userId, @RequestBody UpdateNicknameRequest request) {
         try {
-            service.updateNickname(userId, request.nickname());
+            userService.updateNickname(userId, request.nickname());
             return ResponseEntity.ok("Nickname updated successfully");
         } catch (UserNotExistsException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
         } catch (NicknameAlreadyExistsException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Nickname already exists");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An internal error occurred");
+        }
+    }
+
+    @Authenticated
+    @PutMapping("/age-sex")
+    public ResponseEntity<String> updateAgeAndSex(@AuthenticationPrincipal Long userId, @RequestBody UpdateAgeAndSex request) {
+        try {
+            userService.updateAgeAndSex(userId, request.age(),request.sex());
+            return ResponseEntity.ok("Age and Sex updated successfully");
+        } catch (UserNotExistsException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An internal error occurred");
         }

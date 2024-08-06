@@ -29,4 +29,11 @@ public class UserService {
         User user = userRepository.findByUserId(userId);
         user.updateNickname(nickname);
     }
+
+    @Transactional
+    public void updateAgeAndSex(Long userId, String age, String sex) {
+        User user = userRepository.findByUserId(userId);
+        user.updateAgeAndSex(age,sex);
+    }
+
 }
