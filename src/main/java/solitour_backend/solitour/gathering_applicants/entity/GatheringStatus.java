@@ -6,9 +6,9 @@ import java.util.Arrays;
 
 @Getter
 public enum GatheringStatus {
-    WAIT("대기"),
-    CONSENT("승낙"),
-    REFUSE("거절");
+    WAIT("wait"),
+    CONSENT("consent"),
+    REFUSE("refuse");
 
     private final String name;
 
