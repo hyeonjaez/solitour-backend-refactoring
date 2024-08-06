@@ -2,6 +2,9 @@ package solitour_backend.solitour.information.repository;
 
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.JPQLQuery;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Objects;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -17,10 +20,6 @@ import solitour_backend.solitour.information.dto.response.InformationRankRespons
 import solitour_backend.solitour.information.entity.Information;
 import solitour_backend.solitour.information.entity.QInformation;
 import solitour_backend.solitour.zone_category.entity.QZoneCategory;
-
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Objects;
 
 public class InformationRepositoryImpl extends QuerydslRepositorySupport implements InformationRepositoryCustom {
 
@@ -38,11 +37,15 @@ public class InformationRepositoryImpl extends QuerydslRepositorySupport impleme
 
 
     @Override
-    public Page<InformationBriefResponse> getInformationByParentCategoryFilterZoneCategory(Pageable pageable, Long parentCategoryId, Long userId, Long zoneCategoryId) {
+    public Page<InformationBriefResponse> getInformationByParentCategoryFilterZoneCategory(Pageable pageable,
+                                                                                           Long parentCategoryId,
+                                                                                           Long userId,
+                                                                                           Long zoneCategoryId) {
         JPQLQuery<Information> query = from(information)
                 .join(zoneCategoryChild).on(zoneCategoryChild.id.eq(information.zoneCategory.id))
                 .leftJoin(zoneCategoryParent).on(zoneCategoryParent.id.eq(zoneCategoryChild.parentZoneCategory.id))
-                .leftJoin(bookMarkInformation).on(bookMarkInformation.information.id.eq(information.id).and(bookMarkInformation.user.id.eq(userId)))
+                .leftJoin(bookMarkInformation)
+                .on(bookMarkInformation.information.id.eq(information.id).and(bookMarkInformation.user.id.eq(userId)))
                 .leftJoin(image).on(image.information.id.eq(information.id)
                         .and(image.imageStatus.eq(ImageStatus.THUMBNAIL)))
                 .leftJoin(greatInformation).on(greatInformation.information.id.eq(information.id))
@@ -76,11 +79,15 @@ public class InformationRepositoryImpl extends QuerydslRepositorySupport impleme
     }
 
     @Override
-    public Page<InformationBriefResponse> getInformationByChildCategoryFilterZoneCategory(Pageable pageable, Long childCategoryId, Long userId, Long zoneCategoryId) {
+    public Page<InformationBriefResponse> getInformationByChildCategoryFilterZoneCategory(Pageable pageable,
+                                                                                          Long childCategoryId,
+                                                                                          Long userId,
+                                                                                          Long zoneCategoryId) {
         JPQLQuery<Information> query = from(information)
                 .join(zoneCategoryChild).on(zoneCategoryChild.id.eq(information.zoneCategory.id))
                 .leftJoin(zoneCategoryParent).on(zoneCategoryParent.id.eq(zoneCategoryChild.parentZoneCategory.id))
-                .leftJoin(bookMarkInformation).on(bookMarkInformation.information.id.eq(information.id).and(bookMarkInformation.user.id.eq(userId)))
+                .leftJoin(bookMarkInformation)
+                .on(bookMarkInformation.information.id.eq(information.id).and(bookMarkInformation.user.id.eq(userId)))
                 .leftJoin(image).on(image.information.id.eq(information.id)
                         .and(image.imageStatus.eq(ImageStatus.THUMBNAIL)))
                 .leftJoin(greatInformation).on(greatInformation.information.id.eq(information.id))
@@ -115,11 +122,15 @@ public class InformationRepositoryImpl extends QuerydslRepositorySupport impleme
 
 
     @Override
-    public Page<InformationBriefResponse> getInformationByParentCategoryFilterZoneCategoryLikeCount(Pageable pageable, Long categoryId, Long userId, Long zoneCategoryId) {
+    public Page<InformationBriefResponse> getInformationByParentCategoryFilterZoneCategoryLikeCount(Pageable pageable,
+                                                                                                    Long categoryId,
+                                                                                                    Long userId,
+                                                                                                    Long zoneCategoryId) {
         JPQLQuery<Information> query = from(information)
                 .join(zoneCategoryChild).on(zoneCategoryChild.id.eq(information.zoneCategory.id))
                 .leftJoin(zoneCategoryParent).on(zoneCategoryParent.id.eq(zoneCategoryChild.parentZoneCategory.id))
-                .leftJoin(bookMarkInformation).on(bookMarkInformation.information.id.eq(information.id).and(bookMarkInformation.user.id.eq(userId)))
+                .leftJoin(bookMarkInformation)
+                .on(bookMarkInformation.information.id.eq(information.id).and(bookMarkInformation.user.id.eq(userId)))
                 .leftJoin(image).on(image.information.id.eq(information.id)
                         .and(image.imageStatus.eq(ImageStatus.THUMBNAIL)))
                 .leftJoin(greatInformation).on(greatInformation.information.id.eq(information.id))
@@ -129,7 +140,8 @@ public class InformationRepositoryImpl extends QuerydslRepositorySupport impleme
             query = query.where(information.zoneCategory.parentZoneCategory.id.eq(zoneCategoryId));
         }
 
-        List<InformationBriefResponse> list = query.groupBy(information.id, zoneCategoryChild.id, zoneCategoryParent.id, image.id)
+        List<InformationBriefResponse> list = query.groupBy(information.id, zoneCategoryChild.id, zoneCategoryParent.id,
+                        image.id)
                 .orderBy(greatInformation.information.count().desc())
                 .select(Projections.constructor(
                         InformationBriefResponse.class,
@@ -152,11 +164,15 @@ public class InformationRepositoryImpl extends QuerydslRepositorySupport impleme
     }
 
     @Override
-    public Page<InformationBriefResponse> getInformationByChildCategoryFilterZoneCategoryLikeCount(Pageable pageable, Long categoryId, Long userId, Long zoneCategoryId) {
+    public Page<InformationBriefResponse> getInformationByChildCategoryFilterZoneCategoryLikeCount(Pageable pageable,
+                                                                                                   Long categoryId,
+                                                                                                   Long userId,
+                                                                                                   Long zoneCategoryId) {
         JPQLQuery<Information> query = from(information)
                 .join(zoneCategoryChild).on(zoneCategoryChild.id.eq(information.zoneCategory.id))
                 .leftJoin(zoneCategoryParent).on(zoneCategoryParent.id.eq(zoneCategoryChild.parentZoneCategory.id))
-                .leftJoin(bookMarkInformation).on(bookMarkInformation.information.id.eq(information.id).and(bookMarkInformation.user.id.eq(userId)))
+                .leftJoin(bookMarkInformation)
+                .on(bookMarkInformation.information.id.eq(information.id).and(bookMarkInformation.user.id.eq(userId)))
                 .leftJoin(image).on(image.information.id.eq(information.id)
                         .and(image.imageStatus.eq(ImageStatus.THUMBNAIL)))
                 .leftJoin(greatInformation).on(greatInformation.information.id.eq(information.id))
@@ -190,11 +206,15 @@ public class InformationRepositoryImpl extends QuerydslRepositorySupport impleme
     }
 
     @Override
-    public Page<InformationBriefResponse> getInformationByParentCategoryFilterZoneCategoryViewCount(Pageable pageable, Long categoryId, Long userId, Long zoneCategoryId) {
+    public Page<InformationBriefResponse> getInformationByParentCategoryFilterZoneCategoryViewCount(Pageable pageable,
+                                                                                                    Long categoryId,
+                                                                                                    Long userId,
+                                                                                                    Long zoneCategoryId) {
         JPQLQuery<Information> query = from(information)
                 .join(zoneCategoryChild).on(zoneCategoryChild.id.eq(information.zoneCategory.id))
                 .leftJoin(zoneCategoryParent).on(zoneCategoryParent.id.eq(zoneCategoryChild.parentZoneCategory.id))
-                .leftJoin(bookMarkInformation).on(bookMarkInformation.information.id.eq(information.id).and(bookMarkInformation.user.id.eq(userId)))
+                .leftJoin(bookMarkInformation)
+                .on(bookMarkInformation.information.id.eq(information.id).and(bookMarkInformation.user.id.eq(userId)))
                 .leftJoin(image).on(image.information.id.eq(information.id)
                         .and(image.imageStatus.eq(ImageStatus.THUMBNAIL)))
                 .leftJoin(greatInformation).on(greatInformation.information.id.eq(information.id))
@@ -228,11 +248,15 @@ public class InformationRepositoryImpl extends QuerydslRepositorySupport impleme
     }
 
     @Override
-    public Page<InformationBriefResponse> getInformationByChildCategoryFilterZoneCategoryViewCount(Pageable pageable, Long categoryId, Long userId, Long zoneCategoryId) {
+    public Page<InformationBriefResponse> getInformationByChildCategoryFilterZoneCategoryViewCount(Pageable pageable,
+                                                                                                   Long categoryId,
+                                                                                                   Long userId,
+                                                                                                   Long zoneCategoryId) {
         JPQLQuery<Information> query = from(information)
                 .join(zoneCategoryChild).on(zoneCategoryChild.id.eq(information.zoneCategory.id))
                 .leftJoin(zoneCategoryParent).on(zoneCategoryParent.id.eq(zoneCategoryChild.parentZoneCategory.id))
-                .leftJoin(bookMarkInformation).on(bookMarkInformation.information.id.eq(information.id).and(bookMarkInformation.user.id.eq(userId)))
+                .leftJoin(bookMarkInformation)
+                .on(bookMarkInformation.information.id.eq(information.id).and(bookMarkInformation.user.id.eq(userId)))
                 .leftJoin(image).on(image.information.id.eq(information.id)
                         .and(image.imageStatus.eq(ImageStatus.THUMBNAIL)))
                 .leftJoin(greatInformation).on(greatInformation.information.id.eq(information.id))
@@ -271,12 +295,15 @@ public class InformationRepositoryImpl extends QuerydslRepositorySupport impleme
         return from(information)
                 .leftJoin(zoneCategoryChild).on(zoneCategoryChild.id.eq(information.zoneCategory.id))
                 .leftJoin(zoneCategoryParent).on(zoneCategoryParent.id.eq(zoneCategoryChild.parentZoneCategory.id))
-                .leftJoin(bookMarkInformation).on(bookMarkInformation.information.id.eq(information.id).and(bookMarkInformation.user.id.eq(userId)))
-                .leftJoin(image).on(image.information.id.eq(information.id).and(image.imageStatus.eq(ImageStatus.THUMBNAIL)))
+                .leftJoin(bookMarkInformation)
+                .on(bookMarkInformation.information.id.eq(information.id).and(bookMarkInformation.user.id.eq(userId)))
+                .leftJoin(image)
+                .on(image.information.id.eq(information.id).and(image.imageStatus.eq(ImageStatus.THUMBNAIL)))
                 .leftJoin(greatInformation).on(greatInformation.information.id.eq(information.id))
                 .leftJoin(category).on(category.id.eq(information.category.id))
                 .where(information.createdDate.after(LocalDateTime.now().minusMonths(3)))
-                .groupBy(information.id, information.title, zoneCategoryParent.name, zoneCategoryChild.name, bookMarkInformation.id, image.address)
+                .groupBy(information.id, information.title, zoneCategoryParent.name, zoneCategoryChild.name,
+                        bookMarkInformation.id, image.address)
                 .orderBy(greatInformation.information.id.count().desc())
                 .select(Projections.constructor(
                         InformationMainResponse.class,
@@ -294,11 +321,13 @@ public class InformationRepositoryImpl extends QuerydslRepositorySupport impleme
     }
 
     @Override
-    public List<InformationBriefResponse> getInformationRecommend(Long informationId, Long childCategoryId, Long userId) {
+    public List<InformationBriefResponse> getInformationRecommend(Long informationId, Long childCategoryId,
+                                                                  Long userId) {
         return from(information)
                 .join(zoneCategoryChild).on(zoneCategoryChild.id.eq(information.zoneCategory.id))
                 .leftJoin(zoneCategoryParent).on(zoneCategoryParent.id.eq(zoneCategoryChild.parentZoneCategory.id))
-                .leftJoin(bookMarkInformation).on(bookMarkInformation.information.id.eq(information.id).and(bookMarkInformation.user.id.eq(userId)))
+                .leftJoin(bookMarkInformation)
+                .on(bookMarkInformation.information.id.eq(information.id).and(bookMarkInformation.user.id.eq(userId)))
                 .leftJoin(image).on(image.information.id.eq(information.id)
                         .and(image.imageStatus.eq(ImageStatus.THUMBNAIL)))
                 .leftJoin(greatInformation).on(greatInformation.information.id.eq(information.id))

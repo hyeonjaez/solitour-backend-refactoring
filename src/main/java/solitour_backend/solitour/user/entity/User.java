@@ -10,9 +10,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-
 import java.time.LocalDateTime;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -84,7 +82,7 @@ public class User {
 
     public void updateAgeAndSex(String age, String sex) {
         this.age = Integer.parseInt(age);
-        this.sex= sex;
+        this.sex = sex;
     }
 
     public void deleteUser(Long userId) {

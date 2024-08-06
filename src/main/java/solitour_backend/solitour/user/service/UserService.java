@@ -33,7 +33,7 @@ public class UserService {
     @Transactional
     public void updateAgeAndSex(Long userId, String age, String sex) {
         User user = userRepository.findByUserId(userId);
-        user.updateAgeAndSex(age,sex);
+        user.updateAgeAndSex(age, sex);
     }
 
 

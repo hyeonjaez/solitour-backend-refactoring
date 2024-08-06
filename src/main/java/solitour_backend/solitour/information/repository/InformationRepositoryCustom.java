@@ -1,5 +1,6 @@
 package solitour_backend.solitour.information.repository;
 
+import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.NoRepositoryBean;
@@ -7,23 +8,37 @@ import solitour_backend.solitour.information.dto.response.InformationBriefRespon
 import solitour_backend.solitour.information.dto.response.InformationMainResponse;
 import solitour_backend.solitour.information.dto.response.InformationRankResponse;
 
-import java.util.List;
-
 
 @NoRepositoryBean
 public interface InformationRepositoryCustom {
 
-    Page<InformationBriefResponse> getInformationByParentCategoryFilterZoneCategory(Pageable pageable, Long parentCategoryId, Long userId, Long zoneCategoryId);
+    Page<InformationBriefResponse> getInformationByParentCategoryFilterZoneCategory(Pageable pageable,
+                                                                                    Long parentCategoryId, Long userId,
+                                                                                    Long zoneCategoryId);
 
-    Page<InformationBriefResponse> getInformationByChildCategoryFilterZoneCategory(Pageable pageable, Long childCategoryId, Long userId, Long zoneCategoryId);
+    Page<InformationBriefResponse> getInformationByChildCategoryFilterZoneCategory(Pageable pageable,
+                                                                                   Long childCategoryId, Long userId,
+                                                                                   Long zoneCategoryId);
 
-    Page<InformationBriefResponse> getInformationByParentCategoryFilterZoneCategoryLikeCount(Pageable pageable, Long categoryId, Long userId, Long zoneCategoryId);
+    Page<InformationBriefResponse> getInformationByParentCategoryFilterZoneCategoryLikeCount(Pageable pageable,
+                                                                                             Long categoryId,
+                                                                                             Long userId,
+                                                                                             Long zoneCategoryId);
 
-    Page<InformationBriefResponse> getInformationByChildCategoryFilterZoneCategoryLikeCount(Pageable pageable, Long categoryId, Long userId, Long zoneCategoryId);
+    Page<InformationBriefResponse> getInformationByChildCategoryFilterZoneCategoryLikeCount(Pageable pageable,
+                                                                                            Long categoryId,
+                                                                                            Long userId,
+                                                                                            Long zoneCategoryId);
 
-    Page<InformationBriefResponse> getInformationByParentCategoryFilterZoneCategoryViewCount(Pageable pageable, Long categoryId, Long userId, Long zoneCategoryId);
+    Page<InformationBriefResponse> getInformationByParentCategoryFilterZoneCategoryViewCount(Pageable pageable,
+                                                                                             Long categoryId,
+                                                                                             Long userId,
+                                                                                             Long zoneCategoryId);
 
-    Page<InformationBriefResponse> getInformationByChildCategoryFilterZoneCategoryViewCount(Pageable pageable, Long categoryId, Long userId, Long zoneCategoryId);
+    Page<InformationBriefResponse> getInformationByChildCategoryFilterZoneCategoryViewCount(Pageable pageable,
+                                                                                            Long categoryId,
+                                                                                            Long userId,
+                                                                                            Long zoneCategoryId);
 
     List<InformationRankResponse> getInformationRank();
 

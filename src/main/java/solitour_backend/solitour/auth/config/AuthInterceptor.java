@@ -3,10 +3,8 @@ package solitour_backend.solitour.auth.config;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
 import java.lang.annotation.Annotation;
 import java.util.Optional;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.cors.CorsUtils;
 import org.springframework.web.method.HandlerMethod;

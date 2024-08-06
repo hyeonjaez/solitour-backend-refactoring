@@ -1,9 +1,7 @@
 package solitour_backend.solitour.category.controller;
 
 import jakarta.validation.Valid;
-
 import java.util.List;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -48,8 +46,9 @@ public class CategoryController {
     }
 
     @PostMapping
-    public ResponseEntity<CategoryResponse> registerCategory(@Valid @RequestBody CategoryRegisterRequest categoryRegisterRequest,
-                                                             BindingResult bindingResult) {
+    public ResponseEntity<CategoryResponse> registerCategory(
+            @Valid @RequestBody CategoryRegisterRequest categoryRegisterRequest,
+            BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             throw new RequestValidationFailedException(bindingResult);
         }
@@ -62,9 +61,10 @@ public class CategoryController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CategoryResponse> modifyCategory(@Valid @RequestBody CategoryModifyRequest categoryModifyRequest,
-                                                           BindingResult bindingResult,
-                                                           @PathVariable Long id) {
+    public ResponseEntity<CategoryResponse> modifyCategory(
+            @Valid @RequestBody CategoryModifyRequest categoryModifyRequest,
+            BindingResult bindingResult,
+            @PathVariable Long id) {
         if (bindingResult.hasErrors()) {
             throw new RequestValidationFailedException(bindingResult);
         }

@@ -1,15 +1,12 @@
 package solitour_backend.solitour.user.controller;
 
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -17,7 +14,6 @@ import solitour_backend.solitour.auth.config.Authenticated;
 import solitour_backend.solitour.auth.config.AuthenticationPrincipal;
 import solitour_backend.solitour.auth.service.OauthService;
 import solitour_backend.solitour.auth.service.TokenService;
-import solitour_backend.solitour.auth.support.CookieExtractor;
 import solitour_backend.solitour.auth.support.google.GoogleConnector;
 import solitour_backend.solitour.auth.support.kakao.KakaoConnector;
 import solitour_backend.solitour.user.dto.UpdateAgeAndSex;
@@ -48,7 +44,8 @@ public class UserController {
 
     @Authenticated
     @PutMapping("/nickname")
-    public ResponseEntity<String> updateNickname(@AuthenticationPrincipal Long userId, @RequestBody UpdateNicknameRequest request) {
+    public ResponseEntity<String> updateNickname(@AuthenticationPrincipal Long userId,
+                                                 @RequestBody UpdateNicknameRequest request) {
         try {
             userService.updateNickname(userId, request.nickname());
             return ResponseEntity.ok("Nickname updated successfully");
@@ -63,9 +60,10 @@ public class UserController {
 
     @Authenticated
     @PutMapping("/age-sex")
-    public ResponseEntity<String> updateAgeAndSex(@AuthenticationPrincipal Long userId, @RequestBody UpdateAgeAndSex request) {
+    public ResponseEntity<String> updateAgeAndSex(@AuthenticationPrincipal Long userId,
+                                                  @RequestBody UpdateAgeAndSex request) {
         try {
-            userService.updateAgeAndSex(userId, request.age(),request.sex());
+            userService.updateAgeAndSex(userId, request.age(), request.sex());
             return ResponseEntity.ok("Age and Sex updated successfully");
         } catch (UserNotExistsException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
@@ -76,8 +74,9 @@ public class UserController {
 
     @Authenticated
     @DeleteMapping()
-    public ResponseEntity<String> deleteUser(@AuthenticationPrincipal Long id, @RequestParam String type, @RequestParam String code, @RequestParam String redirectUrl) {
-        String token  = getOauthAccessToken(type,code,redirectUrl);
+    public ResponseEntity<String> deleteUser(@AuthenticationPrincipal Long id, @RequestParam String type,
+                                             @RequestParam String code, @RequestParam String redirectUrl) {
+        String token = getOauthAccessToken(type, code, redirectUrl);
 
         try {
             oauthservice.revokeToken(token);
@@ -91,7 +90,7 @@ public class UserController {
         }
     }
 
-    private String getOauthAccessToken(String type, String code, String redirectUrl){
+    private String getOauthAccessToken(String type, String code, String redirectUrl) {
         String token = "";
         switch (type) {
             case "kakao" -> {

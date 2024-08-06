@@ -1,7 +1,6 @@
 package solitour_backend.solitour.user.user_status;
 
 import java.util.Arrays;
-
 import lombok.Getter;
 
 @Getter

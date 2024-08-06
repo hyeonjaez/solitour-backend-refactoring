@@ -32,7 +32,8 @@ public class OauthController {
     }
 
     @GetMapping(value = "/login", params = {"type", "code", "redirectUrl"})
-    public ResponseEntity<LoginResponse> login(HttpServletResponse response, @RequestParam String type, @RequestParam String code, @RequestParam String redirectUrl) {
+    public ResponseEntity<LoginResponse> login(HttpServletResponse response, @RequestParam String type,
+                                               @RequestParam String code, @RequestParam String redirectUrl) {
         LoginResponse loginResponse = oauthService.requestAccessToken(type, code, redirectUrl);
 
         String accessCookieHeader = setCookieHeader(loginResponse.getAccessToken());
@@ -53,7 +54,8 @@ public class OauthController {
 
 
     @PostMapping("/token/refresh")
-    public ResponseEntity<Void> reissueAccessToken(HttpServletResponse response, @AuthenticationRefreshPrincipal Long memberId) {
+    public ResponseEntity<Void> reissueAccessToken(HttpServletResponse response,
+                                                   @AuthenticationRefreshPrincipal Long memberId) {
         AccessTokenResponse accessToken = oauthService.reissueAccessToken(memberId);
 
         String accessCookieHeader = setCookieHeader(accessToken.getAccessToken());
@@ -64,6 +66,6 @@ public class OauthController {
 
     private String setCookieHeader(Cookie cookie) {
         return String.format("%s=%s; Path=%s; Max-Age=%d;Secure; HttpOnly; SameSite=Lax",
-                cookie.getName(), cookie.getValue(), cookie.getPath(),cookie.getMaxAge());
+                cookie.getName(), cookie.getValue(), cookie.getPath(), cookie.getMaxAge());
     }
 }

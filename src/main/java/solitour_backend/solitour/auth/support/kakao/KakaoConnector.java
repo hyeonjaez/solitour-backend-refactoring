@@ -3,7 +3,6 @@ package solitour_backend.solitour.auth.support.kakao;
 
 import java.util.Collections;
 import java.util.Optional;
-
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
