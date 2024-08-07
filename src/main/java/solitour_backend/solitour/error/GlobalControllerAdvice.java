@@ -11,6 +11,7 @@ import solitour_backend.solitour.gathering.exception.GatheringNotExistsException
 import solitour_backend.solitour.gathering_applicants.exception.GatheringApplicantsAlreadyExistsException;
 import solitour_backend.solitour.gathering_applicants.exception.GatheringApplicantsAlreadyFullPeopleException;
 import solitour_backend.solitour.gathering_applicants.exception.GatheringApplicantsNotExistsException;
+import solitour_backend.solitour.gathering_applicants.exception.GatheringNotManagerException;
 import solitour_backend.solitour.image.exception.ImageAlreadyExistsException;
 import solitour_backend.solitour.image.exception.ImageNotExistsException;
 import solitour_backend.solitour.image.exception.ImageRequestValidationFailedException;
@@ -54,6 +55,13 @@ public class GlobalControllerAdvice {
     public ResponseEntity<String> notFoundException(Exception exception) {
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
+                .body(exception.getMessage());
+    }
+
+    @ExceptionHandler({GatheringNotManagerException.class})
+    public ResponseEntity<String> forbiddenException(Exception exception) {
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
                 .body(exception.getMessage());
     }
 }
