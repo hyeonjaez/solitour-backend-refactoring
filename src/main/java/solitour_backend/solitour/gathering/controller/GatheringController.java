@@ -12,6 +12,7 @@ import solitour_backend.solitour.auth.support.CookieExtractor;
 import solitour_backend.solitour.auth.support.JwtTokenProvider;
 import solitour_backend.solitour.error.Utils;
 import solitour_backend.solitour.error.exception.RequestValidationFailedException;
+import solitour_backend.solitour.gathering.dto.request.GatheringModifyRequest;
 import solitour_backend.solitour.gathering.dto.request.GatheringRegisterRequest;
 import solitour_backend.solitour.gathering.dto.response.GatheringDetailResponse;
 import solitour_backend.solitour.gathering.dto.response.GatheringResponse;
@@ -60,6 +61,29 @@ public class GatheringController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(gatheringDetail);
+    }
+
+    @PutMapping("/{gatheringId}")
+    public ResponseEntity<GatheringResponse> updateGathering(@AuthenticationPrincipal Long userId,
+                                                             @PathVariable Long gatheringId,
+                                                             @Valid @RequestBody GatheringModifyRequest gatheringModifyRequest) {
+
+
+        if (gatheringModifyRequest.getEndAge() > gatheringModifyRequest.getStartAge()) {
+            throw new RequestValidationFailedException("시작 나이 연도가 끝 나이 연도 보다 앞에 있네요");
+        }
+        if (gatheringModifyRequest.getScheduleStartDate().isAfter(gatheringModifyRequest.getScheduleEndDate())) {
+            throw new RequestValidationFailedException("시작 날짜는 종료 날짜보다 앞에 있어야 합니다.");
+        }
+
+        if (gatheringModifyRequest.getDeadline().isBefore(LocalDateTime.now())) {
+            throw new RequestValidationFailedException("마감일은 현재 시간보다 이후여야 합니다.");
+        }
+        GatheringResponse gatheringResponse = gatheringService.modifyGathering(userId, gatheringId, gatheringModifyRequest);
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(gatheringResponse);
     }
 
 
