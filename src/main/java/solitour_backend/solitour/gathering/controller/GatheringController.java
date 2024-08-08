@@ -64,11 +64,10 @@ public class GatheringController {
     }
 
     @PutMapping("/{gatheringId}")
-    public ResponseEntity<GatheringResponse> updateGathering(@PathVariable Long gatheringId,
-                                                             @Valid @RequestBody GatheringModifyRequest gatheringModifyRequest,
-                                                             HttpServletRequest request) {
+    public ResponseEntity<GatheringResponse> updateGathering(@AuthenticationPrincipal Long userId,
+                                                             @PathVariable Long gatheringId,
+                                                             @Valid @RequestBody GatheringModifyRequest gatheringModifyRequest) {
 
-        Long userId = findUser(request);
 
         if (gatheringModifyRequest.getEndAge() > gatheringModifyRequest.getStartAge()) {
             throw new RequestValidationFailedException("시작 나이 연도가 끝 나이 연도 보다 앞에 있네요");
