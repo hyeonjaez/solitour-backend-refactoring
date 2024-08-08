@@ -10,7 +10,6 @@ import solitour_backend.solitour.book_mark_information.entity.BookMarkInformatio
 import solitour_backend.solitour.category.entity.Category;
 import solitour_backend.solitour.category.exception.CategoryNotExistsException;
 import solitour_backend.solitour.category.repository.CategoryRepository;
-import solitour_backend.solitour.error.exception.RequestValidationFailedException;
 import solitour_backend.solitour.great_information.repository.GreatInformationRepository;
 import solitour_backend.solitour.image.dto.mapper.ImageMapper;
 import solitour_backend.solitour.image.dto.request.ImageDeleteRequest;
