@@ -1,5 +1,10 @@
 package solitour_backend.solitour.information.service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,7 +31,11 @@ import solitour_backend.solitour.info_tag.repository.InfoTagRepository;
 import solitour_backend.solitour.information.dto.mapper.InformationMapper;
 import solitour_backend.solitour.information.dto.request.InformationModifyRequest;
 import solitour_backend.solitour.information.dto.request.InformationRegisterRequest;
-import solitour_backend.solitour.information.dto.response.*;
+import solitour_backend.solitour.information.dto.response.InformationBriefResponse;
+import solitour_backend.solitour.information.dto.response.InformationDetailResponse;
+import solitour_backend.solitour.information.dto.response.InformationMainResponse;
+import solitour_backend.solitour.information.dto.response.InformationRankResponse;
+import solitour_backend.solitour.information.dto.response.InformationResponse;
 import solitour_backend.solitour.information.entity.Information;
 import solitour_backend.solitour.information.exception.InformationNotExistsException;
 import solitour_backend.solitour.information.repository.InformationRepository;
@@ -49,12 +58,6 @@ import solitour_backend.solitour.zone_category.dto.response.ZoneCategoryResponse
 import solitour_backend.solitour.zone_category.entity.ZoneCategory;
 import solitour_backend.solitour.zone_category.exception.ZoneCategoryNotExistsException;
 import solitour_backend.solitour.zone_category.repository.ZoneCategoryRepository;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 
 @Service
 @Transactional(readOnly = true)
@@ -83,7 +86,8 @@ public class InformationService {
 
 
     @Transactional
-    public InformationResponse registerInformation(InformationRegisterRequest informationRegisterRequest, MultipartFile thumbnail, List<MultipartFile> contentImages) {
+    public InformationResponse registerInformation(InformationRegisterRequest informationRegisterRequest,
+                                                   MultipartFile thumbnail, List<MultipartFile> contentImages) {
         Category category = categoryRepository.findById(informationRegisterRequest.getCategoryId())
                 .orElseThrow(
                         () -> new CategoryNotExistsException("해당하는 id의 category 가 없습니다"));
@@ -172,7 +176,8 @@ public class InformationService {
 
         int likeCount = greatInformationRepository.countByInformationId(information.getId());
 
-        List<InformationBriefResponse> informationRecommend = informationRepository.getInformationRecommend(information.getId(), information.getCategory().getId(), userId);
+        List<InformationBriefResponse> informationRecommend = informationRepository.getInformationRecommend(
+                information.getId(), information.getCategory().getId(), userId);
 
         return new InformationDetailResponse(
                 information.getTitle(),
@@ -191,7 +196,8 @@ public class InformationService {
     }
 
     @Transactional
-    public InformationResponse modifyInformation(Long id, InformationModifyRequest informationModifyRequest, MultipartFile thumbNail, List<MultipartFile> contentImages) {
+    public InformationResponse modifyInformation(Long id, InformationModifyRequest informationModifyRequest,
+                                                 MultipartFile thumbNail, List<MultipartFile> contentImages) {
         Information information = informationRepository.findById(id)
                 .orElseThrow(
                         () -> new InformationNotExistsException("해당하는 id의 information이 존재하지 않습니다."));
@@ -214,11 +220,13 @@ public class InformationService {
                         () -> new CategoryNotExistsException("해당하는 cateogry Id 가 존재하지 않습니다."));
         information.setCategory(categoryInformation);
 
-        ZoneCategory parentZoneCategory = zoneCategoryRepository.findByParentZoneCategoryIdAndName(null, informationModifyRequest.getZoneCategoryNameParent())
+        ZoneCategory parentZoneCategory = zoneCategoryRepository.findByParentZoneCategoryIdAndName(null,
+                        informationModifyRequest.getZoneCategoryNameParent())
                 .orElseThrow(
                         () -> new ZoneCategoryNotExistsException("해당하는 name에 대한 zoneCategory가 존재하지 않습니다"));
 
-        ZoneCategory childZoneCategory = zoneCategoryRepository.findByParentZoneCategoryIdAndName(parentZoneCategory.getId(), informationModifyRequest.getZoneCategoryNameChild())
+        ZoneCategory childZoneCategory = zoneCategoryRepository.findByParentZoneCategoryIdAndName(
+                        parentZoneCategory.getId(), informationModifyRequest.getZoneCategoryNameChild())
                 .orElseThrow(
                         () -> new ZoneCategoryNotExistsException("해당하는 name에 대한 zoneCategory가 존재하지 않습니다"));
 
@@ -323,7 +331,10 @@ public class InformationService {
     }
 
     //default
-    public Page<InformationBriefResponse> getBriefInformationPageByParentCategoryFilterZoneCategory(Pageable pageable, Long parentCategoryId, Long userId, Long zoneCategoryId) {
+    public Page<InformationBriefResponse> getBriefInformationPageByParentCategoryFilterZoneCategory(Pageable pageable,
+                                                                                                    Long parentCategoryId,
+                                                                                                    Long userId,
+                                                                                                    Long zoneCategoryId) {
         if (!categoryRepository.existsById(parentCategoryId)) {
             throw new CategoryNotExistsException("해당하는 id의 category는 없습니다");
         }
@@ -331,21 +342,27 @@ public class InformationService {
             throw new ZoneCategoryNotExistsException("해당하는 id의 zoneCategory는 없습니다");
         }
 
-        return informationRepository.getInformationByParentCategoryFilterZoneCategory(pageable, parentCategoryId, userId, zoneCategoryId);
+        return informationRepository.getInformationByParentCategoryFilterZoneCategory(pageable, parentCategoryId,
+                userId, zoneCategoryId);
     }
 
-    public Page<InformationBriefResponse> getBriefInformationPageByChildCategoryFilterZoneCategory(Pageable pageable, Long childCategoryId, Long userId, Long zoneCategoryId) {
+    public Page<InformationBriefResponse> getBriefInformationPageByChildCategoryFilterZoneCategory(Pageable pageable,
+                                                                                                   Long childCategoryId,
+                                                                                                   Long userId,
+                                                                                                   Long zoneCategoryId) {
         if (!categoryRepository.existsById(childCategoryId)) {
             throw new CategoryNotExistsException("해당하는 id의 category는 없습니다");
         }
         if (Objects.nonNull(zoneCategoryId) && !zoneCategoryRepository.existsById(zoneCategoryId)) {
             throw new ZoneCategoryNotExistsException("해당하는 id의 zoneCategory는 없습니다");
         }
-        return informationRepository.getInformationByChildCategoryFilterZoneCategory(pageable, childCategoryId, userId, zoneCategoryId);
+        return informationRepository.getInformationByChildCategoryFilterZoneCategory(pageable, childCategoryId, userId,
+                zoneCategoryId);
     }
 
     //지역카테고리별 좋아요순
-    public Page<InformationBriefResponse> getBriefInformationPageByParentCategoryFilterZoneCategoryLikeCount(Pageable pageable, Long parentCategoryId, Long userId, Long zoneCategoryId) {
+    public Page<InformationBriefResponse> getBriefInformationPageByParentCategoryFilterZoneCategoryLikeCount(
+            Pageable pageable, Long parentCategoryId, Long userId, Long zoneCategoryId) {
         if (!categoryRepository.existsById(parentCategoryId)) {
             throw new CategoryNotExistsException("해당하는 id의 category는 없습니다");
         }
@@ -353,10 +370,12 @@ public class InformationService {
             throw new ZoneCategoryNotExistsException("해당하는 id의 zoneCategory는 없습니다");
         }
 
-        return informationRepository.getInformationByParentCategoryFilterZoneCategoryLikeCount(pageable, parentCategoryId, userId, zoneCategoryId);
+        return informationRepository.getInformationByParentCategoryFilterZoneCategoryLikeCount(pageable,
+                parentCategoryId, userId, zoneCategoryId);
     }
 
-    public Page<InformationBriefResponse> getBriefInformationPageByChildCategoryFilterZoneCategoryLikeCount(Pageable pageable, Long childCategoryId, Long userId, Long zoneCategoryId) {
+    public Page<InformationBriefResponse> getBriefInformationPageByChildCategoryFilterZoneCategoryLikeCount(
+            Pageable pageable, Long childCategoryId, Long userId, Long zoneCategoryId) {
         if (!categoryRepository.existsById(childCategoryId)) {
             throw new CategoryNotExistsException("해당하는 id의 category는 없습니다");
         }
@@ -364,11 +383,13 @@ public class InformationService {
             throw new ZoneCategoryNotExistsException("해당하는 id의 zoneCategory는 없습니다");
         }
 
-        return informationRepository.getInformationByChildCategoryFilterZoneCategoryLikeCount(pageable, childCategoryId, userId, zoneCategoryId);
+        return informationRepository.getInformationByChildCategoryFilterZoneCategoryLikeCount(pageable, childCategoryId,
+                userId, zoneCategoryId);
     }
 
     //지역카테고리별 조회순
-    public Page<InformationBriefResponse> getBriefInformationPageByParentCategoryFilterZoneCategoryViewCount(Pageable pageable, Long parentCategoryId, Long userId, Long zoneCategoryId) {
+    public Page<InformationBriefResponse> getBriefInformationPageByParentCategoryFilterZoneCategoryViewCount(
+            Pageable pageable, Long parentCategoryId, Long userId, Long zoneCategoryId) {
         if (!categoryRepository.existsById(parentCategoryId)) {
             throw new CategoryNotExistsException("해당하는 id의 category는 없습니다");
         }
@@ -376,10 +397,12 @@ public class InformationService {
             throw new ZoneCategoryNotExistsException("해당하는 id의 zoneCategory는 없습니다");
         }
 
-        return informationRepository.getInformationByParentCategoryFilterZoneCategoryViewCount(pageable, parentCategoryId, userId, zoneCategoryId);
+        return informationRepository.getInformationByParentCategoryFilterZoneCategoryViewCount(pageable,
+                parentCategoryId, userId, zoneCategoryId);
     }
 
-    public Page<InformationBriefResponse> getBriefInformationPageByChildCategoryFilterZoneCategoryViewCount(Pageable pageable, Long childCategoryId, Long userId, Long zoneCategoryId) {
+    public Page<InformationBriefResponse> getBriefInformationPageByChildCategoryFilterZoneCategoryViewCount(
+            Pageable pageable, Long childCategoryId, Long userId, Long zoneCategoryId) {
         if (!categoryRepository.existsById(childCategoryId)) {
             throw new CategoryNotExistsException("해당하는 id의 category는 없습니다");
         }
@@ -387,7 +410,8 @@ public class InformationService {
             throw new ZoneCategoryNotExistsException("해당하는 id의 zoneCategory는 없습니다");
         }
 
-        return informationRepository.getInformationByChildCategoryFilterZoneCategoryViewCount(pageable, childCategoryId, userId, zoneCategoryId);
+        return informationRepository.getInformationByChildCategoryFilterZoneCategoryViewCount(pageable, childCategoryId,
+                userId, zoneCategoryId);
     }
 
     public List<InformationRankResponse> getRankInformation() {

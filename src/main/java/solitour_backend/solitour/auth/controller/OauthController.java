@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import solitour_backend.solitour.auth.config.Authenticated;
 import solitour_backend.solitour.auth.config.AuthenticationPrincipal;
 import solitour_backend.solitour.auth.config.AuthenticationRefreshPrincipal;
 import solitour_backend.solitour.auth.service.OauthService;
@@ -33,7 +32,8 @@ public class OauthController {
     }
 
     @GetMapping(value = "/login", params = {"type", "code", "redirectUrl"})
-    public ResponseEntity<LoginResponse> login(HttpServletResponse response, @RequestParam String type, @RequestParam String code, @RequestParam String redirectUrl) {
+    public ResponseEntity<LoginResponse> login(HttpServletResponse response, @RequestParam String type,
+                                               @RequestParam String code, @RequestParam String redirectUrl) {
         LoginResponse loginResponse = oauthService.requestAccessToken(type, code, redirectUrl);
 
         String accessCookieHeader = setCookieHeader(loginResponse.getAccessToken());
@@ -45,7 +45,6 @@ public class OauthController {
         return ResponseEntity.ok().build();
     }
 
-    @Authenticated
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(@AuthenticationPrincipal Long memberId) {
         oauthService.logout(memberId);
@@ -55,7 +54,8 @@ public class OauthController {
 
 
     @PostMapping("/token/refresh")
-    public ResponseEntity<Void> reissueAccessToken(HttpServletResponse response, @AuthenticationRefreshPrincipal Long memberId) {
+    public ResponseEntity<Void> reissueAccessToken(HttpServletResponse response,
+                                                   @AuthenticationRefreshPrincipal Long memberId) {
         AccessTokenResponse accessToken = oauthService.reissueAccessToken(memberId);
 
         String accessCookieHeader = setCookieHeader(accessToken.getAccessToken());
@@ -66,6 +66,6 @@ public class OauthController {
 
     private String setCookieHeader(Cookie cookie) {
         return String.format("%s=%s; Path=%s; Max-Age=%d;Secure; HttpOnly; SameSite=Lax",
-                cookie.getName(), cookie.getValue(), cookie.getPath(),cookie.getMaxAge());
+                cookie.getName(), cookie.getValue(), cookie.getPath(), cookie.getMaxAge());
     }
 }

@@ -10,9 +10,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-
 import java.time.LocalDateTime;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -77,4 +75,18 @@ public class User {
 
     @Column(name = "user_deleted_at")
     private LocalDateTime deletedAt;
+
+    public void updateNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    public void updateAgeAndSex(String age, String sex) {
+        this.age = Integer.parseInt(age);
+        this.sex = sex;
+    }
+
+    public void deleteUser(Long userId) {
+        this.userStatus = UserStatus.DELETE;
+        this.deletedAt = LocalDateTime.now();
+    }
 }

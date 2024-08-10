@@ -2,12 +2,12 @@ package solitour_backend.solitour.auth.service;
 
 
 import jakarta.servlet.http.Cookie;
-
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
-
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import solitour_backend.solitour.auth.service.dto.response.AccessTokenResponse;
@@ -176,7 +176,24 @@ public class OauthService {
     }
 
     @Transactional
-    public void logout(Long memberId) {
-        tokenService.deleteByMemberId(memberId);
+    public void logout(Long userId) {
+        tokenService.deleteByMemberId(userId);
     }
+
+    public void revokeToken(String type, String token) throws IOException {
+        HttpStatusCode responseCode;
+        switch (type) {
+            case "kakao" -> responseCode = kakaoConnector.requestRevoke(token);
+            case "google" -> responseCode = googleConnector.requestRevoke(token);
+            default -> throw new RuntimeException("Unsupported oauth type");
+        }
+
+        if (responseCode.is2xxSuccessful()) {
+            System.out.println("Token successfully revoked");
+        } else {
+            System.out.println("Failed to revoke token, response code: " + responseCode);
+            throw new RuntimeException("Failed to revoke token");
+        }
+    }
+
 }

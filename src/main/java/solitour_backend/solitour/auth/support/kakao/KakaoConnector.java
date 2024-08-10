@@ -1,14 +1,15 @@
 package solitour_backend.solitour.auth.support.kakao;
 
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.Optional;
-
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -39,7 +40,7 @@ public class KakaoConnector {
                 KakaoUserResponse.class);
     }
 
-    private String requestAccessToken(String code, String redirectUrl) {
+    public String requestAccessToken(String code, String redirectUrl) {
         HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(
                 createBody(code, redirectUrl), createHeaders());
 
@@ -73,4 +74,20 @@ public class KakaoConnector {
 
         return response.getAccessToken();
     }
+
+    public HttpStatusCode requestRevoke(String token) throws IOException {
+        HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(createRevokeHeaders(token));
+
+        ResponseEntity<String> response = REST_TEMPLATE.postForEntity(provider.getRevokeUrl(), entity, String.class);
+
+        return response.getStatusCode();
+    }
+
+    private HttpHeaders createRevokeHeaders(String token) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        headers.set("Authorization", String.join(" ", BEARER_TYPE, token));
+        return headers;
+    }
+
 }

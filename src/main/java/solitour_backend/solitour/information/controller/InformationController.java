@@ -3,10 +3,8 @@ package solitour_backend.solitour.information.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-
 import java.util.List;
 import java.util.Objects;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -14,15 +12,27 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import solitour_backend.solitour.auth.config.Authenticated;
 import solitour_backend.solitour.auth.support.CookieExtractor;
 import solitour_backend.solitour.auth.support.JwtTokenProvider;
-import solitour_backend.solitour.auth.config.Authenticated;
 import solitour_backend.solitour.error.Utils;
 import solitour_backend.solitour.information.dto.request.InformationModifyRequest;
 import solitour_backend.solitour.information.dto.request.InformationRegisterRequest;
-import solitour_backend.solitour.information.dto.response.*;
+import solitour_backend.solitour.information.dto.response.InformationBriefResponse;
+import solitour_backend.solitour.information.dto.response.InformationDetailResponse;
+import solitour_backend.solitour.information.dto.response.InformationMainResponse;
+import solitour_backend.solitour.information.dto.response.InformationRankResponse;
+import solitour_backend.solitour.information.dto.response.InformationResponse;
 import solitour_backend.solitour.information.service.InformationService;
 
 @RestController
@@ -37,10 +47,11 @@ public class InformationController {
 
     @PostMapping
     @Authenticated
-    public ResponseEntity<InformationResponse> createInformation(@Valid @RequestPart("request") InformationRegisterRequest informationRegisterRequest,
-                                                                 @RequestPart("thumbNailImage") MultipartFile thumbnail,
-                                                                 @RequestPart("contentImages") List<MultipartFile> contentImages,
-                                                                 BindingResult bindingResult) {
+    public ResponseEntity<InformationResponse> createInformation(
+            @Valid @RequestPart("request") InformationRegisterRequest informationRegisterRequest,
+            @RequestPart("thumbNailImage") MultipartFile thumbnail,
+            @RequestPart("contentImages") List<MultipartFile> contentImages,
+            BindingResult bindingResult) {
         Utils.validationRequest(bindingResult);
         InformationResponse informationResponse = informationService.registerInformation(
                 informationRegisterRequest, thumbnail, contentImages);
@@ -54,7 +65,8 @@ public class InformationController {
     public ResponseEntity<InformationDetailResponse> getDetailInformation(@PathVariable Long informationId,
                                                                           HttpServletRequest request) {
         Long userId = findUser(request);
-        InformationDetailResponse informationDetailResponse = informationService.getDetailInformation(userId, informationId);
+        InformationDetailResponse informationDetailResponse = informationService.getDetailInformation(userId,
+                informationId);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -89,15 +101,17 @@ public class InformationController {
     }
 
     @GetMapping("/parent-category/{parentCategoryId}")
-    public ResponseEntity<Page<InformationBriefResponse>> pageInformationByParentCategoryFilterZoneCategory(@RequestParam(defaultValue = "0") int page,
-                                                                                                            @RequestParam(required = false, name = "zoneCategory") Long zoneCategoryId,
-                                                                                                            @PathVariable("parentCategoryId") Long categoryId,
-                                                                                                            HttpServletRequest request) {
+    public ResponseEntity<Page<InformationBriefResponse>> pageInformationByParentCategoryFilterZoneCategory(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(required = false, name = "zoneCategory") Long zoneCategoryId,
+            @PathVariable("parentCategoryId") Long categoryId,
+            HttpServletRequest request) {
 
         Long userId = findUser(request);
 
         Pageable pageable = PageRequest.of(page, PAGE_SIZE);
-        Page<InformationBriefResponse> briefInformationPage = informationService.getBriefInformationPageByParentCategoryFilterZoneCategory(pageable, categoryId, userId, zoneCategoryId);
+        Page<InformationBriefResponse> briefInformationPage = informationService.getBriefInformationPageByParentCategoryFilterZoneCategory(
+                pageable, categoryId, userId, zoneCategoryId);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -105,14 +119,16 @@ public class InformationController {
     }
 
     @GetMapping("/child-category/{childCategoryId}")
-    public ResponseEntity<Page<InformationBriefResponse>> pageInformationByChildCategoryFilterZoneCategory(@RequestParam(defaultValue = "0") int page,
-                                                                                                           @PathVariable("childCategoryId") Long categoryId,
-                                                                                                           @RequestParam(required = false, name = "zoneCategory") Long zoneCategoryId,
-                                                                                                           HttpServletRequest request) {
+    public ResponseEntity<Page<InformationBriefResponse>> pageInformationByChildCategoryFilterZoneCategory(
+            @RequestParam(defaultValue = "0") int page,
+            @PathVariable("childCategoryId") Long categoryId,
+            @RequestParam(required = false, name = "zoneCategory") Long zoneCategoryId,
+            HttpServletRequest request) {
         Long userId = findUser(request);
 
         Pageable pageable = PageRequest.of(page, PAGE_SIZE);
-        Page<InformationBriefResponse> briefInformationPage = informationService.getBriefInformationPageByChildCategoryFilterZoneCategory(pageable, categoryId, userId, zoneCategoryId);
+        Page<InformationBriefResponse> briefInformationPage = informationService.getBriefInformationPageByChildCategoryFilterZoneCategory(
+                pageable, categoryId, userId, zoneCategoryId);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -121,26 +137,30 @@ public class InformationController {
 
     //지역 카테고리 별 좋아요순
     @GetMapping("/parent-category/{parentCategory}/like-count")
-    public ResponseEntity<Page<InformationBriefResponse>> pageInformationByParentCategoryFilterZoneCategoryLikeCount(@RequestParam(defaultValue = "0") int page,
-                                                                                                                     @RequestParam(required = false, name = "zoneCategory") Long zoneCategoryId,
-                                                                                                                     @PathVariable("parentCategory") Long categoryId,
-                                                                                                                     HttpServletRequest request) {
+    public ResponseEntity<Page<InformationBriefResponse>> pageInformationByParentCategoryFilterZoneCategoryLikeCount(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(required = false, name = "zoneCategory") Long zoneCategoryId,
+            @PathVariable("parentCategory") Long categoryId,
+            HttpServletRequest request) {
         Long userId = findUser(request);
         Pageable pageable = PageRequest.of(page, PAGE_SIZE);
-        Page<InformationBriefResponse> briefInformationPage = informationService.getBriefInformationPageByParentCategoryFilterZoneCategoryLikeCount(pageable, categoryId, userId, zoneCategoryId);
+        Page<InformationBriefResponse> briefInformationPage = informationService.getBriefInformationPageByParentCategoryFilterZoneCategoryLikeCount(
+                pageable, categoryId, userId, zoneCategoryId);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(briefInformationPage);
     }
 
     @GetMapping("/child-category/{childCategory}/like-count")
-    public ResponseEntity<Page<InformationBriefResponse>> pageInformationChildCategoryFilterZoneCategoryLikeCount(@RequestParam(defaultValue = "0") int page,
-                                                                                                                  @RequestParam(required = false, name = "zoneCategory") Long zoneCategoryId,
-                                                                                                                  @PathVariable("childCategory") Long categoryId,
-                                                                                                                  HttpServletRequest request) {
+    public ResponseEntity<Page<InformationBriefResponse>> pageInformationChildCategoryFilterZoneCategoryLikeCount(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(required = false, name = "zoneCategory") Long zoneCategoryId,
+            @PathVariable("childCategory") Long categoryId,
+            HttpServletRequest request) {
         Long userId = findUser(request);
         Pageable pageable = PageRequest.of(page, PAGE_SIZE);
-        Page<InformationBriefResponse> briefInformationPage = informationService.getBriefInformationPageByChildCategoryFilterZoneCategoryLikeCount(pageable, categoryId, userId, zoneCategoryId);
+        Page<InformationBriefResponse> briefInformationPage = informationService.getBriefInformationPageByChildCategoryFilterZoneCategoryLikeCount(
+                pageable, categoryId, userId, zoneCategoryId);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(briefInformationPage);
@@ -149,27 +169,31 @@ public class InformationController {
 
     //지역 카테고리 별 조회순
     @GetMapping("/parent-category/{parentCategoryId}/view-count")
-    public ResponseEntity<Page<InformationBriefResponse>> pageInformationByParentCategoryFilterZoneCategoryViewCount(@RequestParam(defaultValue = "0") int page,
-                                                                                                                     @RequestParam(required = false, name = "zoneCategory") Long zoneCategoryId,
-                                                                                                                     @PathVariable("parentCategoryId") Long categoryId,
-                                                                                                                     HttpServletRequest request) {
+    public ResponseEntity<Page<InformationBriefResponse>> pageInformationByParentCategoryFilterZoneCategoryViewCount(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(required = false, name = "zoneCategory") Long zoneCategoryId,
+            @PathVariable("parentCategoryId") Long categoryId,
+            HttpServletRequest request) {
 
         Long userId = findUser(request);
         Pageable pageable = PageRequest.of(page, PAGE_SIZE);
-        Page<InformationBriefResponse> briefInformationPage = informationService.getBriefInformationPageByParentCategoryFilterZoneCategoryViewCount(pageable, categoryId, userId, zoneCategoryId);
+        Page<InformationBriefResponse> briefInformationPage = informationService.getBriefInformationPageByParentCategoryFilterZoneCategoryViewCount(
+                pageable, categoryId, userId, zoneCategoryId);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(briefInformationPage);
     }
 
     @GetMapping("/child-category/{childCategoryId}/view-count")
-    public ResponseEntity<Page<InformationBriefResponse>> pageInformationByChildCategoryViewCount(@RequestParam(defaultValue = "0") int page,
-                                                                                                  @PathVariable("childCategoryId") Long categoryId,
-                                                                                                  @RequestParam(required = false, name = "zoneCategory") Long zoneCategoryId,
-                                                                                                  HttpServletRequest request) {
+    public ResponseEntity<Page<InformationBriefResponse>> pageInformationByChildCategoryViewCount(
+            @RequestParam(defaultValue = "0") int page,
+            @PathVariable("childCategoryId") Long categoryId,
+            @RequestParam(required = false, name = "zoneCategory") Long zoneCategoryId,
+            HttpServletRequest request) {
         Long userId = findUser(request);
         Pageable pageable = PageRequest.of(page, PAGE_SIZE);
-        Page<InformationBriefResponse> briefInformationPage = informationService.getBriefInformationPageByChildCategoryFilterZoneCategoryViewCount(pageable, categoryId, userId, zoneCategoryId);
+        Page<InformationBriefResponse> briefInformationPage = informationService.getBriefInformationPageByChildCategoryFilterZoneCategoryViewCount(
+                pageable, categoryId, userId, zoneCategoryId);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(briefInformationPage);

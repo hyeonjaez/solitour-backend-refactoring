@@ -37,8 +37,9 @@ public class ZoneCategoryController {
     }
 
     @PostMapping
-    public ResponseEntity<ZoneCategoryResponse> registerZoneCategory(@Valid @RequestBody ZoneCategoryRegisterRequest zoneCategoryRegisterRequest,
-                                                                     BindingResult bindingResult) {
+    public ResponseEntity<ZoneCategoryResponse> registerZoneCategory(
+            @Valid @RequestBody ZoneCategoryRegisterRequest zoneCategoryRegisterRequest,
+            BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             throw new RequestValidationFailedException(bindingResult);
         }

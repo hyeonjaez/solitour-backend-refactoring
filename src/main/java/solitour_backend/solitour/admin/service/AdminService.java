@@ -1,5 +1,6 @@
 package solitour_backend.solitour.admin.service;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -11,8 +12,6 @@ import solitour_backend.solitour.admin.dto.UserListResponseDTO;
 import solitour_backend.solitour.admin.dto.UserListWithPage;
 import solitour_backend.solitour.admin.repository.AdminRepository;
 import solitour_backend.solitour.user.entity.User;
-
-import java.util.List;
 
 @Service
 @Slf4j

@@ -17,7 +17,8 @@ public class AdminController {
     private final AdminService adminService;
 
     @GetMapping("/user/list")
-    public ResponseEntity<UserListWithPage> getUserInfoList(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "") String nickname) {
+    public ResponseEntity<UserListWithPage> getUserInfoList(@RequestParam(defaultValue = "1") int page,
+                                                            @RequestParam(defaultValue = "") String nickname) {
         UserListWithPage response = adminService.getUserInfoList(nickname, page);
         return ResponseEntity.ok(response);
     }

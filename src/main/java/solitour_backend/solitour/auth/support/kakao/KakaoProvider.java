@@ -3,7 +3,6 @@ package solitour_backend.solitour.auth.support.kakao;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
-
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -18,6 +17,7 @@ public class KakaoProvider {
     private final String accessTokenUrl;
     private final String userInfoUrl;
     private final String grantType;
+    private final String revokeUrl;
     private final String scope;
 
 
@@ -27,6 +27,7 @@ public class KakaoProvider {
                          @Value("${oauth2.kakao.url.token}") String accessTokenUrl,
                          @Value("${oauth2.kakao.url.userinfo}") String userInfoUrl,
                          @Value("${oauth2.kakao.grant-type}") String grantType,
+                         @Value("${oauth2.kakao.url.revoke}") String revokeUrl,
                          @Value("${oauth2.kakao.scope}") String scope) {
         this.clientId = clientId;
         this.clientSecret = clientSecret;
@@ -34,6 +35,7 @@ public class KakaoProvider {
         this.accessTokenUrl = accessTokenUrl;
         this.userInfoUrl = userInfoUrl;
         this.grantType = grantType;
+        this.revokeUrl = revokeUrl;
         this.scope = scope;
     }
 

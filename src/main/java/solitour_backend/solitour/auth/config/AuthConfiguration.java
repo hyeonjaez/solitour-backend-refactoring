@@ -1,5 +1,6 @@
 package solitour_backend.solitour.auth.config;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
@@ -9,8 +10,6 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import solitour_backend.solitour.auth.entity.TokenRepository;
 import solitour_backend.solitour.auth.support.JwtTokenProvider;
-
-import java.util.List;
 
 @RequiredArgsConstructor
 @Configuration

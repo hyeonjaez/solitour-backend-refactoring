@@ -1,9 +1,7 @@
 package solitour_backend.solitour.book_mark_information.service;
 
 import jakarta.persistence.EntityNotFoundException;
-
 import java.util.List;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

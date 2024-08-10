@@ -3,6 +3,10 @@ package solitour_backend.solitour.admin.service;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import java.io.IOException;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,11 +19,6 @@ import org.springframework.web.server.ResponseStatusException;
 import solitour_backend.solitour.admin.entity.Banner;
 import solitour_backend.solitour.admin.repository.BannerRepository;
 import solitour_backend.solitour.util.TimeUtil;
-
-import java.io.IOException;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
 
 @Service
 @Slf4j
@@ -36,7 +35,7 @@ public class BannerService {
     public ResponseEntity getBannerList() {
         List<Banner> banners = bannerRepository.findAllByOrderById();
         HttpHeaders headers = new HttpHeaders();
-        headers.setCacheControl("max-age="+timeUtil.getSecondsUntilMidnightInKST());
+        headers.setCacheControl("max-age=" + timeUtil.getSecondsUntilMidnightInKST());
         return new ResponseEntity<>(banners, HttpStatus.OK);
     }
 

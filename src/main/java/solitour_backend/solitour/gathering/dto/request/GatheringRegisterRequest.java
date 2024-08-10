@@ -1,16 +1,19 @@
 package solitour_backend.solitour.gathering.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import java.time.LocalDateTime;
+import java.util.List;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import solitour_backend.solitour.gathering.entity.AllowedSex;
 import solitour_backend.solitour.place.dto.request.PlaceRegisterRequest;
 import solitour_backend.solitour.tag.dto.request.TagRegisterRequest;
-
-import java.time.LocalDateTime;
-import java.util.List;
 
 @Getter
 @NoArgsConstructor

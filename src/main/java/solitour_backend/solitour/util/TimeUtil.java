@@ -1,11 +1,10 @@
 package solitour_backend.solitour.util;
 
-import org.springframework.stereotype.Component;
-
 import java.time.Duration;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import org.springframework.stereotype.Component;
 
 @Component
 public class TimeUtil {
