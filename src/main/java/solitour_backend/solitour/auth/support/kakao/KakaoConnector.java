@@ -1,13 +1,18 @@
 package solitour_backend.solitour.auth.support.kakao;
 
 
+import java.io.IOException;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -71,5 +76,28 @@ public class KakaoConnector {
                 .orElseThrow(() -> new RuntimeException("카카오 토큰을 가져오는데 실패했습니다."));
 
         return response.getAccessToken();
+    }
+
+    public HttpStatusCode requestRevoke(Long userId, String token) throws IOException {
+        HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(
+                createRevokeBody(userId), createRevokeHeaders(token));
+
+        ResponseEntity<Void> response = REST_TEMPLATE.postForEntity(provider.getRevokeUrl(), entity, Void.class);
+
+        return response.getStatusCode();
+    }
+
+    private HttpHeaders createRevokeHeaders(String token) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        headers.set("Authorization", "KakaoAK "+ token);
+        return headers;
+    }
+
+    private MultiValueMap<String, String> createRevokeBody(Long userId) {
+        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+        body.add("user_id", userId.toString());
+        body.add("referrer_type", "UNLINK_FROM_APPS");
+        return body;
     }
 }

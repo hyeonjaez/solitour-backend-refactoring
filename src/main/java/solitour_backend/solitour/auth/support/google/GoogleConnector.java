@@ -54,7 +54,7 @@ public class GoogleConnector {
 
     public HttpStatusCode requestRevoke(String token) throws IOException {
         HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(
-                createLogoutBody(token), createLogoutHeaders());
+                createRevokeBody(token), createRevokeHeaders());
 
         ResponseEntity<Void> response = REST_TEMPLATE.postForEntity(provider.getRevokeUrl(), entity, Void.class);
 
@@ -78,13 +78,13 @@ public class GoogleConnector {
         return body;
     }
 
-    private HttpHeaders createLogoutHeaders() {
+    private HttpHeaders createRevokeHeaders() {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         return headers;
     }
 
-    private MultiValueMap<String, String> createLogoutBody(String token) {
+    private MultiValueMap<String, String> createRevokeBody(String token) {
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("token", token);
         return body;

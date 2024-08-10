@@ -180,9 +180,13 @@ public class OauthService {
         tokenService.deleteByMemberId(userId);
     }
 
-    public void revokeToken(String token) throws IOException {
-
-        HttpStatusCode responseCode = googleConnector.requestRevoke(token);
+    public void revokeToken(Long userId,String type, String token) throws IOException {
+        HttpStatusCode responseCode;
+        switch (type) {
+            case "kakao" ->  responseCode = kakaoConnector.requestRevoke(userId,token);
+            case "google" -> responseCode = googleConnector.requestRevoke(token);
+            default -> throw new RuntimeException("Unsupported oauth type");
+        }
 
         if (responseCode.is2xxSuccessful()) {
             System.out.println("Token successfully revoked");
@@ -191,4 +195,5 @@ public class OauthService {
             throw new RuntimeException("Failed to revoke token");
         }
     }
+
 }
