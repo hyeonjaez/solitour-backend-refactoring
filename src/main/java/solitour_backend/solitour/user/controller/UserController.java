@@ -79,10 +79,10 @@ public class UserController {
         String token = getOauthAccessToken(type, code, redirectUrl);
 
         try {
-            oauthservice.revokeToken(id,type,token);
+            oauthservice.revokeToken(type,token);
 
-            userService.deleteUser(id);
             oauthservice.logout(id);
+            userService.deleteUser(id);
 
             return ResponseEntity.ok("User deleted successfully");
         } catch (Exception e) {

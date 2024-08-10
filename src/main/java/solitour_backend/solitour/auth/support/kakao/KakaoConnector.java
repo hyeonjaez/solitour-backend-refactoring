@@ -78,11 +78,10 @@ public class KakaoConnector {
         return response.getAccessToken();
     }
 
-    public HttpStatusCode requestRevoke(Long userId, String token) throws IOException {
-        HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(
-                createRevokeBody(userId), createRevokeHeaders(token));
+    public HttpStatusCode requestRevoke(String token) throws IOException {
+        HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(createRevokeHeaders(token));
 
-        ResponseEntity<Void> response = REST_TEMPLATE.postForEntity(provider.getRevokeUrl(), entity, Void.class);
+        ResponseEntity<String> response = REST_TEMPLATE.postForEntity(provider.getRevokeUrl(), entity, String.class);
 
         return response.getStatusCode();
     }
@@ -90,14 +89,8 @@ public class KakaoConnector {
     private HttpHeaders createRevokeHeaders(String token) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        headers.set("Authorization", "KakaoAK "+ token);
+        headers.set("Authorization", String.join(" ", BEARER_TYPE, token));
         return headers;
     }
 
-    private MultiValueMap<String, String> createRevokeBody(Long userId) {
-        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
-        body.add("user_id", userId.toString());
-        body.add("referrer_type", "UNLINK_FROM_APPS");
-        return body;
-    }
 }
