@@ -35,4 +35,7 @@ public class GreatGathering {
     @JoinColumn(name = "gathering_id")
     private Gathering gathering;
 
+    @Column(name = "is_deleted")
+    private Boolean isDeleted;
+
 }

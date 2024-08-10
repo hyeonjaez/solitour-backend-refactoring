@@ -130,10 +130,8 @@ public class InformationService {
         Information saveInformation = informationRepository.save(information);
         LocalDate localDate = LocalDate.now();
 
-        String thumbNailImageUrl = s3Uploader.upload(thumbnail, IMAGE_PATH,
-                saveInformation.getId());
-        Image thumbImage = new Image(ImageStatus.THUMBNAIL, saveInformation, thumbNailImageUrl,
-                localDate);
+        String thumbNailImageUrl = s3Uploader.upload(thumbnail, IMAGE_PATH, saveInformation.getId());
+        Image thumbImage = new Image(ImageStatus.THUMBNAIL, saveInformation, thumbNailImageUrl, localDate);
         imageRepository.save(thumbImage);
 
         for (MultipartFile multipartFile : contentImages) {
