@@ -79,7 +79,7 @@ public class UserController {
         String token = getOauthAccessToken(type, code, redirectUrl);
 
         try {
-            oauthservice.revokeToken(type,token);
+            oauthservice.revokeToken(type, token);
 
             oauthservice.logout(id);
             userService.deleteUser(id);

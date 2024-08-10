@@ -1,5 +1,6 @@
 package solitour_backend.solitour.gathering_applicants.service;
 
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,8 +18,6 @@ import solitour_backend.solitour.gathering_applicants.repository.GatheringApplic
 import solitour_backend.solitour.user.entity.User;
 import solitour_backend.solitour.user.entity.UserRepository;
 import solitour_backend.solitour.user.exception.UserNotExistsException;
-
-import java.util.Objects;
 
 @Service
 @Transactional
@@ -44,7 +43,8 @@ public class GatheringApplicantsService {
         }
 
         Integer personCount = gathering.getPersonCount();
-        int nowPersonCount = gatheringApplicantsRepository.countAllByGathering_IdAndGatheringStatus(gatheringId, GatheringStatus.CONSENT);
+        int nowPersonCount = gatheringApplicantsRepository.countAllByGathering_IdAndGatheringStatus(gatheringId,
+                GatheringStatus.CONSENT);
 
         if (personCount <= nowPersonCount) {
             throw new GatheringApplicantsAlreadyFullPeopleException("이미 인원이 가득 찼습니다.");
@@ -66,15 +66,18 @@ public class GatheringApplicantsService {
                         () ->
                                 new UserNotExistsException("해당하는 id의 user가 없습니다"));
 
-        GatheringApplicants gatheringApplicants = gatheringApplicantsRepository.findByGatheringIdAndUserId(gathering.getId(), user.getId())
+        GatheringApplicants gatheringApplicants = gatheringApplicantsRepository.findByGatheringIdAndUserId(
+                        gathering.getId(), user.getId())
                 .orElseThrow(
                         () ->
-                                new GatheringApplicantsNotExistsException("해당하는 모임과 user의 gathering applicants가 없습니다."));
+                                new GatheringApplicantsNotExistsException(
+                                        "해당하는 모임과 user의 gathering applicants가 없습니다."));
 
         gatheringApplicantsRepository.delete(gatheringApplicants);
     }
 
-    public boolean updateGatheringApplicantsManagement(Long userId, Long gatheringId, GatheringApplicantsModifyRequest gatheringApplicantsModifyRequest) {
+    public boolean updateGatheringApplicantsManagement(Long userId, Long gatheringId,
+                                                       GatheringApplicantsModifyRequest gatheringApplicantsModifyRequest) {
         Gathering gathering = gatheringRepository.findById(gatheringId)
                 .orElseThrow(
                         () ->
@@ -89,13 +92,15 @@ public class GatheringApplicantsService {
             throw new GatheringNotManagerException("해당하는 user 가 해당 gathering 의 manage 가 아닙니다");
         }
 
-        GatheringApplicants gatheringApplicants = gatheringApplicantsRepository.findByGatheringIdAndUserId(gathering.getId(), gatheringApplicantsModifyRequest.getUserId())
+        GatheringApplicants gatheringApplicants = gatheringApplicantsRepository.findByGatheringIdAndUserId(
+                        gathering.getId(), gatheringApplicantsModifyRequest.getUserId())
                 .orElseThrow(
                         () ->
                                 new GatheringApplicantsNotExistsException("해당하는 모임, user 의 applicants 가 없습니다")
                 );
 
-        if (Objects.equals(gatheringApplicants.getGatheringStatus(), gatheringApplicantsModifyRequest.getGatheringStatus())) {
+        if (Objects.equals(gatheringApplicants.getGatheringStatus(),
+                gatheringApplicantsModifyRequest.getGatheringStatus())) {
             return false;
         }
 

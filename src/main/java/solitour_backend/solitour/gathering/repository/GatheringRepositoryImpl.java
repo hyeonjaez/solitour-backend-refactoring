@@ -1,6 +1,7 @@
 package solitour_backend.solitour.gathering.repository;
 
 import com.querydsl.core.types.Projections;
+import java.util.List;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 import solitour_backend.solitour.book_mark_gathering.entity.QBookMarkGathering;
 import solitour_backend.solitour.gathering.dto.response.GatheringBriefResponse;
@@ -11,8 +12,6 @@ import solitour_backend.solitour.gathering_applicants.entity.QGatheringApplicant
 import solitour_backend.solitour.gathering_category.entity.QGatheringCategory;
 import solitour_backend.solitour.great_gathering.entity.QGreatGathering;
 import solitour_backend.solitour.zone_category.entity.QZoneCategory;
-
-import java.util.List;
 
 public class GatheringRepositoryImpl extends QuerydslRepositorySupport implements GatheringRepositoryCustom {
     public GatheringRepositoryImpl() {
@@ -33,14 +32,16 @@ public class GatheringRepositoryImpl extends QuerydslRepositorySupport implement
         return from(gathering)
                 .join(zoneCategoryChild).on(zoneCategoryChild.id.eq(gathering.zoneCategory.id))
                 .leftJoin(zoneCategoryParent).on(zoneCategoryParent.id.eq(zoneCategoryChild.parentZoneCategory.id))
-                .leftJoin(bookMarkGathering).on(bookMarkGathering.gathering.id.eq(gathering.id).and(bookMarkGathering.user.id.eq(userId)))
+                .leftJoin(bookMarkGathering)
+                .on(bookMarkGathering.gathering.id.eq(gathering.id).and(bookMarkGathering.user.id.eq(userId)))
                 .leftJoin(greatGathering).on(greatGathering.gathering.id.eq(gathering.id))
                 .leftJoin(category).on(category.id.eq(gathering.gatheringCategory.id))
                 .leftJoin(gatheringApplicants).on(gatheringApplicants.gathering.id.eq(gathering.id))
                 .where(gathering.isFinish.eq(Boolean.FALSE)
                         .and(gathering.gatheringCategory.id.eq(gatheringCategoryId))
                         .and(gathering.id.ne(gatheringId))
-                        .and(gatheringApplicants.gatheringStatus.eq(GatheringStatus.CONSENT).or(gatheringApplicants.gatheringStatus.isNull()))
+                        .and(gatheringApplicants.gatheringStatus.eq(GatheringStatus.CONSENT)
+                                .or(gatheringApplicants.gatheringStatus.isNull()))
                 )
                 .groupBy(gathering.id, zoneCategoryChild.id, zoneCategoryParent.id, category.id)
                 .orderBy(gathering.createdAt.desc())

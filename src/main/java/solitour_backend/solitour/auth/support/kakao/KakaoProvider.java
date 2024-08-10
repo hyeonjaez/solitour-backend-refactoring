@@ -21,7 +21,6 @@ public class KakaoProvider {
     private final String scope;
 
 
-
     public KakaoProvider(@Value("${oauth2.kakao.client.id}") String clientId,
                          @Value("${oauth2.kakao.client.secret}") String clientSecret,
                          @Value("${oauth2.kakao.url.auth}") String authUrl,

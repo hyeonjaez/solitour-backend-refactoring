@@ -1,8 +1,7 @@
 package solitour_backend.solitour.gathering_applicants.entity;
 
-import lombok.Getter;
-
 import java.util.Arrays;
+import lombok.Getter;
 
 @Getter
 public enum GatheringStatus {

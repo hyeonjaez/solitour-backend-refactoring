@@ -7,13 +7,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import solitour_backend.solitour.admin.dto.mapper.GatheringCategoryMapper;
-import solitour_backend.solitour.gathering_category.entity.GatheringCategory;
-import solitour_backend.solitour.gathering_category.repository.GatheringCategoryRepository;
 import solitour_backend.solitour.category.dto.request.CategoryModifyRequest;
 import solitour_backend.solitour.category.dto.request.CategoryRegisterRequest;
 import solitour_backend.solitour.category.dto.response.CategoryGetResponse;
 import solitour_backend.solitour.category.dto.response.CategoryResponse;
 import solitour_backend.solitour.category.exception.CategoryNotExistsException;
+import solitour_backend.solitour.gathering_category.entity.GatheringCategory;
+import solitour_backend.solitour.gathering_category.repository.GatheringCategoryRepository;
 
 @Service
 @Transactional(readOnly = true)

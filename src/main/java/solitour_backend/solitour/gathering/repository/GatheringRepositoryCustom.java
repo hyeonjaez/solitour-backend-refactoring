@@ -1,9 +1,8 @@
 package solitour_backend.solitour.gathering.repository;
 
+import java.util.List;
 import org.springframework.data.repository.NoRepositoryBean;
 import solitour_backend.solitour.gathering.dto.response.GatheringBriefResponse;
-
-import java.util.List;
 
 @NoRepositoryBean
 public interface GatheringRepositoryCustom {

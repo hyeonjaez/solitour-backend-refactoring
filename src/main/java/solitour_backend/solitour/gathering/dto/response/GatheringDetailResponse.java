@@ -1,5 +1,7 @@
 package solitour_backend.solitour.gathering.dto.response;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import solitour_backend.solitour.gathering.entity.AllowedSex;
@@ -8,9 +10,6 @@ import solitour_backend.solitour.place.dto.response.PlaceResponse;
 import solitour_backend.solitour.tag.dto.response.TagResponse;
 import solitour_backend.solitour.user.dto.UserPostingResponse;
 import solitour_backend.solitour.zone_category.dto.response.ZoneCategoryResponse;
-
-import java.time.LocalDateTime;
-import java.util.List;
 
 @Getter
 @AllArgsConstructor
