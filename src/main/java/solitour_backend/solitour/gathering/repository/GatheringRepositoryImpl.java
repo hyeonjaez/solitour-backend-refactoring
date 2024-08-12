@@ -1,7 +1,11 @@
 package solitour_backend.solitour.gathering.repository;
 
 import com.querydsl.core.types.Projections;
+
 import java.util.List;
+
+import com.querydsl.core.types.dsl.CaseBuilder;
+import com.querydsl.jpa.JPAExpressions;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 import solitour_backend.solitour.book_mark_gathering.entity.QBookMarkGathering;
 import solitour_backend.solitour.gathering.dto.response.GatheringBriefResponse;
@@ -29,6 +33,8 @@ public class GatheringRepositoryImpl extends QuerydslRepositorySupport implement
 
     @Override
     public List<GatheringBriefResponse> getGatheringRecommend(Long gatheringId, Long gatheringCategoryId, Long userId) {
+        QGreatGathering greatGatheringSub = new QGreatGathering("greatGatheringSub");
+
         return from(gathering)
                 .join(zoneCategoryChild).on(zoneCategoryChild.id.eq(gathering.zoneCategory.id))
                 .leftJoin(zoneCategoryParent).on(zoneCategoryParent.id.eq(zoneCategoryChild.parentZoneCategory.id))
@@ -43,7 +49,11 @@ public class GatheringRepositoryImpl extends QuerydslRepositorySupport implement
                         .and(gatheringApplicants.gatheringStatus.eq(GatheringStatus.CONSENT)
                                 .or(gatheringApplicants.gatheringStatus.isNull()))
                 )
-                .groupBy(gathering.id, zoneCategoryChild.id, zoneCategoryParent.id, category.id)
+                .groupBy(gathering.id, zoneCategoryChild.id, zoneCategoryParent.id, category.id,
+                        gathering.title, gathering.viewCount, gathering.user.name,
+                        gathering.scheduleStartDate, gathering.scheduleEndDate,
+                        gathering.deadline, gathering.allowedSex,
+                        gathering.startAge, gathering.endAge, gathering.personCount)
                 .orderBy(gathering.createdAt.desc())
                 .select(Projections.constructor(
                         GatheringBriefResponse.class,
@@ -63,7 +73,15 @@ public class GatheringRepositoryImpl extends QuerydslRepositorySupport implement
                         gathering.startAge,
                         gathering.endAge,
                         gathering.personCount,
-                        gatheringApplicants.count().coalesce(0L).intValue()
+                        gatheringApplicants.count().coalesce(0L).intValue(),
+                        new CaseBuilder()
+                                .when(JPAExpressions.selectOne()
+                                        .from(greatGatheringSub)
+                                        .where(greatGatheringSub.gathering.id.eq(gathering.id)
+                                                .and(greatGatheringSub.user.id.eq(userId)))
+                                        .exists())
+                                .then(true)
+                                .otherwise(false)
                 )).limit(3L).fetch();
     }
 
