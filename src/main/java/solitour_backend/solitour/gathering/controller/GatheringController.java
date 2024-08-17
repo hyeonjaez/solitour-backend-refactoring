@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,7 @@ import solitour_backend.solitour.gathering.dto.request.GatheringPageRequest;
 import solitour_backend.solitour.gathering.dto.request.GatheringRegisterRequest;
 import solitour_backend.solitour.gathering.dto.response.GatheringBriefResponse;
 import solitour_backend.solitour.gathering.dto.response.GatheringDetailResponse;
+import solitour_backend.solitour.gathering.dto.response.GatheringRankResponse;
 import solitour_backend.solitour.gathering.dto.response.GatheringResponse;
 import solitour_backend.solitour.gathering.service.GatheringService;
 
@@ -97,10 +99,10 @@ public class GatheringController {
 
 
     @GetMapping
-    public ResponseEntity<Page<GatheringBriefResponse>> pageGathering(@RequestParam(defaultValue = "0") int page,
-                                                                      @Valid @ModelAttribute GatheringPageRequest gatheringPageRequest,
-                                                                      BindingResult bindingResult,
-                                                                      HttpServletRequest request) {
+    public ResponseEntity<Page<GatheringBriefResponse>> pageGatheringSortAndFilter(@RequestParam(defaultValue = "0") int page,
+                                                                                   @Valid @ModelAttribute GatheringPageRequest gatheringPageRequest,
+                                                                                   BindingResult bindingResult,
+                                                                                   HttpServletRequest request) {
         Utils.validationRequest(bindingResult);
         Long userId = findUser(request);
 
@@ -110,6 +112,15 @@ public class GatheringController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(pageGathering);
+    }
+
+    @GetMapping("/ranks")
+    public ResponseEntity<List<GatheringRankResponse>> getGatheringRankOrderByLikes() {
+        List<GatheringRankResponse> gatheringRankOrderByLikes = gatheringService.getGatheringRankOrderByLikes();
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(gatheringRankOrderByLikes);
     }
 
 
