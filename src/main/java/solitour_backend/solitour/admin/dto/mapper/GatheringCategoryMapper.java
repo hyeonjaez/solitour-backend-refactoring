@@ -1,15 +1,16 @@
 package solitour_backend.solitour.admin.dto.mapper;
 
 import java.util.List;
+
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
-import solitour_backend.solitour.category.dto.response.CategoryResponse;
+import solitour_backend.solitour.gathering_category.dto.response.GatheringCategoryResponse;
 import solitour_backend.solitour.gathering_category.entity.GatheringCategory;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.ERROR)
 public interface GatheringCategoryMapper {
 
-    CategoryResponse mapToCategoryResponse(GatheringCategory category);
+    GatheringCategoryResponse mapToCategoryResponse(GatheringCategory category);
 
-    List<CategoryResponse> mapToCategoryResponses(List<GatheringCategory> categories);
+    List<GatheringCategoryResponse> mapToCategoryResponses(List<GatheringCategory> categories);
 }

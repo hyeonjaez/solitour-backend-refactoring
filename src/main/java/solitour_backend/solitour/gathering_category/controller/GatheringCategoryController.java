@@ -1,7 +1,9 @@
-package solitour_backend.solitour.admin.controller;
+package solitour_backend.solitour.gathering_category.controller;
 
 import jakarta.validation.Valid;
+
 import java.util.List;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,12 +15,12 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import solitour_backend.solitour.admin.service.GatheringCategoryService;
-import solitour_backend.solitour.category.dto.request.CategoryModifyRequest;
 import solitour_backend.solitour.category.dto.request.CategoryRegisterRequest;
-import solitour_backend.solitour.category.dto.response.CategoryGetResponse;
-import solitour_backend.solitour.category.dto.response.CategoryResponse;
+import solitour_backend.solitour.error.Utils;
 import solitour_backend.solitour.error.exception.RequestValidationFailedException;
+import solitour_backend.solitour.gathering_category.dto.request.GatheringCategoryModifyRequest;
+import solitour_backend.solitour.gathering_category.dto.response.GatheringCategoryResponse;
+import solitour_backend.solitour.gathering_category.service.GatheringCategoryService;
 
 @RestController
 @RequiredArgsConstructor
@@ -28,8 +30,8 @@ public class GatheringCategoryController {
     private final GatheringCategoryService gatheringCategoryService;
 
     @GetMapping
-    public ResponseEntity<List<CategoryGetResponse>> getAllCategories() {
-        List<CategoryGetResponse> parentCategories = gatheringCategoryService.getParentCategories();
+    public ResponseEntity<List<GatheringCategoryResponse>> getAllCategories() {
+        List<GatheringCategoryResponse> parentCategories = gatheringCategoryService.getCategories();
 
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -37,8 +39,8 @@ public class GatheringCategoryController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CategoryResponse> getCategory(@PathVariable Long id) {
-        CategoryResponse category = gatheringCategoryService.getCategory(id);
+    public ResponseEntity<GatheringCategoryResponse> getCategory(@PathVariable Long id) {
+        GatheringCategoryResponse category = gatheringCategoryService.getCategory(id);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -46,13 +48,11 @@ public class GatheringCategoryController {
     }
 
     @PostMapping
-    public ResponseEntity<CategoryResponse> registerCategory(
-            @Valid @RequestBody CategoryRegisterRequest categoryRegisterRequest,
-            BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            throw new RequestValidationFailedException(bindingResult);
-        }
-        CategoryResponse categoryResponse = gatheringCategoryService.registerCategory(
+    public ResponseEntity<GatheringCategoryResponse> registerCategory(@Valid @RequestBody CategoryRegisterRequest categoryRegisterRequest,
+                                                                      BindingResult bindingResult) {
+        Utils.validationRequest(bindingResult);
+
+        GatheringCategoryResponse categoryResponse = gatheringCategoryService.registerCategory(
                 categoryRegisterRequest);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -61,15 +61,14 @@ public class GatheringCategoryController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CategoryResponse> modifyCategory(
-            @Valid @RequestBody CategoryModifyRequest categoryModifyRequest,
-            BindingResult bindingResult,
-            @PathVariable Long id) {
+    public ResponseEntity<GatheringCategoryResponse> modifyCategory(@Valid @RequestBody GatheringCategoryModifyRequest gatheringCategoryModifyRequest,
+                                                                    BindingResult bindingResult,
+                                                                    @PathVariable Long id) {
         if (bindingResult.hasErrors()) {
             throw new RequestValidationFailedException(bindingResult);
         }
-        CategoryResponse categoryResponse = gatheringCategoryService.modifyCategory(id,
-                categoryModifyRequest);
+        GatheringCategoryResponse categoryResponse = gatheringCategoryService.modifyCategory(id,
+                gatheringCategoryModifyRequest);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
