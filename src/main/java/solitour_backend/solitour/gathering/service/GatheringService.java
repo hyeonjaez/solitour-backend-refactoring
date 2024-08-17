@@ -3,11 +3,16 @@ package solitour_backend.solitour.gathering.service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import solitour_backend.solitour.error.exception.RequestValidationFailedException;
 import solitour_backend.solitour.gathering.dto.mapper.GatheringMapper;
 import solitour_backend.solitour.gathering.dto.request.GatheringModifyRequest;
+import solitour_backend.solitour.gathering.dto.request.GatheringPageRequest;
 import solitour_backend.solitour.gathering.dto.request.GatheringRegisterRequest;
 import solitour_backend.solitour.gathering.dto.response.GatheringBriefResponse;
 import solitour_backend.solitour.gathering.dto.response.GatheringDetailResponse;
@@ -47,6 +52,10 @@ import solitour_backend.solitour.zone_category.entity.ZoneCategory;
 import solitour_backend.solitour.zone_category.exception.ZoneCategoryNotExistsException;
 import solitour_backend.solitour.zone_category.repository.ZoneCategoryRepository;
 
+import static solitour_backend.solitour.gathering.repository.GatheringRepositoryCustom.LIKE_COUNT_SORT;
+import static solitour_backend.solitour.gathering.repository.GatheringRepositoryCustom.VIEW_COUNT_SORT;
+
+
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -66,6 +75,7 @@ public class GatheringService {
     private final GreatGatheringRepository greatGatheringRepository;
     private final GatheringApplicantsRepository gatheringApplicantsRepository;
     private final GatheringApplicantsMapper gatheringApplicantsMapper;
+
 
     public GatheringDetailResponse getGatheringDetail(Long userId, Long gatheringId) {
         Gathering gathering = gatheringRepository.findById(gatheringId)
@@ -245,21 +255,52 @@ public class GatheringService {
         return gatheringMapper.mapToGatheringResponse(gathering);
     }
 
+    public Page<GatheringBriefResponse> getPageGathering(Pageable pageable, GatheringPageRequest gatheringPageRequest, Long userId) {
+        validateGatheringPageRequest(gatheringPageRequest);
+
+        return gatheringRepository.getGatheringPageFilterAndOrder(pageable, gatheringPageRequest, userId);
+    }
+
+    private void validateGatheringPageRequest(GatheringPageRequest gatheringPageRequest) {
+        // Category 검증
+        if (Objects.nonNull(gatheringPageRequest.getCategory())) {
+            if (!gatheringCategoryRepository.existsById(gatheringPageRequest.getCategory())) {
+                throw new GatheringCategoryNotExistsException("해당하는 모임 카테고리가 없습니다.");
+            }
+        }
+
+        // Location 검증
+        if (Objects.nonNull(gatheringPageRequest.getLocation())) {
+            if (!zoneCategoryRepository.existsById(gatheringPageRequest.getLocation())) {
+                throw new ZoneCategoryNotExistsException("해당하는 지역 카테고리가 없습니다.");
+            }
+        }
+
+        // 나이 범위 검증
+        if (Objects.nonNull(gatheringPageRequest.getStartAge()) && Objects.nonNull(gatheringPageRequest.getEndAge())) {
+            if (gatheringPageRequest.getStartAge() > gatheringPageRequest.getEndAge()) {
+                throw new RequestValidationFailedException("시작 나이가 끝 나이보다 클 수 없습니다.");
+            }
+        } else if (Objects.nonNull(gatheringPageRequest.getStartAge()) || Objects.nonNull(gatheringPageRequest.getEndAge())) {
+            throw new RequestValidationFailedException("시작 나이와 끝 나이는 둘 다 입력되거나 둘 다 비어 있어야 합니다.");
+        }
+
+        // 정렬 방식 검증
+        if (Objects.nonNull(gatheringPageRequest.getSort())) {
+            if (!LIKE_COUNT_SORT.equals(gatheringPageRequest.getSort()) && !VIEW_COUNT_SORT.equals(gatheringPageRequest.getSort())) {
+                throw new RequestValidationFailedException("잘못된 정렬 코드입니다.");
+            }
+        }
+
+        // 날짜 검증
+        if (Objects.nonNull(gatheringPageRequest.getStartDate()) && Objects.nonNull(gatheringPageRequest.getEndDate())) {
+            if (gatheringPageRequest.getStartDate().isAfter(gatheringPageRequest.getEndDate())) {
+                throw new RequestValidationFailedException("시작 날짜가 종료 날짜보다 나중일 수 없습니다.");
+            }
+        } else if (Objects.nonNull(gatheringPageRequest.getStartDate()) || Objects.nonNull(gatheringPageRequest.getEndDate())) {
+            throw new RequestValidationFailedException("시작 날짜와 종료 날짜는 둘 다 입력되거나 둘 다 비어 있어야 합니다.");
+        }
+    }
+
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
