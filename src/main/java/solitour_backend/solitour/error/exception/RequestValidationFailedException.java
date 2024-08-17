@@ -1,7 +1,9 @@
 package solitour_backend.solitour.error.exception;
 
 import jakarta.validation.ValidationException;
+
 import java.util.stream.Collectors;
+
 import org.springframework.validation.BindingResult;
 
 public class RequestValidationFailedException extends ValidationException {
@@ -10,13 +12,15 @@ public class RequestValidationFailedException extends ValidationException {
         super(bindingResult.getAllErrors()
                 .stream()
                 .map(objectError -> new StringBuilder()
-                        .append("object: ")
+                        .append("Object: ")
                         .append(objectError.getObjectName())
-                        .append(", message: ")
+                        .append("\nMessage: ")
                         .append(objectError.getDefaultMessage())
-                        .append(", error code: ")
-                        .append(objectError.getCode()))
-                .collect(Collectors.joining("|")));
+                        .append("\nError Code: ")
+                        .append(objectError.getCode())
+                        .append("\n")
+                        .toString())
+                .collect(Collectors.joining("\n-----------------------------\n")));
     }
 
 

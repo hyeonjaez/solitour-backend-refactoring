@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.NoRepositoryBean;
 import solitour_backend.solitour.gathering.dto.request.GatheringPageRequest;
 import solitour_backend.solitour.gathering.dto.response.GatheringBriefResponse;
+import solitour_backend.solitour.gathering.dto.response.GatheringRankResponse;
 
 @NoRepositoryBean
 public interface GatheringRepositoryCustom {
@@ -17,4 +18,5 @@ public interface GatheringRepositoryCustom {
 
     Page<GatheringBriefResponse> getGatheringPageFilterAndOrder(Pageable pageable, GatheringPageRequest gatheringPageRequest, Long userId);
 
+    List<GatheringRankResponse> getGatheringRankList();
 }
