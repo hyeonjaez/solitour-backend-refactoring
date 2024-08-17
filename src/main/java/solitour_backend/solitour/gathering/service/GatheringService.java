@@ -16,6 +16,7 @@ import solitour_backend.solitour.gathering.dto.request.GatheringPageRequest;
 import solitour_backend.solitour.gathering.dto.request.GatheringRegisterRequest;
 import solitour_backend.solitour.gathering.dto.response.GatheringBriefResponse;
 import solitour_backend.solitour.gathering.dto.response.GatheringDetailResponse;
+import solitour_backend.solitour.gathering.dto.response.GatheringRankResponse;
 import solitour_backend.solitour.gathering.dto.response.GatheringResponse;
 import solitour_backend.solitour.gathering.entity.Gathering;
 import solitour_backend.solitour.gathering.exception.GatheringCategoryNotExistsException;
@@ -260,6 +261,11 @@ public class GatheringService {
 
         return gatheringRepository.getGatheringPageFilterAndOrder(pageable, gatheringPageRequest, userId);
     }
+
+    public List<GatheringRankResponse> getGatheringRankOrderByLikes() {
+        return gatheringRepository.getGatheringRankList();
+    }
+
 
     private void validateGatheringPageRequest(GatheringPageRequest gatheringPageRequest) {
         // Category 검증
