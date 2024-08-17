@@ -20,6 +20,7 @@ import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport
 import solitour_backend.solitour.book_mark_gathering.entity.QBookMarkGathering;
 import solitour_backend.solitour.gathering.dto.request.GatheringPageRequest;
 import solitour_backend.solitour.gathering.dto.response.GatheringBriefResponse;
+import solitour_backend.solitour.gathering.dto.response.GatheringRankResponse;
 import solitour_backend.solitour.gathering.entity.Gathering;
 import solitour_backend.solitour.gathering.entity.QGathering;
 import solitour_backend.solitour.gathering_applicants.entity.GatheringStatus;
@@ -32,7 +33,6 @@ public class GatheringRepositoryImpl extends QuerydslRepositorySupport implement
     public GatheringRepositoryImpl() {
         super(Gathering.class);
     }
-
 
 
     QGathering gathering = QGathering.gathering;
@@ -53,7 +53,6 @@ public class GatheringRepositoryImpl extends QuerydslRepositorySupport implement
                 .leftJoin(zoneCategoryParent).on(zoneCategoryParent.id.eq(zoneCategoryChild.parentZoneCategory.id))
                 .leftJoin(bookMarkGathering)
                 .on(bookMarkGathering.gathering.id.eq(gathering.id).and(bookMarkGathering.user.id.eq(userId)))
-                .leftJoin(greatGathering).on(greatGathering.gathering.id.eq(gathering.id))
                 .leftJoin(category).on(category.id.eq(gathering.gatheringCategory.id))
                 .leftJoin(gatheringApplicants).on(gatheringApplicants.gathering.id.eq(gathering.id))
                 .where(gathering.isFinish.eq(Boolean.FALSE)
@@ -111,7 +110,6 @@ public class GatheringRepositoryImpl extends QuerydslRepositorySupport implement
                 .join(zoneCategoryChild).on(zoneCategoryChild.id.eq(gathering.zoneCategory.id))
                 .leftJoin(zoneCategoryParent).on(zoneCategoryParent.id.eq(zoneCategoryChild.parentZoneCategory.id))
                 .leftJoin(bookMarkGathering).on(bookMarkGathering.gathering.id.eq(gathering.id).and(bookMarkGathering.user.id.eq(userId)))
-                .leftJoin(greatGathering).on(greatGathering.gathering.id.eq(gathering.id).and(greatGathering.isDeleted.isFalse()))
                 .leftJoin(gatheringApplicants).on(gatheringApplicants.gathering.id.eq(gathering.id))
                 .where(booleanBuilder)
                 .groupBy(gathering.id, zoneCategoryChild.id, zoneCategoryParent.id, category.id,
@@ -155,6 +153,21 @@ public class GatheringRepositoryImpl extends QuerydslRepositorySupport implement
 
         return new PageImpl<>(content, pageable, total);
     }
+
+    @Override
+    public List<GatheringRankResponse> getGatheringRankList() {
+        return from(gathering)
+                .orderBy(countGreatGatheringByGatheringById().desc())
+                .groupBy(gathering.id, gathering.title)
+                .where(gathering.isFinish.eq(Boolean.FALSE))
+                .limit(5)
+                .select(Projections.constructor(
+                        GatheringRankResponse.class,
+                        gathering.id,
+                        gathering.title
+                )).fetch();
+    }
+
 
     //where 절
     private BooleanBuilder makeWhereSQL(GatheringPageRequest gatheringPageRequest) {
