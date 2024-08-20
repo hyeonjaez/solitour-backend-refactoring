@@ -27,6 +27,8 @@ import solitour_backend.solitour.gathering_applicants.dto.response.GatheringAppl
 import solitour_backend.solitour.gathering_applicants.entity.GatheringStatus;
 import solitour_backend.solitour.gathering_applicants.exception.GatheringNotManagerException;
 import solitour_backend.solitour.gathering_applicants.repository.GatheringApplicantsRepository;
+import solitour_backend.solitour.gathering_category.dto.mapper.GatheringCategoryMapper;
+import solitour_backend.solitour.gathering_category.dto.response.GatheringCategoryResponse;
 import solitour_backend.solitour.gathering_category.entity.GatheringCategory;
 import solitour_backend.solitour.gathering_category.repository.GatheringCategoryRepository;
 import solitour_backend.solitour.gathering_tag.entity.GatheringTag;
@@ -76,6 +78,7 @@ public class GatheringService {
     private final GreatGatheringRepository greatGatheringRepository;
     private final GatheringApplicantsRepository gatheringApplicantsRepository;
     private final GatheringApplicantsMapper gatheringApplicantsMapper;
+    private final GatheringCategoryMapper gatheringCategoryMapper;
 
 
     public GatheringDetailResponse getGatheringDetail(Long userId, Long gatheringId) {
@@ -94,6 +97,9 @@ public class GatheringService {
                             tagMapper.mapToTagResponse(data.getTag()))
                     .toList();
         }
+        GatheringCategory gatheringCategory = gathering.getGatheringCategory();
+
+        GatheringCategoryResponse gatheringCategoryResponse = gatheringCategoryMapper.mapToCategoryResponse(gatheringCategory);
 
         PlaceResponse placeResponse = placeMapper.mapToPlaceResponse(gathering.getPlace());
 
@@ -107,6 +113,8 @@ public class GatheringService {
 
         int nowPersonCount = gatheringApplicantsRepository.countAllByGathering_IdAndGatheringStatus(gathering.getId(),
                 GatheringStatus.CONSENT);
+
+        boolean isLike = greatGatheringRepository.existsByGatheringIdAndUserIdAndIsDeletedFalse(gathering.getId(), userId);
 
         List<GatheringBriefResponse> gatheringRecommend = gatheringRepository.getGatheringRecommend(gathering.getId(),
                 gathering.getGatheringCategory().getId(), userId);
@@ -128,8 +136,10 @@ public class GatheringService {
                 userPostingResponse,
                 placeResponse,
                 zoneCategoryResponse,
+                gatheringCategoryResponse,
                 likeCount,
                 nowPersonCount,
+                isLike,
                 gatheringApplicantsResponses,
                 gatheringRecommend
         );
