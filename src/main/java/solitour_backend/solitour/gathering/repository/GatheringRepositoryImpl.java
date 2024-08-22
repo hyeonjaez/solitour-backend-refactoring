@@ -226,8 +226,8 @@ public class GatheringRepositoryImpl extends QuerydslRepositorySupport implement
                     .and(gathering.scheduleEndDate.loe(gatheringPageRequest.getEndDate().atTime(LocalTime.MAX)));
         }
 
-        if (Objects.nonNull(gatheringPageRequest.getIsExclude())) {
-            whereClause.and(gathering.isFinish.eq(gatheringPageRequest.getIsExclude()));
+        if (Objects.isNull(gatheringPageRequest.getIsExclude())) {
+            whereClause.and(gathering.isFinish.eq(false));
         }
 
         return whereClause;
