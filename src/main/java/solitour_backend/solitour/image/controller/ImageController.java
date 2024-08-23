@@ -29,16 +29,16 @@ public class ImageController {
 
     @Authenticated
     @PostMapping
-    public ResponseEntity<ImageResponse> uploadImage(@AuthenticationPrincipal  Long userId,
+    public ResponseEntity<ImageResponse> uploadImage(@RequestParam Long id,
                                                      @RequestPart("image") MultipartFile userImage,
-                                                     @RequestParam String imagePath,
+                                                     @RequestParam String type,
                                                      @RequestParam String imageStatus) {
-        ImageResponse informationResponse = imageService.uploadImage(userId, userImage, imagePath,
+        ImageResponse imageResponse = imageService.uploadImage(id, userImage, type,
                 imageStatus);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(informationResponse);
+                .body(imageResponse);
     }
 
 }

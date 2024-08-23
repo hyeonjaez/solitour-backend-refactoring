@@ -24,8 +24,8 @@ public class ImageService {
     private final S3Uploader s3Uploader;
 
     @Transactional
-    public ImageResponse uploadImage(Long userId, MultipartFile image, String imagePath, String imageStatus) {
-        String imageUrl = s3Uploader.upload(image, imagePath, userId);
+    public ImageResponse uploadImage(Long id, MultipartFile image, String type, String imageStatus) {
+        String imageUrl = s3Uploader.upload(image, type, id);
         ImageStatus status = checkImageStatus(imageStatus);
         Image contentImage = new Image(status, imageUrl, LocalDate.now());
         imageRepository.save(contentImage);
