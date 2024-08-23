@@ -277,6 +277,11 @@ public class GatheringRepositoryImpl extends QuerydslRepositorySupport implement
             whereClause.and(gathering.isFinish.eq(false));
         }
 
+        if (Objects.nonNull(gatheringPageRequest.getSearch())) {
+            String searchKeyword = gatheringPageRequest.getSearch().trim();
+            whereClause.and(gathering.title.trim().containsIgnoreCase(searchKeyword));
+        }
+
         return whereClause;
     }
 
