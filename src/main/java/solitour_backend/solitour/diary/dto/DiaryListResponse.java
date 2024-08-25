@@ -12,17 +12,17 @@ import solitour_backend.solitour.diary.entity.Diary;
 public class DiaryListResponse {
     private final List<DiaryContent> diaryContentResponse;
 
-    public DiaryListResponse(List<Diary> diaries) {
+    public DiaryListResponse(List<List<Diary>> diaries) {
 
-        diaryContentResponse=  diaries.stream().map(
-                    diary -> DiaryContent.builder()
-                            .diaryId(diary.getId())
-                            .title(diary.getTitle())
-                            .titleImage(diary.getTitleImage())
-                            .startDatetime(diary.getStartDatetime())
-                            .endDatetime(diary.getEndDatetime())
-                            .diaryDayContentResponses(new DiaryDayContentResponse(diary.getDiaryDayContent())).build()
-                            ).collect(Collectors.toList());
+        diaryContentResponse = diaries.stream().flatMap(List::stream).map(
+                diary -> DiaryContent.builder()
+                        .diaryId(diary.getId())
+                        .title(diary.getTitle())
+                        .titleImage(diary.getTitleImage())
+                        .startDatetime(diary.getStartDatetime())
+                        .endDatetime(diary.getEndDatetime())
+                        .diaryDayContentResponses(new DiaryDayContentResponse(diary.getDiaryDayContent())).build()
+        ).collect(Collectors.toList());
 
     }
 
@@ -42,18 +42,19 @@ public class DiaryListResponse {
 
         private final List<DiaryDayContentDetail> diaryDayContentDetail;
 
-    private DiaryDayContentResponse(List<DiaryDayContent> diaryDayContent) {
-        this.diaryDayContentDetail = diaryDayContent.stream()
-                .map(diaryDayContentDetail ->
-                        DiaryDayContentDetail.builder()
-                                .content(diaryDayContentDetail.getContent())
-                                .feelingStatus(diaryDayContentDetail.getFeelingStatus().name())
-                                .place(diaryDayContentDetail.getPlace())
-                                .build()
-                        ).collect(Collectors.toList());
+        private DiaryDayContentResponse(List<DiaryDayContent> diaryDayContent) {
+            this.diaryDayContentDetail = diaryDayContent.stream()
+                    .map(diaryDayContentDetail ->
+                            DiaryDayContentDetail.builder()
+                                    .content(diaryDayContentDetail.getContent())
+                                    .feelingStatus(diaryDayContentDetail.getFeelingStatus().name())
+                                    .place(diaryDayContentDetail.getPlace())
+                                    .build()
+                    ).collect(Collectors.toList());
         }
 
     }
+
     @Getter
     @Builder
     private static class DiaryDayContentDetail {
