@@ -58,6 +58,8 @@ import solitour_backend.solitour.user.dto.mapper.UserMapper;
 import solitour_backend.solitour.user.entity.User;
 import solitour_backend.solitour.user.entity.UserRepository;
 import solitour_backend.solitour.user.exception.UserNotExistsException;
+import solitour_backend.solitour.user_image.entity.UserImage;
+import solitour_backend.solitour.user_image.entity.UserImageRepository;
 import solitour_backend.solitour.zone_category.dto.mapper.ZoneCategoryMapper;
 import solitour_backend.solitour.zone_category.dto.response.ZoneCategoryResponse;
 import solitour_backend.solitour.zone_category.entity.ZoneCategory;
@@ -85,6 +87,7 @@ public class InformationService {
     private final UserMapper userMapper;
     private final GreatInformationRepository greatInformationRepository;
     private final BookMarkInformationRepository bookMarkInformationRepository;
+    private final UserImageRepository userImageRepository;
 
     public static final String IMAGE_PATH = "information";
     private final ImageRepository imageRepository;
@@ -183,6 +186,9 @@ public class InformationService {
 
         List<InformationBriefResponse> informationRecommend = informationRepository.getInformationRecommend(
                 information.getId(), information.getCategory().getId(), userId);
+        boolean isLike = greatInformationRepository.existsByInformationIdAndUserIdAndIsDeletedFalse(information.getId(), userId);
+        UserImage userImage = userImageRepository.findById(userId).orElseThrow();
+
 
         return new InformationDetailResponse(
                 information.getTitle(),
@@ -197,6 +203,8 @@ public class InformationService {
                 zoneCategoryResponse,
                 imageResponseList,
                 likeCount,
+                userImage.getAddress(),
+                isLike,
                 informationRecommend);
     }
 
