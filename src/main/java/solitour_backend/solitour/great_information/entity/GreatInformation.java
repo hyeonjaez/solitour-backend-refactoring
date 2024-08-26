@@ -33,6 +33,9 @@ public class GreatInformation {
     @JoinColumn(name = "information_id")
     private Information information;
 
+    @Column(name = "is_deleted")
+    private Boolean isDeleted;
+
     public GreatInformation(User user, Information information) {
         this.user = user;
         this.information = information;
