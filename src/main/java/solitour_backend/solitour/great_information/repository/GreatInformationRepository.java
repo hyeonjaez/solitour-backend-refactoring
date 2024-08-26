@@ -1,6 +1,7 @@
 package solitour_backend.solitour.great_information.repository;
 
 import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import solitour_backend.solitour.great_information.entity.GreatInformation;
@@ -13,4 +14,6 @@ public interface GreatInformationRepository extends JpaRepository<GreatInformati
     Optional<GreatInformation> findByInformationIdAndUserId(Long informationId, Long userId);
 
     void deleteAllByInformationId(Long informationId);
+
+    boolean existsByInformationIdAndUserIdAndIsDeletedFalse(Long informationId, Long userId);
 }

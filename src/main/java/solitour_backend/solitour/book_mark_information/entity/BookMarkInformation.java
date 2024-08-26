@@ -33,6 +33,9 @@ public class BookMarkInformation {
     @JoinColumn(name = "information_id")
     private Information information;
 
+    @Column(name = "is_deleted")
+    private Boolean isDeleted;
+
     public BookMarkInformation(User user, Information information) {
         this.user = user;
         this.information = information;
