@@ -116,6 +116,5 @@ public class Gathering {
         this.allowedSex = allowedSex;
         this.startAge = startAge;
         this.endAge = endAge;
-        this.isDeleted = false;
     }
 }
