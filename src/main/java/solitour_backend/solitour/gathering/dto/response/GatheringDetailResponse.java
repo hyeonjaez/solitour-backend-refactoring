@@ -45,4 +45,6 @@ public class GatheringDetailResponse {
     private List<GatheringApplicantsResponse> gatheringApplicantsResponses;
 
     private List<GatheringBriefResponse> gatheringRecommend;
+
+    private Boolean isApplicants;
 }

@@ -4,9 +4,11 @@ import static solitour_backend.solitour.information.controller.InformationContro
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -96,8 +98,8 @@ public class GatheringController {
         if (gatheringModifyRequest.getDeadline().isBefore(LocalDateTime.now())) {
             throw new RequestValidationFailedException("마감일은 현재 시간보다 이후여야 합니다.");
         }
-        GatheringResponse gatheringResponse = gatheringService.modifyGathering(userId, gatheringId,
-                gatheringModifyRequest);
+
+        GatheringResponse gatheringResponse = gatheringService.modifyGathering(userId, gatheringId, gatheringModifyRequest);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -117,11 +119,10 @@ public class GatheringController {
 
 
     @GetMapping
-    public ResponseEntity<Page<GatheringBriefResponse>> pageGatheringSortAndFilter(
-            @RequestParam(defaultValue = "0") int page,
-            @Valid @ModelAttribute GatheringPageRequest gatheringPageRequest,
-            BindingResult bindingResult,
-            HttpServletRequest request) {
+    public ResponseEntity<Page<GatheringBriefResponse>> pageGatheringSortAndFilter(@RequestParam(defaultValue = "0") int page,
+                                                                                   @Valid @ModelAttribute GatheringPageRequest gatheringPageRequest,
+                                                                                   BindingResult bindingResult,
+                                                                                   HttpServletRequest request) {
         Utils.validationRequest(bindingResult);
         Long userId = findUser(request);
 

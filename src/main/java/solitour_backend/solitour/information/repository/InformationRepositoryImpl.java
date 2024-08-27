@@ -9,9 +9,11 @@ import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.JPQLQuery;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -51,8 +53,7 @@ public class InformationRepositoryImpl extends QuerydslRepositorySupport impleme
         BooleanBuilder whereClause = new BooleanBuilder();
 
         if (Objects.nonNull(informationPageRequest.getZoneCategoryId())) {
-            whereClause.and(
-                    information.zoneCategory.parentZoneCategory.id.eq(informationPageRequest.getZoneCategoryId()));
+            whereClause.and(information.zoneCategory.parentZoneCategory.id.eq(informationPageRequest.getZoneCategoryId()));
         }
 
         BooleanBuilder categoryCondition = new BooleanBuilder();
@@ -70,11 +71,9 @@ public class InformationRepositoryImpl extends QuerydslRepositorySupport impleme
                 .join(zoneCategoryChild).on(zoneCategoryChild.id.eq(information.zoneCategory.id))
                 .leftJoin(zoneCategoryParent).on(zoneCategoryParent.id.eq(zoneCategoryChild.parentZoneCategory.id))
                 .leftJoin(bookMarkInformation)
-                .on(bookMarkInformation.information.id.eq(information.id).and(bookMarkInformation.user.id.eq(userId).and(bookMarkInformation.isDeleted.isFalse())))
-                .leftJoin(image).on(image.information.id.eq(information.id)
-                        .and(image.imageStatus.eq(ImageStatus.THUMBNAIL)))
-                .join(category).on(category.id.eq(information.category.id)
-                        .and(categoryCondition))
+                .on(bookMarkInformation.information.id.eq(information.id).and(bookMarkInformation.user.id.eq(userId)))
+                .leftJoin(image).on(image.information.id.eq(information.id).and(image.imageStatus.eq(ImageStatus.THUMBNAIL)))
+                .join(category).on(category.id.eq(information.category.id).and(categoryCondition))
                 .where(whereClause)
                 .select(information.count()).fetchCount();
 
@@ -82,11 +81,9 @@ public class InformationRepositoryImpl extends QuerydslRepositorySupport impleme
                 .join(zoneCategoryChild).on(zoneCategoryChild.id.eq(information.zoneCategory.id))
                 .leftJoin(zoneCategoryParent).on(zoneCategoryParent.id.eq(zoneCategoryChild.parentZoneCategory.id))
                 .leftJoin(bookMarkInformation)
-                .on(bookMarkInformation.information.id.eq(information.id).and(bookMarkInformation.user.id.eq(userId).and(bookMarkInformation.isDeleted.isFalse())))
-                .leftJoin(image).on(image.information.id.eq(information.id)
-                        .and(image.imageStatus.eq(ImageStatus.THUMBNAIL)))
-                .join(category).on(category.id.eq(information.category.id)
-                        .and(categoryCondition))
+                .on(bookMarkInformation.information.id.eq(information.id).and(bookMarkInformation.user.id.eq(userId)))
+                .leftJoin(image).on(image.information.id.eq(information.id).and(image.imageStatus.eq(ImageStatus.THUMBNAIL)))
+                .join(category).on(category.id.eq(information.category.id).and(categoryCondition))
                 .leftJoin(greatInformation).on(greatInformation.information.id.eq(information.id))
                 .where(whereClause)
                 .groupBy(information.id, zoneCategoryChild.id, zoneCategoryParent.id, image.id)
@@ -116,7 +113,7 @@ public class InformationRepositoryImpl extends QuerydslRepositorySupport impleme
                 .leftJoin(zoneCategoryChild).on(zoneCategoryChild.id.eq(information.zoneCategory.id))
                 .leftJoin(zoneCategoryParent).on(zoneCategoryParent.id.eq(zoneCategoryChild.parentZoneCategory.id))
                 .leftJoin(bookMarkInformation)
-                .on(bookMarkInformation.information.id.eq(information.id).and(bookMarkInformation.user.id.eq(userId).and(bookMarkInformation.isDeleted.isFalse())))
+                .on(bookMarkInformation.information.id.eq(information.id).and(bookMarkInformation.user.id.eq(userId)))
                 .leftJoin(image)
                 .on(image.information.id.eq(information.id).and(image.imageStatus.eq(ImageStatus.THUMBNAIL)))
                 .leftJoin(greatInformation).on(greatInformation.information.id.eq(information.id))
@@ -142,13 +139,12 @@ public class InformationRepositoryImpl extends QuerydslRepositorySupport impleme
     }
 
     @Override
-    public List<InformationBriefResponse> getInformationRecommend(Long informationId, Long childCategoryId,
-                                                                  Long userId) {
+    public List<InformationBriefResponse> getInformationRecommend(Long informationId, Long childCategoryId, Long userId) {
         return from(information)
                 .join(zoneCategoryChild).on(zoneCategoryChild.id.eq(information.zoneCategory.id))
                 .leftJoin(zoneCategoryParent).on(zoneCategoryParent.id.eq(zoneCategoryChild.parentZoneCategory.id))
                 .leftJoin(bookMarkInformation)
-                .on(bookMarkInformation.information.id.eq(information.id).and(bookMarkInformation.user.id.eq(userId).and(bookMarkInformation.isDeleted.isFalse())))
+                .on(bookMarkInformation.information.id.eq(information.id).and(bookMarkInformation.user.id.eq(userId)))
                 .leftJoin(image).on(image.information.id.eq(information.id)
                         .and(image.imageStatus.eq(ImageStatus.THUMBNAIL)))
                 .leftJoin(greatInformation).on(greatInformation.information.id.eq(information.id))
@@ -202,8 +198,7 @@ public class InformationRepositoryImpl extends QuerydslRepositorySupport impleme
         JPQLQuery<Long> likeCountSubQuery = JPAExpressions
                 .select(greatInformationSub.count())
                 .from(greatInformationSub)
-                .where(greatInformationSub.information.id.eq(information.id)
-                        .and(greatInformationSub.isDeleted.isFalse()));
+                .where(greatInformationSub.information.id.eq(information.id));
 
         return Expressions.numberTemplate(Long.class, "{0}", likeCountSubQuery).coalesce(0L).intValue();
     }
@@ -213,8 +208,7 @@ public class InformationRepositoryImpl extends QuerydslRepositorySupport impleme
                 .when(JPAExpressions.selectOne()
                         .from(greatInformation)
                         .where(greatInformation.information.id.eq(information.id)
-                                .and(greatInformation.information.id.eq(userId))
-                                .and(greatInformation.isDeleted.isFalse()))
+                                .and(greatInformation.information.id.eq(userId)))
                         .exists())
                 .then(true)
                 .otherwise(false);

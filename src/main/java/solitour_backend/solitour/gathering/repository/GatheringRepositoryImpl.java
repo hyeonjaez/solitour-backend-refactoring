@@ -10,11 +10,13 @@ import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.JPQLQuery;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Objects;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -53,15 +55,13 @@ public class GatheringRepositoryImpl extends QuerydslRepositorySupport implement
                 .join(zoneCategoryChild).on(zoneCategoryChild.id.eq(gathering.zoneCategory.id))
                 .leftJoin(zoneCategoryParent).on(zoneCategoryParent.id.eq(zoneCategoryChild.parentZoneCategory.id))
                 .leftJoin(bookMarkGathering)
-                .on(bookMarkGathering.gathering.id.eq(gathering.id).and(bookMarkGathering.user.id.eq(userId)).and(bookMarkGathering.isDeleted.isFalse()))
+                .on(bookMarkGathering.gathering.id.eq(gathering.id).and(bookMarkGathering.user.id.eq(userId)))
                 .leftJoin(category).on(category.id.eq(gathering.gatheringCategory.id))
-                .leftJoin(gatheringApplicants).on(gatheringApplicants.gathering.id.eq(gathering.id))
+                .leftJoin(gatheringApplicants).on(gatheringApplicants.gathering.id.eq(gathering.id).and(gatheringApplicants.gatheringStatus.eq(GatheringStatus.CONSENT)))
                 .where(gathering.isFinish.eq(Boolean.FALSE)
                         .and(gathering.gatheringCategory.id.eq(gatheringCategoryId))
                         .and(gathering.id.ne(gatheringId))
                         .and(gathering.isDeleted.eq(Boolean.FALSE))
-                        .and(gatheringApplicants.gatheringStatus.eq(GatheringStatus.CONSENT)
-                                .or(gatheringApplicants.gatheringStatus.isNull()))
                 )
                 .groupBy(gathering.id, zoneCategoryChild.id, zoneCategoryParent.id, category.id,
                         gathering.title, gathering.viewCount, gathering.user.name,
@@ -116,7 +116,7 @@ public class GatheringRepositoryImpl extends QuerydslRepositorySupport implement
                 .join(zoneCategoryChild).on(zoneCategoryChild.id.eq(gathering.zoneCategory.id))
                 .leftJoin(zoneCategoryParent).on(zoneCategoryParent.id.eq(zoneCategoryChild.parentZoneCategory.id))
                 .leftJoin(bookMarkGathering)
-                .on(bookMarkGathering.gathering.id.eq(gathering.id).and(bookMarkGathering.user.id.eq(userId)).and(bookMarkGathering.isDeleted.isFalse()))
+                .on(bookMarkGathering.gathering.id.eq(gathering.id).and(bookMarkGathering.user.id.eq(userId)))
                 .leftJoin(gatheringApplicants).on(gatheringApplicants.gathering.id.eq(gathering.id))
                 .where(booleanBuilder)
                 .groupBy(gathering.id, zoneCategoryChild.id, zoneCategoryParent.id, category.id,
@@ -176,9 +176,9 @@ public class GatheringRepositoryImpl extends QuerydslRepositorySupport implement
                 .join(zoneCategoryChild).on(zoneCategoryChild.id.eq(gathering.zoneCategory.id))
                 .leftJoin(zoneCategoryParent).on(zoneCategoryParent.id.eq(zoneCategoryChild.parentZoneCategory.id))
                 .leftJoin(bookMarkGathering)
-                .on(bookMarkGathering.gathering.id.eq(gathering.id).and(bookMarkGathering.user.id.eq(userId)).and(bookMarkGathering.isDeleted.isFalse()))
+                .on(bookMarkGathering.gathering.id.eq(gathering.id).and(bookMarkGathering.user.id.eq(userId)))
                 .leftJoin(category).on(category.id.eq(gathering.gatheringCategory.id))
-                .leftJoin(gatheringApplicants).on(gatheringApplicants.gathering.id.eq(gathering.id))
+                .leftJoin(gatheringApplicants).on(gatheringApplicants.gathering.id.eq(gathering.id).and(gatheringApplicants.gatheringStatus.eq(GatheringStatus.CONSENT)))
                 .where(gathering.isFinish.eq(Boolean.FALSE)
                         .and(gathering.isDeleted.eq(Boolean.FALSE))
                         .and(gathering.createdAt.after(LocalDateTime.now().minusMonths(3))))
@@ -277,8 +277,8 @@ public class GatheringRepositoryImpl extends QuerydslRepositorySupport implement
         JPQLQuery<Long> likeCountSubQuery = JPAExpressions
                 .select(greatGatheringSub.count())
                 .from(greatGatheringSub)
-                .where(greatGatheringSub.gathering.id.eq(gathering.id)
-                        .and(greatGatheringSub.isDeleted.isFalse()));
+                .where(greatGatheringSub.gathering.id.eq(gathering.id));
+
         return Expressions.numberTemplate(Long.class, "{0}", likeCountSubQuery)
                 .coalesce(0L)
                 .intValue();
@@ -289,8 +289,7 @@ public class GatheringRepositoryImpl extends QuerydslRepositorySupport implement
                 .when(JPAExpressions.selectOne()
                         .from(greatGathering)
                         .where(greatGathering.gathering.id.eq(gathering.id)
-                                .and(greatGathering.user.id.eq(userId))
-                                .and(greatGathering.isDeleted.isFalse()))
+                                .and(greatGathering.user.id.eq(userId)))
                         .exists())
                 .then(true)
                 .otherwise(false);

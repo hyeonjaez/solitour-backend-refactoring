@@ -15,5 +15,5 @@ public interface GreatInformationRepository extends JpaRepository<GreatInformati
 
     void deleteAllByInformationId(Long informationId);
 
-    boolean existsByInformationIdAndUserIdAndIsDeletedFalse(Long informationId, Long userId);
+    boolean existsByInformationIdAndUserId(Long informationId, Long userId);
 }
