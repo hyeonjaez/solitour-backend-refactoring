@@ -3,6 +3,7 @@ package solitour_backend.solitour.information.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import java.util.Base64;
 import java.util.List;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
@@ -121,6 +122,26 @@ public class InformationController {
                 .body(pageInformation);
     }
 
+    @GetMapping("/tag/search")
+    public ResponseEntity<Page<InformationBriefResponse>> getPageInformationByTag(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "1") Long parentCategoryId,
+            @Valid @ModelAttribute InformationPageRequest informationPageRequest,
+            @RequestParam(required = false, name = "tagName") String tag,
+            BindingResult bindingResult,
+            HttpServletRequest request) {
+        byte[] decodedBytes = Base64.getUrlDecoder().decode(tag);
+        String decodedTag = new String(decodedBytes);
+
+        Utils.validationRequest(bindingResult);
+        Long userId = findUser(request);
+        Pageable pageable = PageRequest.of(page, PAGE_SIZE);
+        Page<InformationBriefResponse> briefInformationPage = informationService.getPageInformationByTag(
+                pageable, userId, parentCategoryId, informationPageRequest, decodedTag);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(briefInformationPage);
+    }
 
     @GetMapping("/ranks")
     public ResponseEntity<List<InformationRankResponse>> rankInformation() {
