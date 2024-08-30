@@ -23,7 +23,6 @@ public class ImageService {
     public ImageResponse uploadImage(Long id, MultipartFile image, String type) {
         String imageUrl = s3Uploader.upload(image, type, id);
 
-        return new ImageResponse( imageUrl);
+        return new ImageResponse(ImageStatus.CONTENT.getName(), imageUrl);
     }
-
 }
