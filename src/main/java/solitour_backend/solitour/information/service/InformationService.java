@@ -227,22 +227,26 @@ public class InformationService {
 
         Place placeInformation = placeRepository.findById(information.getPlace().getId())
                 .orElseThrow(
-                        () -> new PlaceNotExistsException("해당하는 information의 place에서의 id가 존재하지 않습니다"));
+                        () -> new PlaceNotExistsException("해당하는 information 의 place 에서의 id가 존재하지 않습니다"));
         placeInformation.setName(informationUpdateRequest.getPlaceModifyRequest().getName());
         placeInformation.setAddress(informationUpdateRequest.getPlaceModifyRequest().getAddress());
         placeInformation.setXaxis(informationUpdateRequest.getPlaceModifyRequest().getXAxis());
         placeInformation.setYaxis(informationUpdateRequest.getPlaceModifyRequest().getYAxis());
         placeInformation.setSearchId(informationUpdateRequest.getPlaceModifyRequest().getSearchId());
 
-        Category categoryInformation = categoryRepository.findByIdAndParentCategoryId(informationUpdateRequest.getCategoryId(), null)
+        Category categoryInformation = categoryRepository.findById(informationUpdateRequest.getCategoryId())
                 .orElseThrow(
-                        () -> new CategoryNotExistsException("해당하는 cateogry Id 가 존재하지 않습니다."));
+                        () -> new CategoryNotExistsException("해당하는 category Id 가 존재하지 않습니다."));
+
+        if (Objects.isNull(categoryInformation.getParentCategory())) {
+            throw new RequestValidationFailedException("부모 카테고리는 등록이 안됩니다");
+        }
         information.setCategory(categoryInformation);
 
         ZoneCategory parentZoneCategory = zoneCategoryRepository.findByParentZoneCategoryIdAndName(null,
                         informationUpdateRequest.getZoneCategoryNameParent())
                 .orElseThrow(
-                        () -> new ZoneCategoryNotExistsException("해당하는 name에 대한 zoneCategory가 존재하지 않습니다"));
+                        () -> new ZoneCategoryNotExistsException("해당하는 name 에 대한 zoneCategory 가 존재하지 않습니다"));
 
         ZoneCategory childZoneCategory = zoneCategoryRepository.findByParentZoneCategoryIdAndName(
                         parentZoneCategory.getId(), informationUpdateRequest.getZoneCategoryNameChild())

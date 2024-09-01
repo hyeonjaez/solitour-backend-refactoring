@@ -87,7 +87,7 @@ public class InformationController {
 //    }
 
     @Authenticated
-    @PutMapping("{/informationId}")
+    @PutMapping("/{informationId}")
     public ResponseEntity<InformationResponse> modifyInformation(@AuthenticationPrincipal Long userId,
                                                                  @PathVariable Long informationId,
                                                                  @Valid @RequestBody InformationUpdateRequest informationUpdateRequest,
