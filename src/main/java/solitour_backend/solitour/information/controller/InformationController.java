@@ -25,6 +25,7 @@ import solitour_backend.solitour.error.Utils;
 import solitour_backend.solitour.information.dto.request.InformationCreateRequest;
 import solitour_backend.solitour.information.dto.request.InformationModifyRequest;
 import solitour_backend.solitour.information.dto.request.InformationPageRequest;
+import solitour_backend.solitour.information.dto.request.InformationUpdateRequest;
 import solitour_backend.solitour.information.dto.response.InformationBriefResponse;
 import solitour_backend.solitour.information.dto.response.InformationDetailResponse;
 import solitour_backend.solitour.information.dto.response.InformationMainResponse;
@@ -68,17 +69,32 @@ public class InformationController {
                 .body(informationDetailResponse);
     }
 
+//    @Authenticated
+//    @PutMapping("/{informationId}")
+//    public ResponseEntity<InformationResponse> modifyInformation(@PathVariable Long informationId,
+//                                                                 @RequestPart(value = "thumbNailImage", required = false) MultipartFile thumbnail,
+//                                                                 @RequestPart(value = "contentImages", required = false) List<MultipartFile> contentImages,
+//                                                                 @Valid @RequestPart("request") InformationModifyRequest informationModifyRequest,
+//                                                                 BindingResult bindingResult) {
+//        Utils.validationRequest(bindingResult);
+//
+//        InformationResponse informationResponse = informationService.modifyInformation(
+//                informationId, informationModifyRequest, thumbnail, contentImages);
+//
+//        return ResponseEntity
+//                .status(HttpStatus.CREATED)
+//                .body(informationResponse);
+//    }
+
     @Authenticated
-    @PutMapping("/{informationId}")
-    public ResponseEntity<InformationResponse> modifyInformation(@PathVariable Long informationId,
-                                                                 @RequestPart(value = "thumbNailImage", required = false) MultipartFile thumbnail,
-                                                                 @RequestPart(value = "contentImages", required = false) List<MultipartFile> contentImages,
-                                                                 @Valid @RequestPart("request") InformationModifyRequest informationModifyRequest,
+    @PutMapping("{/informationId}")
+    public ResponseEntity<InformationResponse> modifyInformation(@AuthenticationPrincipal Long userId,
+                                                                 @PathVariable Long informationId,
+                                                                 @Valid @RequestBody InformationUpdateRequest informationUpdateRequest,
                                                                  BindingResult bindingResult) {
         Utils.validationRequest(bindingResult);
 
-        InformationResponse informationResponse = informationService.modifyInformation(
-                informationId, informationModifyRequest, thumbnail, contentImages);
+        InformationResponse informationResponse = informationService.updateInformation(userId, informationId, informationUpdateRequest);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -87,8 +103,9 @@ public class InformationController {
 
     @Authenticated
     @DeleteMapping("/{informationId}")
-    public ResponseEntity<Void> deleteInformation(@PathVariable Long informationId) {
-        informationService.deleteInformation(informationId);
+    public ResponseEntity<Void> deleteInformation(@AuthenticationPrincipal Long userId,
+                                                  @PathVariable Long informationId) {
+        informationService.deleteInformation(userId, informationId);
 
         return ResponseEntity
                 .status(HttpStatus.NO_CONTENT)
