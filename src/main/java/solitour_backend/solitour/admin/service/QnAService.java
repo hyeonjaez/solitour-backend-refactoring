@@ -14,7 +14,6 @@ import solitour_backend.solitour.admin.entity.QnA;
 import solitour_backend.solitour.admin.entity.QnAMessage;
 import solitour_backend.solitour.admin.repository.AnswerRepository;
 import solitour_backend.solitour.admin.repository.QnARepository;
-import solitour_backend.solitour.error.exception.InvalidTokenException;
 import solitour_backend.solitour.user.entity.User;
 import solitour_backend.solitour.user.repository.UserRepository;
 
@@ -57,10 +56,6 @@ public class QnAService {
 
 
     public Page<QnA> getPagedQnAsByUserId(Long userId, int page, int size) {
-
-        if(userId == null) {
-            throw new InvalidTokenException("토큰이 유효하지 않으니 유저가 없겠지?");
-        }
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("id")));
         return qnaRepository.findByUserId(userId, pageable);
     }
