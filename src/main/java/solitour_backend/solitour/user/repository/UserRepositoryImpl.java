@@ -8,7 +8,10 @@ import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.core.types.dsl.StringExpression;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.JPQLQuery;
+
 import java.util.List;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -38,6 +41,12 @@ public class UserRepositoryImpl extends QuerydslRepositorySupport implements Use
     public UserRepositoryImpl() {
         super(User.class);
     }
+
+    @Value("${user.profile.url.male}")
+    private String maleProfileUrl;
+
+    @Value("${user.profile.url.female}")
+    private String femaleProfileUrl;
 
     QInformation information = QInformation.information;
     QZoneCategory zoneCategoryChild = QZoneCategory.zoneCategory;
@@ -270,6 +279,16 @@ public class UserRepositoryImpl extends QuerydslRepositorySupport implements Use
         long total = query.fetchCount();
 
         return new PageImpl<>(list, pageable, total);
+    }
+
+    @Override
+    public String getProfileUrl(String gender) {
+        if ("male".equalsIgnoreCase(gender)) {
+            return maleProfileUrl;
+        } else if ("female".equalsIgnoreCase(gender)) {
+            return femaleProfileUrl;
+        }
+        return null; // Or return a default URL
     }
 
     private StringExpression getGatheringStatus() {
