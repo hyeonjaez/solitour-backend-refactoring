@@ -12,7 +12,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 import solitour_backend.solitour.book_mark_information.entity.BookMarkInformationRepository;
 import solitour_backend.solitour.category.entity.Category;
 import solitour_backend.solitour.category.exception.CategoryNotExistsException;
@@ -90,9 +89,8 @@ public class InformationService {
     private final GreatInformationRepository greatInformationRepository;
     private final BookMarkInformationRepository bookMarkInformationRepository;
     private final UserImageRepository userImageRepository;
-
-    public static final String IMAGE_PATH = "information";
     private final ImageRepository imageRepository;
+
 
     @Transactional
     public InformationResponse registerInformation(Long userId, InformationCreateRequest informationCreateRequest) {
@@ -190,8 +188,14 @@ public class InformationService {
 
         boolean isLike = greatInformationRepository.existsByInformationIdAndUserId(information.getId(), userId);
 
-        //TODO
-        UserImage userImage = userImageRepository.findById(userId).orElse(null);
+        User user = userRepository.findById(userId)
+                .orElseThrow(
+                        () -> new UserNotExistsException("해당하는 id의 User 가 없습니다"));
+
+        String userImageUrl = userImageRepository.findById(userId)
+                .map(UserImage::getAddress)
+                .orElseGet(
+                        () -> userRepository.getProfileUrl(user.getSex()));
 
         return new InformationDetailResponse(
                 information.getTitle(),
@@ -206,7 +210,7 @@ public class InformationService {
                 zoneCategoryResponse,
                 imageResponseList,
                 likeCount,
-                Objects.requireNonNull(userImage).getAddress(),
+                userImageUrl,
                 isLike,
                 informationRecommend);
     }
