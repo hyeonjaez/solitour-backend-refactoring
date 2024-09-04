@@ -304,7 +304,7 @@ public class GatheringRepositoryImpl extends QuerydslRepositorySupport implement
         }
 
         if (Objects.isNull(gatheringPageRequest.getIsExclude())) {
-            whereClause.and(gathering.isFinish.eq(false));
+            whereClause.and(gathering.isFinish.eq(Boolean.FALSE));
         }
 
         if (Objects.nonNull(gatheringPageRequest.getSearch())) {
