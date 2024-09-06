@@ -33,6 +33,7 @@ import solitour_backend.solitour.auth.support.JwtTokenProvider;
 import solitour_backend.solitour.error.Utils;
 import solitour_backend.solitour.error.exception.RequestValidationFailedException;
 import solitour_backend.solitour.gathering.dto.request.GatheringModifyRequest;
+import solitour_backend.solitour.gathering.dto.request.GatheringNotFinishRequest;
 import solitour_backend.solitour.gathering.dto.request.GatheringPageRequest;
 import solitour_backend.solitour.gathering.dto.request.GatheringRegisterRequest;
 import solitour_backend.solitour.gathering.dto.response.GatheringBriefResponse;
@@ -176,8 +177,12 @@ public class GatheringController {
 
     @PutMapping("/not-finish/{gatheringId}")
     public ResponseEntity<Void> gatheringNotFinish(@AuthenticationPrincipal Long userId,
-                                                   @PathVariable Long gatheringId) {
-        gatheringService.setGatheringNotFinish(userId, gatheringId);
+                                                   @PathVariable Long gatheringId,
+                                                   @RequestBody GatheringNotFinishRequest gatheringNotFinishRequest,
+                                                   BindingResult bindingResult) {
+        Utils.validationRequest(bindingResult);
+
+        gatheringService.setGatheringNotFinish(userId, gatheringId, gatheringNotFinishRequest);
 
         return ResponseEntity
                 .status(HttpStatus.NO_CONTENT)
