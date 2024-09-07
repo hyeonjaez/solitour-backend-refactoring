@@ -43,12 +43,18 @@ public class InformationUpdateRequest {
     @Size(min = 1, max = 20)
     private String zoneCategoryNameChild;
 
-    private List<ImageDeleteRequest> deleteImages;
+    @Size(min = 1, max = 200)
+    private String newThumbNailUrl;
 
-    @Size(min = 0, max = 200)
-    private String thumbNailUrl;
+    @Size(min = 1, max = 200)
+    private String newThumbNailFromContent;
 
-    private List<String> contentImagesUrl;
+    @Size(min = 1, max = 200)
+    private String moveThumbNailToContent;
+
+    private List<@Size(min = 1, max = 200) String> deleteImagesUrl;
+
+    private List<@Size(min = 1, max = 200) String> newContentImagesUrl;
 
     private List<TagRegisterRequest> tagRegisterRequests;
 }
