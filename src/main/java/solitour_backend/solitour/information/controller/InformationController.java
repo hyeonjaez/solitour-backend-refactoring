@@ -5,7 +5,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
 import java.io.UnsupportedEncodingException;
-import java.util.Base64;
 import java.util.List;
 import java.util.Objects;
 
@@ -17,14 +16,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import solitour_backend.solitour.auth.config.Authenticated;
 import solitour_backend.solitour.auth.config.AuthenticationPrincipal;
 import solitour_backend.solitour.auth.support.CookieExtractor;
 import solitour_backend.solitour.auth.support.JwtTokenProvider;
 import solitour_backend.solitour.error.Utils;
 import solitour_backend.solitour.information.dto.request.InformationCreateRequest;
-import solitour_backend.solitour.information.dto.request.InformationModifyRequest;
 import solitour_backend.solitour.information.dto.request.InformationPageRequest;
 import solitour_backend.solitour.information.dto.request.InformationUpdateRequest;
 import solitour_backend.solitour.information.dto.response.InformationBriefResponse;
