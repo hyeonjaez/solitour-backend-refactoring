@@ -85,12 +85,22 @@ public class User {
         this.sex = sex;
     }
 
-    public void deleteUser(Long userId) {
+    public void deleteUser() {
         this.userStatus = UserStatus.DELETE;
+        this.oauthId = null;
+        this.provider = null;
+        this.name = null;
+        this.age = null;
+        this.phoneNumber = null;
+        this.email = null;
         this.deletedAt = LocalDateTime.now();
     }
 
     public void updateUserImage(String imageUrl) {
         this.userImage.updateUserImage(imageUrl);
+    }
+
+    public void updateLoginTime() {
+        this.latestLoginAt = LocalDateTime.now();
     }
 }
