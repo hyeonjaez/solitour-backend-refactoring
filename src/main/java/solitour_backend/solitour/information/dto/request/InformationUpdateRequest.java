@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import solitour_backend.solitour.image.dto.request.ImageDeleteRequest;
+import solitour_backend.solitour.image.dto.request.ImageRequest;
 import solitour_backend.solitour.place.dto.request.PlaceModifyRequest;
 import solitour_backend.solitour.tag.dto.request.TagRegisterRequest;
 
@@ -21,7 +21,7 @@ public class InformationUpdateRequest {
     private String title;
 
     @NotBlank
-    @Size(min = 1, max = 20)
+    @Size(min = 1, max = 50)
     private String address;
 
     private String content;
@@ -43,18 +43,15 @@ public class InformationUpdateRequest {
     @Size(min = 1, max = 20)
     private String zoneCategoryNameChild;
 
-    @Size(min = 1, max = 200)
-    private String newThumbNailUrl;
+    private ImageRequest newThumbNailUrl;
 
-    @Size(min = 1, max = 200)
-    private String newThumbNailFromContent;
+    private ImageRequest newThumbNailFromContent;
 
-    @Size(min = 1, max = 200)
-    private String moveThumbNailToContent;
+    private ImageRequest moveThumbNailToContent;
 
-    private List<@Size(min = 1, max = 200) String> deleteImagesUrl;
+    private List<ImageRequest> deleteImagesUrl;
 
-    private List<@Size(min = 1, max = 200) String> newContentImagesUrl;
+    private List<ImageRequest> newContentImagesUrl;
 
     private List<TagRegisterRequest> tagRegisterRequests;
 }
