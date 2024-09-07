@@ -188,11 +188,9 @@ public class InformationService {
 
         boolean isLike = greatInformationRepository.existsByInformationIdAndUserId(information.getId(), userId);
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(
-                        () -> new UserNotExistsException("해당하는 id의 User 가 없습니다"));
+        User user = information.getUser();
 
-        String userImageUrl = userImageRepository.findById(information.getUser().getId())
+        String userImageUrl = userImageRepository.findById(user.getId())
                 .map(UserImage::getAddress)
                 .orElseGet(
                         () -> userRepository.getProfileUrl(user.getSex()));
