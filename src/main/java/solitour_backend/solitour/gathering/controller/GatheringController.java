@@ -178,11 +178,10 @@ public class GatheringController {
     @PutMapping("/not-finish/{gatheringId}")
     public ResponseEntity<Void> gatheringNotFinish(@AuthenticationPrincipal Long userId,
                                                    @PathVariable Long gatheringId,
-                                                   @RequestBody GatheringNotFinishRequest gatheringNotFinishRequest,
                                                    BindingResult bindingResult) {
         Utils.validationRequest(bindingResult);
 
-        gatheringService.setGatheringNotFinish(userId, gatheringId, gatheringNotFinishRequest);
+        gatheringService.setGatheringNotFinish(userId, gatheringId);
 
         return ResponseEntity
                 .status(HttpStatus.NO_CONTENT)
