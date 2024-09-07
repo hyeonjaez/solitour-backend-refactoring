@@ -15,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 import solitour_backend.solitour.error.exception.RequestValidationFailedException;
 import solitour_backend.solitour.gathering.dto.mapper.GatheringMapper;
 import solitour_backend.solitour.gathering.dto.request.GatheringModifyRequest;
-import solitour_backend.solitour.gathering.dto.request.GatheringNotFinishRequest;
 import solitour_backend.solitour.gathering.dto.request.GatheringPageRequest;
 import solitour_backend.solitour.gathering.dto.request.GatheringRegisterRequest;
 import solitour_backend.solitour.gathering.dto.response.GatheringBriefResponse;
@@ -163,6 +162,7 @@ public class GatheringService {
                 likeCount,
                 nowPersonCount,
                 isLike,
+                gathering.getOpenChattingUrl(),
                 gatheringApplicantsResponses,
                 gatheringRecommend,
                 gatheringStatus
@@ -216,7 +216,8 @@ public class GatheringService {
                         gatheringRegisterRequest.getDeadline(),
                         gatheringRegisterRequest.getAllowedSex(),
                         gatheringRegisterRequest.getStartAge(),
-                        gatheringRegisterRequest.getEndAge()
+                        gatheringRegisterRequest.getEndAge(),
+                        gatheringRegisterRequest.getOpenChattingUrl()
                 );
         Gathering saveGathering = gatheringRepository.save(gathering);
 
@@ -287,6 +288,7 @@ public class GatheringService {
         gathering.setEndAge(gatheringModifyRequest.getEndAge());
         gathering.setGatheringCategory(gatheringCategory);
         gathering.setZoneCategory(childZoneCategory);
+        gathering.setOpenChattingUrl(gatheringModifyRequest.getOpenChattingUrl());
 
         List<GatheringTag> gatheringTags = gatheringTagRepository.findAllByGathering_Id(gathering.getId());
 
@@ -351,6 +353,7 @@ public class GatheringService {
         return gatheringRepository.getGatheringLikeCountFromCreatedIn3(userId);
     }
 
+    @Transactional
     public void setGatheringFinish(Long userId, Long gatheringId) {
         Gathering gathering = gatheringRepository.findById(gatheringId)
                 .orElseThrow(
@@ -375,7 +378,8 @@ public class GatheringService {
         gathering.setIsFinish(true);
     }
 
-    public void setGatheringNotFinish(Long userId, Long gatheringId, GatheringNotFinishRequest gatheringNotFinishRequest) {
+    @Transactional
+    public void setGatheringNotFinish(Long userId, Long gatheringId) {
         Gathering gathering = gatheringRepository.findById(gatheringId)
                 .orElseThrow(
                         () -> new GatheringNotExistsException("해당하는 id의 gathering 이 존재 하지 않습니다"));
@@ -396,13 +400,13 @@ public class GatheringService {
             throw new GatheringFinishConflictException("이미 모임이 not finish 상태입니다");
         }
 
-        if (gathering.getScheduleStartDate().isBefore(gatheringNotFinishRequest.getDeadline())) {
-            throw new RequestValidationFailedException("마감일은 시작 날짜 보다 나중일 순 없습니다");
-        }
-
-        if (Objects.nonNull(gatheringNotFinishRequest.getDeadline())) {
-            gathering.setDeadline(gatheringNotFinishRequest.getDeadline());
-        }
+//        if (gathering.getScheduleStartDate().isBefore(gatheringNotFinishRequest.getDeadline())) {
+//            throw new RequestValidationFailedException("마감일은 시작 날짜 보다 나중일 순 없습니다");
+//        }
+//
+//        if (Objects.nonNull(gatheringNotFinishRequest.getDeadline())) {
+//            gathering.setDeadline(gatheringNotFinishRequest.getDeadline());
+//        }
 
         gathering.setIsFinish(false);
     }
