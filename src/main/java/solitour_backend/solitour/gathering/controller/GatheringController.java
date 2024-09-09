@@ -178,9 +178,7 @@ public class GatheringController {
 
     @PutMapping("/not-finish/{gatheringId}")
     public ResponseEntity<Void> gatheringNotFinish(@AuthenticationPrincipal Long userId,
-                                                   @PathVariable Long gatheringId,
-                                                   BindingResult bindingResult) {
-        Utils.validationRequest(bindingResult);
+                                                   @PathVariable Long gatheringId) {
 
         gatheringService.setGatheringNotFinish(userId, gatheringId);
 
