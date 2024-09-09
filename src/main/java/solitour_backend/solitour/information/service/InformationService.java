@@ -202,7 +202,7 @@ public class InformationService {
                 .orElseGet(
                         () -> userRepository.getProfileUrl(user.getSex()));
 
-        updateViewCount(information, request, response);
+        updateViewCount(information, request, response, userId);
 
         return new InformationDetailResponse(
                 information.getTitle(),
@@ -464,8 +464,8 @@ public class InformationService {
                 decodedTag);
     }
 
-    public void updateViewCount(Information information, HttpServletRequest request, HttpServletResponse response) {
-        String cookieName = "viewed_information_" + information.getId();
+    public void updateViewCount(Information information, HttpServletRequest request, HttpServletResponse response, Long userId) {
+        String cookieName = "viewed_information_" + userId + "_" + information.getId();
         Cookie[] cookies = request.getCookies();
         Cookie postCookie = null;
 

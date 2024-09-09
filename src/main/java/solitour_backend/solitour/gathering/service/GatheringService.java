@@ -148,7 +148,7 @@ public class GatheringService {
         List<GatheringBriefResponse> gatheringRecommend = gatheringRepository.getGatheringRecommend(gathering.getId(),
                 gathering.getGatheringCategory().getId(), userId);
 
-        updateViewCount(gathering, request, response);
+        updateViewCount(gathering, request, response, userId);
 
         return new GatheringDetailResponse(
                 gathering.getTitle(),
@@ -466,8 +466,8 @@ public class GatheringService {
         }
     }
 
-    public void updateViewCount(Gathering gathering, HttpServletRequest request, HttpServletResponse response) {
-        String cookieName = "viewed_gathering_" + gathering.getId();
+    public void updateViewCount(Gathering gathering, HttpServletRequest request, HttpServletResponse response, Long userId) {
+        String cookieName = "viewed_gathering_" + userId + "_" + gathering.getId();
         Cookie[] cookies = request.getCookies();
         Cookie postCookie = null;
 
