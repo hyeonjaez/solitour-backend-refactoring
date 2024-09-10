@@ -3,8 +3,10 @@ package solitour_backend.solitour.admin.dto.response;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import solitour_backend.solitour.admin.entity.QnAMessage;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Builder
