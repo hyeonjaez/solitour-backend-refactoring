@@ -477,7 +477,7 @@ public class InformationService {
         }
 
         LocalDateTime now = LocalDateTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-ddHH:mm:ss");
 
         if (Objects.nonNull(postCookie)) {
             LocalDateTime lastViewedAt = LocalDateTime.parse(postCookie.getValue(), formatter);

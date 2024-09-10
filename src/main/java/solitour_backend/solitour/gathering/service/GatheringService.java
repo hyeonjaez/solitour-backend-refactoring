@@ -409,14 +409,6 @@ public class GatheringService {
             throw new GatheringFinishConflictException("이미 모임이 not finish 상태입니다");
         }
 
-//        if (gathering.getScheduleStartDate().isBefore(gatheringNotFinishRequest.getDeadline())) {
-//            throw new RequestValidationFailedException("마감일은 시작 날짜 보다 나중일 순 없습니다");
-//        }
-//
-//        if (Objects.nonNull(gatheringNotFinishRequest.getDeadline())) {
-//            gathering.setDeadline(gatheringNotFinishRequest.getDeadline());
-//        }
-
         gathering.setIsFinish(false);
     }
 
@@ -479,7 +471,7 @@ public class GatheringService {
         }
 
         LocalDateTime now = LocalDateTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-ddHH:mm:ss");
 
         if (Objects.nonNull(postCookie)) {
             LocalDateTime lastViewedAt = LocalDateTime.parse(postCookie.getValue(), formatter);
