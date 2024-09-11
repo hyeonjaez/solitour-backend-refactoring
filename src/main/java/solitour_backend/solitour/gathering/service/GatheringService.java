@@ -46,7 +46,6 @@ import solitour_backend.solitour.gathering_category.repository.GatheringCategory
 import solitour_backend.solitour.gathering_tag.entity.GatheringTag;
 import solitour_backend.solitour.gathering_tag.repository.GatheringTagRepository;
 import solitour_backend.solitour.great_gathering.repository.GreatGatheringRepository;
-import solitour_backend.solitour.information.entity.Information;
 import solitour_backend.solitour.place.dto.mapper.PlaceMapper;
 import solitour_backend.solitour.place.dto.request.PlaceModifyRequest;
 import solitour_backend.solitour.place.dto.request.PlaceRegisterRequest;
