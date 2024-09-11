@@ -19,6 +19,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import solitour_backend.solitour.book_mark_information.entity.BookMarkInformationRepository;
+import solitour_backend.solitour.category.dto.mapper.CategoryMapper;
+import solitour_backend.solitour.category.dto.response.CategoryResponse;
 import solitour_backend.solitour.category.entity.Category;
 import solitour_backend.solitour.category.exception.CategoryNotExistsException;
 import solitour_backend.solitour.category.repository.CategoryRepository;
@@ -94,6 +96,7 @@ public class InformationService {
     private final BookMarkInformationRepository bookMarkInformationRepository;
     private final UserImageRepository userImageRepository;
     private final ImageRepository imageRepository;
+    private final CategoryMapper categoryMapper;
 
 
     @Transactional
@@ -184,6 +187,7 @@ public class InformationService {
         }
         PlaceResponse placeResponse = placeMapper.mapToPlaceResponse(information.getPlace());
         ZoneCategoryResponse zoneCategoryResponse = zoneCategoryMapper.mapToZoneCategoryResponse(information.getZoneCategory());
+        CategoryResponse categoryResponse = categoryMapper.mapToCategoryResponse(information.getCategory());
 
         List<Image> images = imageRepository.findAllByInformationId(information.getId());
 
@@ -215,6 +219,7 @@ public class InformationService {
                 tagResponses,
                 placeResponse,
                 zoneCategoryResponse,
+                categoryResponse,
                 imageResponseList,
                 likeCount,
                 userImageUrl,
@@ -445,8 +450,7 @@ public class InformationService {
             }
         }
 
-        return informationRepository.getInformationPageFilterAndOrder(pageable, informationPageRequest, userId,
-                parentCategoryId);
+        return informationRepository.getInformationPageFilterAndOrder(pageable, informationPageRequest, userId, parentCategoryId);
     }
 
     public List<InformationRankResponse> getRankInformation() {
