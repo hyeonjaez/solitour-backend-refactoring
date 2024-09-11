@@ -61,6 +61,8 @@ import solitour_backend.solitour.user.dto.mapper.UserMapper;
 import solitour_backend.solitour.user.entity.User;
 import solitour_backend.solitour.user.exception.UserNotExistsException;
 import solitour_backend.solitour.user.repository.UserRepository;
+import solitour_backend.solitour.user_image.entity.UserImage;
+import solitour_backend.solitour.user_image.entity.UserImageRepository;
 import solitour_backend.solitour.zone_category.dto.mapper.ZoneCategoryMapper;
 import solitour_backend.solitour.zone_category.dto.response.ZoneCategoryResponse;
 import solitour_backend.solitour.zone_category.entity.ZoneCategory;
@@ -88,6 +90,7 @@ public class GatheringService {
     private final GatheringApplicantsRepository gatheringApplicantsRepository;
     private final GatheringApplicantsMapper gatheringApplicantsMapper;
     private final GatheringCategoryMapper gatheringCategoryMapper;
+    private final UserImageRepository userImageRepository;
 
 
     public GatheringDetailResponse getGatheringDetail(Long userId, Long gatheringId, HttpServletRequest request, HttpServletResponse response) {
@@ -125,7 +128,13 @@ public class GatheringService {
 
         List<GatheringApplicantsResponse> gatheringApplicantsResponses = null;
 
-//        boolean isApplicants = gatheringApplicantsRepository.existsByGatheringIdAndUserId(gathering.getId(), userId);
+        User user = gathering.getUser();
+
+        String userImageUrl = userImageRepository.findById(user.getUserImage().getId())
+                .map(UserImage::getAddress)
+                .orElseGet(
+                        () -> userRepository.getProfileUrl(user.getSex())
+                );
 
         GatheringStatus gatheringStatus = null;
         GatheringApplicants gatheringApplicants = gatheringApplicantsRepository.findByGatheringIdAndUserId(gathering.getId(), userId).orElse(null);
@@ -171,6 +180,7 @@ public class GatheringService {
                 nowPersonCount,
                 isLike,
                 gathering.getOpenChattingUrl(),
+                userImageUrl,
                 gatheringApplicantsResponses,
                 gatheringRecommend,
                 gatheringStatus
