@@ -46,6 +46,8 @@ public class GatheringDetailResponse {
 
     private String openChattingUrl;
 
+    private String userImage;
+
     private List<GatheringApplicantsResponse> gatheringApplicantsResponses;
 
     private List<GatheringBriefResponse> gatheringRecommend;
