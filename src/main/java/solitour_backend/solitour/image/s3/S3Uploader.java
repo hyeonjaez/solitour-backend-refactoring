@@ -72,7 +72,7 @@ public class S3Uploader {
     }
 
     public void deleteImage(String fileUrl) {
-        String fileName = extractFileNameFromUrl(fileUrl);
+        String fileName = extractFileNameFromUrlUseBucketName(fileUrl);
 
         amazonS3Client.deleteObject(new DeleteObjectRequest(bucket, fileName));
     }

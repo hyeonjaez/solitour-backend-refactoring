@@ -3,12 +3,9 @@ package solitour_backend.solitour.gathering.service;
 import static solitour_backend.solitour.gathering.repository.GatheringRepositoryCustom.LIKE_COUNT_SORT;
 import static solitour_backend.solitour.gathering.repository.GatheringRepositoryCustom.VIEW_COUNT_SORT;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -63,6 +60,7 @@ import solitour_backend.solitour.user.exception.UserNotExistsException;
 import solitour_backend.solitour.user.repository.UserRepository;
 import solitour_backend.solitour.user_image.entity.UserImage;
 import solitour_backend.solitour.user_image.entity.UserImageRepository;
+import solitour_backend.solitour.util.HmacUtils;
 import solitour_backend.solitour.zone_category.dto.mapper.ZoneCategoryMapper;
 import solitour_backend.solitour.zone_category.dto.response.ZoneCategoryResponse;
 import solitour_backend.solitour.zone_category.entity.ZoneCategory;
@@ -93,6 +91,7 @@ public class GatheringService {
     private final UserImageRepository userImageRepository;
 
 
+    @Transactional
     public GatheringDetailResponse getGatheringDetail(Long userId, Long gatheringId, HttpServletRequest request, HttpServletResponse response) {
         Gathering gathering = gatheringRepository.findById(gatheringId)
                 .orElseThrow(
@@ -156,7 +155,12 @@ public class GatheringService {
         List<GatheringBriefResponse> gatheringRecommend = gatheringRepository.getGatheringRecommend(gathering.getId(),
                 gathering.getGatheringCategory().getId(), userId);
 
-        updateViewCount(gathering, request, response, userId);
+        try {
+            updateViewCount(gathering, request, response, userId);
+        } catch (Exception e) {
+            throw new IllegalArgumentException();
+        }
+
 
         return new GatheringDetailResponse(
                 gathering.getTitle(),
@@ -467,7 +471,7 @@ public class GatheringService {
         }
     }
 
-    public void updateViewCount(Gathering gathering, HttpServletRequest request, HttpServletResponse response, Long userId) {
+    public void updateViewCount(Gathering gathering, HttpServletRequest request, HttpServletResponse response, Long userId) throws Exception {
         String cookieName = "viewed_gathering_" + userId + "_" + gathering.getId();
         Cookie[] cookies = request.getCookies();
         Cookie postCookie = null;
@@ -479,19 +483,25 @@ public class GatheringService {
                     .orElse(null);
         }
 
-        LocalDateTime now = LocalDateTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-ddHH:mm:ss");
+        LocalDate now = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        String cookieData = now.format(formatter);
 
         if (Objects.nonNull(postCookie)) {
-            LocalDateTime lastViewedAt = LocalDateTime.parse(postCookie.getValue(), formatter);
-            if (lastViewedAt.isBefore(now.minusDays(1))) {
-                incrementGatheringViewCount(gathering);
-                postCookie.setValue(now.format(formatter));
-                response.addCookie(postCookie);
+            String[] parts = postCookie.getValue().split("\\|");
+            if (parts.length == 2 && HmacUtils.verifyHmac(parts[0], parts[1])) {
+                LocalDate lastViewedAt = LocalDate.parse(parts[0], formatter);
+                if (lastViewedAt.isBefore(now.minusDays(1))) {
+                    incrementGatheringViewCount(gathering);
+                    String newHmac = HmacUtils.generateHmac(cookieData);
+                    postCookie.setValue(cookieData + "|" + newHmac);
+                    response.addCookie(postCookie);
+                }
             }
         } else {
             incrementGatheringViewCount(gathering);
-            Cookie newCookie = new Cookie(cookieName, now.format(formatter));
+            String hmac = HmacUtils.generateHmac(cookieData);
+            Cookie newCookie = new Cookie(cookieName, cookieData + "|" + hmac);
             newCookie.setMaxAge(60 * 60 * 24 * 365);
             response.addCookie(newCookie);
         }
@@ -500,5 +510,6 @@ public class GatheringService {
     private void incrementGatheringViewCount(Gathering gathering) {
         gathering.upViewCount();
     }
+
 
 }

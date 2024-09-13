@@ -3,7 +3,7 @@ package solitour_backend.solitour.information.service;
 import static solitour_backend.solitour.information.repository.InformationRepositoryCustom.LIKE_COUNT_SORT;
 import static solitour_backend.solitour.information.repository.InformationRepositoryCustom.VIEW_COUNT_SORT;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -67,6 +67,7 @@ import solitour_backend.solitour.user.exception.UserNotExistsException;
 import solitour_backend.solitour.user.repository.UserRepository;
 import solitour_backend.solitour.user_image.entity.UserImage;
 import solitour_backend.solitour.user_image.entity.UserImageRepository;
+import solitour_backend.solitour.util.HmacUtils;
 import solitour_backend.solitour.zone_category.dto.mapper.ZoneCategoryMapper;
 import solitour_backend.solitour.zone_category.dto.response.ZoneCategoryResponse;
 import solitour_backend.solitour.zone_category.entity.ZoneCategory;
@@ -167,7 +168,7 @@ public class InformationService {
         return informationMapper.mapToInformationResponse(saveInformation);
     }
 
-
+    @Transactional
     public InformationDetailResponse getDetailInformation(Long userId, Long informationId, HttpServletRequest request, HttpServletResponse response) {
         Information information = informationRepository.findById(informationId)
                 .orElseThrow(
@@ -206,7 +207,11 @@ public class InformationService {
                 .orElseGet(
                         () -> userRepository.getProfileUrl(user.getSex()));
 
-        updateViewCount(information, request, response, userId);
+        try {
+            updateViewCount(information, request, response, userId);
+        } catch (Exception e) {
+            throw new IllegalArgumentException();
+        }
 
         return new InformationDetailResponse(
                 information.getTitle(),
@@ -468,7 +473,7 @@ public class InformationService {
                 decodedTag);
     }
 
-    public void updateViewCount(Information information, HttpServletRequest request, HttpServletResponse response, Long userId) {
+    public void updateViewCount(Information information, HttpServletRequest request, HttpServletResponse response, Long userId) throws Exception {
         String cookieName = "viewed_information_" + userId + "_" + information.getId();
         Cookie[] cookies = request.getCookies();
         Cookie postCookie = null;
@@ -480,19 +485,25 @@ public class InformationService {
                     .orElse(null);
         }
 
-        LocalDateTime now = LocalDateTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-ddHH:mm:ss");
+        LocalDate now = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        String cookieData = now.format(formatter);
 
         if (Objects.nonNull(postCookie)) {
-            LocalDateTime lastViewedAt = LocalDateTime.parse(postCookie.getValue(), formatter);
-            if (lastViewedAt.isBefore(now.minusDays(1))) {
-                incrementInformationViewCount(information);
-                postCookie.setValue(now.format(formatter));
-                response.addCookie(postCookie);
+            String[] parts = postCookie.getValue().split("\\|");
+            if (parts.length == 2 && HmacUtils.verifyHmac(parts[0], parts[1])) {
+                LocalDate lastViewedAt = LocalDate.parse(parts[0], formatter);
+                if (lastViewedAt.isBefore(now.minusDays(1))) {
+                    incrementInformationViewCount(information);
+                    String newHmac = HmacUtils.generateHmac(cookieData);
+                    postCookie.setValue(cookieData + "|" + newHmac);
+                    response.addCookie(postCookie);
+                }
             }
         } else {
             incrementInformationViewCount(information);
-            Cookie newCookie = new Cookie(cookieName, now.format(formatter));
+            String hmac = HmacUtils.generateHmac(cookieData);
+            Cookie newCookie = new Cookie(cookieName, cookieData + "|" + hmac);
             newCookie.setMaxAge(60 * 60 * 24 * 365);
             response.addCookie(newCookie);
         }

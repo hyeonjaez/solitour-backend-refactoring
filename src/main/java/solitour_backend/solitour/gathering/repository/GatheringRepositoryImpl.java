@@ -298,11 +298,10 @@ public class GatheringRepositoryImpl extends QuerydslRepositorySupport implement
             int userMinBirthYear = currentYear - gatheringPageRequest.getEndAge() + 1;
             int userMaxBirthYear = currentYear - gatheringPageRequest.getStartAge() + 1;
 
-            whereClause.and(gathering.startAge.goe(userMaxBirthYear)).and(gathering.endAge.loe(userMinBirthYear));
+            whereClause.and(gathering.startAge.goe(userMaxBirthYear)).or(gathering.endAge.loe(userMinBirthYear));
         }
 
-        if (Objects.nonNull(gatheringPageRequest.getStartDate()) && Objects.nonNull(
-                gatheringPageRequest.getEndDate())) {
+        if (Objects.nonNull(gatheringPageRequest.getStartDate()) && Objects.nonNull(gatheringPageRequest.getEndDate())) {
             whereClause.and(gathering.scheduleStartDate.goe(gatheringPageRequest.getStartDate().atStartOfDay()))
                     .and(gathering.scheduleEndDate.loe(gatheringPageRequest.getEndDate().atTime(LocalTime.MAX)));
         }
