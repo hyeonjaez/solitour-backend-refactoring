@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import solitour_backend.solitour.auth.config.AuthenticationPrincipal;
+import solitour_backend.solitour.auth.exception.TokenNotValidException;
 import solitour_backend.solitour.auth.support.CookieExtractor;
 import solitour_backend.solitour.auth.support.JwtTokenProvider;
 import solitour_backend.solitour.error.Utils;
@@ -208,6 +209,10 @@ public class GatheringController {
         }
         if (Objects.isNull(token)) {
             return (long) 0;
+        }
+
+        if (jwtTokenProvider.validateTokenNotUsable(token)) {
+            throw new TokenNotValidException("토큰이 유효하지 않습니다.");
         }
 
         return jwtTokenProvider.getPayload(token);
