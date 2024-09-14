@@ -3,6 +3,9 @@ package solitour_backend.solitour.gathering.service;
 import static solitour_backend.solitour.gathering.repository.GatheringRepositoryCustom.LIKE_COUNT_SORT;
 import static solitour_backend.solitour.gathering.repository.GatheringRepositoryCustom.VIEW_COUNT_SORT;
 
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -471,8 +474,9 @@ public class GatheringService {
         }
     }
 
+
     public void updateViewCount(Gathering gathering, HttpServletRequest request, HttpServletResponse response, Long userId) throws Exception {
-        String cookieName = "viewed_gathering_" + userId + "_" + gathering.getId();
+        String cookieName = "viewed_gatherings";
         Cookie[] cookies = request.getCookies();
         Cookie postCookie = null;
 
@@ -485,24 +489,56 @@ public class GatheringService {
 
         LocalDate now = LocalDate.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        String cookieData = now.format(formatter);
+        String cookieData = userId + "_" + gathering.getId() + "_" + now.format(formatter);
 
-        if (Objects.nonNull(postCookie)) {
-            String[] parts = postCookie.getValue().split("\\|");
-            if (parts.length == 2 && HmacUtils.verifyHmac(parts[0], parts[1])) {
-                LocalDate lastViewedAt = LocalDate.parse(parts[0], formatter);
-                if (lastViewedAt.isBefore(now.minusDays(1))) {
-                    incrementGatheringViewCount(gathering);
-                    String newHmac = HmacUtils.generateHmac(cookieData);
-                    postCookie.setValue(cookieData + "|" + newHmac);
-                    response.addCookie(postCookie);
+        if (Objects.nonNull(postCookie) && postCookie.getValue() != null) {
+            String[] gatheringDataArray = URLDecoder.decode(postCookie.getValue(), StandardCharsets.UTF_8).split(",");
+            boolean isUpdated = false;
+            boolean hasExistingData = false;
+
+            for (int i = 0; i < gatheringDataArray.length; i++) {
+                String[] parts = gatheringDataArray[i].split("\\|");
+
+                if (parts.length == 2) {
+                    if (HmacUtils.verifyHmac(parts[0], parts[1])) {
+                        String[] cookieInfo = parts[0].split("_");
+                        Long cookieUserId = Long.parseLong(cookieInfo[0]);
+                        Long cookieGatheringId = Long.parseLong(cookieInfo[1]);
+                        LocalDate lastViewedAt = LocalDate.parse(cookieInfo[2], formatter);
+
+                        if (cookieUserId.equals(userId) && cookieGatheringId.equals(gathering.getId())) {
+                            hasExistingData = true;
+                            if (lastViewedAt.isBefore(now.minusDays(1))) {
+                                incrementGatheringViewCount(gathering);
+                                String newHmac = HmacUtils.generateHmac(cookieData);
+                                gatheringDataArray[i] = cookieData + "|" + newHmac;
+                                isUpdated = true;
+                            }
+                            break;
+                        }
+                    }
+
                 }
             }
+
+            if (isUpdated || !hasExistingData) {
+                if (!hasExistingData) {
+                    incrementGatheringViewCount(gathering);
+                }
+                String hmac = HmacUtils.generateHmac(cookieData);
+                String updatedValue = String.join(",", gatheringDataArray) + "," + cookieData + "|" + hmac;
+                postCookie.setValue(URLEncoder.encode(updatedValue, StandardCharsets.UTF_8));
+                postCookie.setPath("/");
+                response.addCookie(postCookie);
+            }
+
+
         } else {
             incrementGatheringViewCount(gathering);
             String hmac = HmacUtils.generateHmac(cookieData);
-            Cookie newCookie = new Cookie(cookieName, cookieData + "|" + hmac);
-            newCookie.setMaxAge(60 * 60 * 24 * 365);
+            Cookie newCookie = new Cookie(cookieName, URLEncoder.encode(cookieData + "|" + hmac, StandardCharsets.UTF_8));
+            newCookie.setMaxAge(60 * 60 * 24);
+            newCookie.setPath("/");
             response.addCookie(newCookie);
         }
     }
