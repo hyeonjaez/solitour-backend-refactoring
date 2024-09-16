@@ -2,6 +2,7 @@ package solitour_backend.solitour.diary.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -129,7 +130,10 @@ public class DiaryService {
     }
 
     private void deleteDiaryImage(DiaryUpdateRequest request) {
-        s3Uploader.deleteImage(request.getDeleteTitleImage());
+        if (request.getDeleteTitleImage() != "") {
+            s3Uploader.deleteImage(request.getDeleteTitleImage());
+        }
+
 
         for (DiaryUpdateDayRequest dayRequest : request.getDiaryDayRequests()) {
             for (String imageUrl : dayRequest.getSplitImageUrl(dayRequest.getDeleteImagesUrl())) {

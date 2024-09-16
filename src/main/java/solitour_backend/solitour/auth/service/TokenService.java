@@ -21,7 +21,7 @@ public class TokenService {
         Token token = tokenRepository.findByUserId(user.getId())
                 .orElseThrow(() -> new TokenNotExistsException("토큰이 존재하지 않습니다"));
 
-          token.updateRefreshToken(refreshToken);
+        token.updateRefreshToken(refreshToken);
     }
 
     @Transactional
@@ -31,9 +31,10 @@ public class TokenService {
 
     @Transactional
     public void saveToken(KakaoTokenResponse tokenResponse, User user) {
-        Token token  = Token.builder()
+        Token token = Token.builder()
                 .user(user)
                 .oauthToken(tokenResponse.getRefreshToken())
+                .refreshToken("test")
                 .build();
 
         tokenRepository.save(token);
