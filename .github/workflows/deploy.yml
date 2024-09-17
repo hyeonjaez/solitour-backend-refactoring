@@ -33,6 +33,9 @@ jobs:
 #          echo "${{ secrets.GATHERING_CATEGORY }}" > ./src/main/resources/gathering_category.sql
 #          echo "${{ secrets.ZONE_CATEGORY }}" > ./src/main/resources/zone_category.sql
 
+      - name: gradlew 실행 권한 부여
+        run: chmod +x ./gradlew
+
       - name: 테스트 및 빌드하기 (main 브랜치)
         if: github.ref == 'refs/heads/main'
         run: ./gradlew clean build --args='--spring.profiles.active=prod'
