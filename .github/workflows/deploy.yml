@@ -2,9 +2,9 @@ name: Docker Image CI
 
 on:
   push:
-    branches: [ "main", "dev" ]
+    branches: [ "main", "develop" ]
   pull_request:
-    branches: [ "main", "dev" ]
+    branches: [ "main", "develop" ]
 
 jobs:
   build:
@@ -33,8 +33,13 @@ jobs:
 #          echo "${{ secrets.GATHERING_CATEGORY }}" > ./src/main/resources/gathering_category.sql
 #          echo "${{ secrets.ZONE_CATEGORY }}" > ./src/main/resources/zone_category.sql
 
-      - name: 테스트 및 빌드하기
-        run: ./gradlew clean build
+      - name: 테스트 및 빌드하기 (main 브랜치)
+        if: github.ref == 'refs/heads/main'
+        run: ./gradlew clean build --args='--spring.profiles.active=prod'
+
+      - name: 테스트 및 빌드하기 (develop 브랜치)
+        if: github.ref == 'refs/heads/develop'
+        run: ./gradlew clean build --args='--spring.profiles.active=dev'
 
       - name: 빌드된 파일 이름 변경
         run: mv ./build/libs/*SNAPSHOT.jar ./project.jar
