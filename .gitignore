@@ -180,4 +180,4 @@ Temporary Items
 /docker/db/
 
 # 설정 파일
-/src/main/resources
+/src/main/resources/**.yml
