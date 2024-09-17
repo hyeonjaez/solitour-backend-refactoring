@@ -38,11 +38,11 @@ jobs:
 
       - name: 테스트 및 빌드하기 (main 브랜치)
         if: github.ref == 'refs/heads/main'
-        run: ./gradlew clean bootJar -PspringProfile=prod --warning-mode all --scan
+        run: ./gradlew clean build -PspringProfile=prod --warning-mode all --scan
 
       - name: 테스트 및 빌드하기 (develop 브랜치)
         if: github.ref == 'refs/heads/develop'
-        run: ./gradlew clean bootJar -PspringProfile=dev --warning-mode all --scan
+        run: ./gradlew clean build -PspringProfile=dev --warning-mode all --scan
 
       - name: 빌드된 파일 이름 변경
         run: mv ./build/libs/*SNAPSHOT.jar ./project.jar
