@@ -45,8 +45,9 @@ jobs:
       - name: 테스트 및 빌드하기 (develop 브랜치)
         if: github.ref == 'refs/heads/develop'
         run: |
-          ./gradlew clean test -DspringProfile=test
-          ./gradlew build -x test -DspringProfile=dev --warning-mode all --scan
+          ./gradlew clean test -PspringProfile=test --warning-mode all --scan
+          ./gradlew build -x test -PspringProfile=dev --warning-mode all --scan
+          
         
         
 
