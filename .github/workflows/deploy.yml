@@ -47,8 +47,6 @@ jobs:
         run: |
           ./gradlew clean test -PspringProfile=test
           ./gradlew build -x test -PspringProfile=dev --warning-mode all --scan
-        
-        
 
       - name: 빌드된 파일 이름 변경
         run: mv ./build/libs/*SNAPSHOT.jar ./project.jar
