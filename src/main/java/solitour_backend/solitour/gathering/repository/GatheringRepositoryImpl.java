@@ -279,8 +279,8 @@ public class GatheringRepositoryImpl extends QuerydslRepositorySupport implement
     private BooleanBuilder makeWhereSQL(GatheringPageRequest gatheringPageRequest) {
         BooleanBuilder whereClause = new BooleanBuilder();
 
-        whereClause.and(gathering.isDeleted.eq(Boolean.FALSE).and(gathering.deadline.after(LocalDateTime.now())));
-
+        whereClause.and(gathering.isDeleted.eq(Boolean.FALSE));
+//        whereClause.and(gathering.deadline.after(LocalDateTime.now()));
         if (Objects.nonNull(gatheringPageRequest.getCategory())) {
             whereClause.and(gathering.gatheringCategory.id.eq(gatheringPageRequest.getCategory()));
         }
