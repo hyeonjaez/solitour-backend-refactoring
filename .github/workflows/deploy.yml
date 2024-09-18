@@ -47,6 +47,7 @@ jobs:
         run: |
           ./gradlew clean test -DspringProfile=test
           ./gradlew build -x test -DspringProfile=dev --warning-mode all --scan
+          
         
         
 
