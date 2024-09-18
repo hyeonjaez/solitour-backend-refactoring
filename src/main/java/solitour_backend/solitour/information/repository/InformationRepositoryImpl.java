@@ -286,7 +286,7 @@ public class InformationRepositoryImpl extends QuerydslRepositorySupport impleme
                 .when(JPAExpressions.selectOne()
                         .from(greatInformation)
                         .where(greatInformation.information.id.eq(information.id)
-                                .and(greatInformation.information.id.eq(userId)))
+                                .and(greatInformation.user.id.eq(userId)))
                         .exists())
                 .then(true)
                 .otherwise(false);
