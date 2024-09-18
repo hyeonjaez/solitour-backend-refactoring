@@ -21,10 +21,11 @@ jobs:
 
       - name: application.yml 파일 만들기
         run: |
-          echo "${{ secrets.APPLICATION_YML }}" > ./src/main/resources/application.yml
-          echo "${{ secrets.APPLICATION_DEV }}" > ./src/main/resources/application-dev.yml
-          echo "${{ secrets.APPLICATION_PROD }}" > ./src/main/resources/application-prod.yml
-          echo "${{ secrets.APPLICATION_LOCAL }}" > ./src/main/resources/application-local.yml
+          mkdir -p ./src/main/resources
+          echo "${{ secrets.APPLICATION_YML }}" | base64 --decode > ./src/main/resources/application.yml
+          echo "${{ secrets.APPLICATION_DEV }}" | base64 --decode > ./src/main/resources/application-dev.yml
+          echo "${{ secrets.APPLICATION_PROD }}" | base64 --decode > ./src/main/resources/application-prod.yml
+          echo "${{ secrets.APPLICATION_LOCAL }}" | base64 --decode > ./src/main/resources/application-local.yml
 
 #      - name: sql 파일 만들기
 #        run: |
