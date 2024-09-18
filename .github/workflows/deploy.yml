@@ -88,5 +88,5 @@ jobs:
             mv /home/ubuntu/solitour-server/tobe/project.jar /home/ubuntu/solitour-server/current/project.jar
             cd /home/ubuntu/solitour-server/current
             sudo fuser -k -n tcp 8080 || true
-            nohup java -jar -Dspring.profiles.active=dev project.jar & > ./output.log 2>&1 &
+            nohup java -jar -Dspring.profiles.active=dev project.jar > ./output.log 2>&1 &
             rm -rf /home/ubuntu/solitour-server/tobe
