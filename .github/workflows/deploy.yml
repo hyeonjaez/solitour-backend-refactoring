@@ -28,9 +28,9 @@ jobs:
           echo "${{ secrets.APPLICATION_LOCAL }}"  > ./src/main/resources/application-local.yml
           echo "${{ secrets.APPLICATION_TEST }}"  > ./src/main/resources/application-test.yml
 
-#      - name: sql 파일 만들기
-#        run: |
-#          echo "${{ secrets.SCHEMA }}" > ./src/main/resources/schema.sql
+      - name: sql 파일 만들기
+        run: |
+          echo "${{ secrets.TEST_SCHEMA }}" > ./src/main/resources/test_schema.sql
 #          echo "${{ secrets.CATEGORY }}" > ./src/main/resources/category.sql
 #          echo "${{ secrets.GATHERING_CATEGORY }}" > ./src/main/resources/gathering_category.sql
 #          echo "${{ secrets.ZONE_CATEGORY }}" > ./src/main/resources/zone_category.sql
