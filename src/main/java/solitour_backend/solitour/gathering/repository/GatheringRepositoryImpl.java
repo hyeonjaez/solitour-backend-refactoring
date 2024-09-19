@@ -112,9 +112,10 @@ public class GatheringRepositoryImpl extends QuerydslRepositorySupport implement
                 .on(bookMarkGathering.gathering.id.eq(gathering.id).and(bookMarkGathering.user.id.eq(userId)))
                 .leftJoin(gatheringApplicants).on(gatheringApplicants.gathering.id.eq(gathering.id))
                 .where(booleanBuilder)
-                .select(gathering.id.count()).fetchCount();
+                .select(gathering.id.countDistinct()).fetchCount();
 
         List<GatheringBriefResponse> content = from(gathering)
+                .distinct()
                 .join(zoneCategoryChild).on(zoneCategoryChild.id.eq(gathering.zoneCategory.id))
                 .leftJoin(zoneCategoryParent).on(zoneCategoryParent.id.eq(zoneCategoryChild.parentZoneCategory.id))
                 .leftJoin(bookMarkGathering)
@@ -236,10 +237,10 @@ public class GatheringRepositoryImpl extends QuerydslRepositorySupport implement
     public List<GatheringBriefResponse> getGatheringLikeCountFromCreatedIn3(Long userId) {
         NumberExpression<Integer> likeCount = countGreatGatheringByGatheringById();
         return from(gathering)
+                .distinct()
                 .join(zoneCategoryChild).on(zoneCategoryChild.id.eq(gathering.zoneCategory.id))
                 .leftJoin(zoneCategoryParent).on(zoneCategoryParent.id.eq(zoneCategoryChild.parentZoneCategory.id))
-                .leftJoin(bookMarkGathering)
-                .on(bookMarkGathering.gathering.id.eq(gathering.id).and(bookMarkGathering.user.id.eq(userId)))
+                .leftJoin(bookMarkGathering).on(bookMarkGathering.gathering.id.eq(gathering.id).and(bookMarkGathering.user.id.eq(userId)))
                 .leftJoin(category).on(category.id.eq(gathering.gatheringCategory.id))
                 .leftJoin(gatheringApplicants).on(gatheringApplicants.gathering.id.eq(gathering.id).and(gatheringApplicants.gatheringStatus.eq(GatheringStatus.CONSENT)))
                 .where(gathering.isFinish.eq(Boolean.FALSE)
@@ -261,7 +262,7 @@ public class GatheringRepositoryImpl extends QuerydslRepositorySupport implement
                         gathering.viewCount,
                         bookMarkGathering.user.id.isNotNull(),
                         likeCount,
-                        category.name,
+                        gathering.gatheringCategory.name,
                         gathering.user.name,
                         gathering.scheduleStartDate,
                         gathering.scheduleEndDate,
@@ -280,7 +281,6 @@ public class GatheringRepositoryImpl extends QuerydslRepositorySupport implement
         BooleanBuilder whereClause = new BooleanBuilder();
 
         whereClause.and(gathering.isDeleted.eq(Boolean.FALSE));
-//        whereClause.and(gathering.deadline.after(LocalDateTime.now()));
         if (Objects.nonNull(gatheringPageRequest.getCategory())) {
             whereClause.and(gathering.gatheringCategory.id.eq(gatheringPageRequest.getCategory()));
         }
@@ -308,6 +308,7 @@ public class GatheringRepositoryImpl extends QuerydslRepositorySupport implement
 
         if (Objects.isNull(gatheringPageRequest.getIsExclude())) {
             whereClause.and(gathering.isFinish.eq(Boolean.FALSE));
+            whereClause.and(gathering.deadline.after(LocalDateTime.now()));
         }
 
         if (Objects.nonNull(gatheringPageRequest.getSearch())) {
