@@ -41,7 +41,6 @@ import solitour_backend.solitour.user.service.dto.response.UserInfoResponse;
 public class UserController {
 
     private final UserService userService;
-
     public static final int PAGE_SIZE = 6;
 
     @GetMapping("/info")
@@ -52,7 +51,8 @@ public class UserController {
     }
 
     @PutMapping("/info")
-    public ResponseEntity<Void> updateUserInfo(@AuthenticationPrincipal Long userId, @RequestBody UpdateUserInfoRequest request) {
+    public ResponseEntity<Void> updateUserInfo(@AuthenticationPrincipal Long userId,
+                                               @RequestBody UpdateUserInfoRequest request) {
         userService.updateUserInfo(userId, request);
 
         return ResponseEntity.noContent().build();

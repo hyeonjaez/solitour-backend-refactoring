@@ -29,6 +29,13 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final UserImageService userImageService;
+    private final S3Uploader s3Uploader;
+    @Value("${user.profile.url.female}")
+    private String femaleProfileUrl;
+    @Value("${user.profile.male}")
+    private String maleProfileUrl;
+    @Value("${user.profile.none}")
+    private String noneProfileUrl;
 
     public UserInfoResponse retrieveUserInfo(Long userId) {
         User user = userRepository.findByUserId(userId);
@@ -55,8 +62,9 @@ public class UserService {
 
     @Transactional
     public void updateUserProfile(Long userId, MultipartFile userProfile) {
-        UserImageResponse response = userImageService.registerInformation(userId, userProfile);
+        UserImageResponse response = userImageService.updateUserProfile(userId, userProfile);
         User user = userRepository.findByUserId(userId);
+        checkUserProfile(user.getUserImage().getAddress());
         user.updateUserImage(response.getImageUrl());
     }
 
@@ -95,4 +103,10 @@ public class UserService {
         }
     }
 
+    private void checkUserProfile(String imageUrl) {
+        if (imageUrl.equals(femaleProfileUrl) || imageUrl.equals(maleProfileUrl) || imageUrl.equals(noneProfileUrl)) {
+            return;
+        }
+        s3Uploader.deleteImage(imageUrl);
+    }
 }
