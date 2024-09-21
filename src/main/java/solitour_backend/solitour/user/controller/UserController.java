@@ -28,6 +28,7 @@ import solitour_backend.solitour.gathering.dto.response.GatheringMypageResponse;
 import solitour_backend.solitour.information.dto.response.InformationBriefResponse;
 import solitour_backend.solitour.user.dto.UpdateAgeAndSex;
 import solitour_backend.solitour.user.dto.UpdateNicknameRequest;
+import solitour_backend.solitour.user.dto.request.UpdateUserInfoRequest;
 import solitour_backend.solitour.user.exception.NicknameAlreadyExistsException;
 import solitour_backend.solitour.user.exception.UserNotExistsException;
 import solitour_backend.solitour.user.service.UserService;
@@ -50,6 +51,13 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
+    @PutMapping("/info")
+    public ResponseEntity<Void> updateUserInfo(@AuthenticationPrincipal Long userId, @RequestBody UpdateUserInfoRequest request) {
+        userService.updateUserInfo(userId, request);
+
+        return ResponseEntity.noContent().build();
+    }
+
     @PutMapping("/nickname")
     public ResponseEntity<String> updateNickname(@AuthenticationPrincipal Long userId,
                                                  @RequestBody UpdateNicknameRequest request) {
@@ -60,19 +68,6 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
         } catch (NicknameAlreadyExistsException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Nickname already exists");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An internal error occurred");
-        }
-    }
-
-    @PutMapping("/age-sex")
-    public ResponseEntity<String> updateAgeAndSex(@AuthenticationPrincipal Long userId,
-                                                  @RequestBody UpdateAgeAndSex request) {
-        try {
-            userService.updateAgeAndSex(userId, request.age(), request.sex());
-            return ResponseEntity.ok("Age and Sex updated successfully");
-        } catch (UserNotExistsException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An internal error occurred");
         }

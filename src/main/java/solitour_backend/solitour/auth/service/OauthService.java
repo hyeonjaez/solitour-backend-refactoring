@@ -58,8 +58,8 @@ public class OauthService {
     private String USER_PROFILE_MALE;
     @Value("${user.profile.url.female}")
     private String USER_PROFILE_FEMALE;
-
-
+    @Value("${user.profile.url.none}")
+    private String USER_PROFILE_NONE;
 
     public OauthLinkResponse generateAuthUrl(String type, String redirectUrl) {
         String oauthLink = getAuthLink(type, redirectUrl);
@@ -120,7 +120,7 @@ public class OauthService {
             throw new RuntimeException("지원하지 않는 oauth 타입입니다.");
         }
     }
-
+    
     private void checkUserStatus(User user) {
         UserStatus userStatus = user.getUserStatus();
         switch (userStatus){
@@ -144,7 +144,7 @@ public class OauthService {
         UserImage savedUserImage = userImageService.saveUserImage(imageUrl);
 
         User user = User.builder()
-                .userStatus(UserStatus.ACTIVATE)
+                .userStatus(UserStatus.INACTIVATE)
                 .oauthId(response.getResourceName())
                 .provider("google")
                 .isAdmin(false)
@@ -167,7 +167,7 @@ public class OauthService {
         if (Objects.equals(gender, "female")) {
             return USER_PROFILE_FEMALE;
         }
-        return "none";
+        return USER_PROFILE_NONE;
     }
 
     private User saveKakaoUser(KakaoUserResponse response) {
@@ -180,10 +180,7 @@ public class OauthService {
                 .provider("kakao")
                 .isAdmin(false)
                 .userImage(savedUserImage)
-                .name(response.getKakaoAccount().getName())
                 .nickname(RandomNickName.generateRandomNickname())
-                .age(Integer.valueOf(response.getKakaoAccount().getBirthYear()))
-                .sex(response.getKakaoAccount().getGender())
                 .email(response.getKakaoAccount().getEmail())
                 .createdAt(LocalDateTime.now())
                 .build();
@@ -198,7 +195,7 @@ public class OauthService {
         if (Objects.equals(gender, "female")) {
             return USER_PROFILE_FEMALE;
         }
-        return "none";
+        return USER_PROFILE_NONE;
     }
 
     private String getAuthLink(String type, String redirectUrl) {
