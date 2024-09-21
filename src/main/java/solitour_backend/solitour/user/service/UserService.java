@@ -29,9 +29,9 @@ public class UserService {
     private final S3Uploader s3Uploader;
     @Value("${user.profile.url.female}")
     private String femaleProfileUrl;
-    @Value("${user.profile.male}")
+    @Value("${user.profile.url.male}")
     private String maleProfileUrl;
-    @Value("${user.profile.none}")
+    @Value("${user.profile.url.none}")
     private String noneProfileUrl;
 
     public UserInfoResponse retrieveUserInfo(Long userId) {
