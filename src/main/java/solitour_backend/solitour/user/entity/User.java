@@ -107,7 +107,7 @@ public class User {
 
     public void updateUserInfo(UpdateUserInfoRequest request) {
         this.name = request.getName();
-        this.userStatus = UserStatus.ACTIVE;
+        this.userStatus = UserStatus.ACTIVATE;
         this.age = Integer.valueOf(request.getAge());
         this.sex = request.getSex();
     }
