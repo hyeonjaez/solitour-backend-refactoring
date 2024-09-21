@@ -1,7 +1,6 @@
 package solitour_backend.solitour.user.controller;
 
 
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -19,14 +18,9 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import solitour_backend.solitour.auth.config.Authenticated;
 import solitour_backend.solitour.auth.config.AuthenticationPrincipal;
-import solitour_backend.solitour.auth.service.OauthService;
-import solitour_backend.solitour.auth.support.google.GoogleConnector;
-import solitour_backend.solitour.auth.support.kakao.KakaoConnector;
 import solitour_backend.solitour.gathering.dto.response.GatheringApplicantResponse;
-import solitour_backend.solitour.gathering.dto.response.GatheringBriefResponse;
 import solitour_backend.solitour.gathering.dto.response.GatheringMypageResponse;
 import solitour_backend.solitour.information.dto.response.InformationBriefResponse;
-import solitour_backend.solitour.user.dto.UpdateAgeAndSex;
 import solitour_backend.solitour.user.dto.UpdateNicknameRequest;
 import solitour_backend.solitour.user.dto.request.UpdateUserInfoRequest;
 import solitour_backend.solitour.user.exception.NicknameAlreadyExistsException;
@@ -41,7 +35,6 @@ import solitour_backend.solitour.user.service.dto.response.UserInfoResponse;
 public class UserController {
 
     private final UserService userService;
-
     public static final int PAGE_SIZE = 6;
 
     @GetMapping("/info")
@@ -52,10 +45,18 @@ public class UserController {
     }
 
     @PutMapping("/info")
-    public ResponseEntity<Void> updateUserInfo(@AuthenticationPrincipal Long userId, @RequestBody UpdateUserInfoRequest request) {
+    public ResponseEntity<Void> updateUserInfo(@AuthenticationPrincipal Long userId,
+                                               @RequestBody UpdateUserInfoRequest request) {
         userService.updateUserInfo(userId, request);
 
         return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/profile")
+    public ResponseEntity<Void> deleteUserProfile(@AuthenticationPrincipal Long userId) {
+        userService.deleteUserProfile(userId);
+
+        return ResponseEntity.ok().build();
     }
 
     @PutMapping("/nickname")

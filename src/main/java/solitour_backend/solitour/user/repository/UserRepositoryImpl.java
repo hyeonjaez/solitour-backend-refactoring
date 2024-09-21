@@ -8,9 +8,7 @@ import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.core.types.dsl.StringExpression;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.JPQLQuery;
-
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -19,7 +17,6 @@ import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport
 import solitour_backend.solitour.book_mark_gathering.entity.QBookMarkGathering;
 import solitour_backend.solitour.book_mark_information.entity.QBookMarkInformation;
 import solitour_backend.solitour.gathering.dto.response.GatheringApplicantResponse;
-import solitour_backend.solitour.gathering.dto.response.GatheringMypageResponse;
 import solitour_backend.solitour.gathering.dto.response.GatheringMypageResponse;
 import solitour_backend.solitour.gathering.entity.Gathering;
 import solitour_backend.solitour.gathering.entity.QGathering;
@@ -147,7 +144,8 @@ public class UserRepositoryImpl extends QuerydslRepositorySupport implements Use
                 .leftJoin(gatheringCategory)
                 .on(gatheringCategory.id.eq(gathering.gatheringCategory.id))
                 .leftJoin(gatheringApplicants)
-                .on(gatheringApplicants.gathering.id.eq(gathering.id).and(gatheringApplicants.gatheringStatus.eq(GatheringStatus.CONSENT)))
+                .on(gatheringApplicants.gathering.id.eq(gathering.id)
+                        .and(gatheringApplicants.gatheringStatus.eq(GatheringStatus.CONSENT)))
                 .orderBy(gathering.createdAt.desc())
                 .where(gathering.user.id.eq(userId));
 
@@ -195,7 +193,8 @@ public class UserRepositoryImpl extends QuerydslRepositorySupport implements Use
                 .leftJoin(gatheringCategory)
                 .on(gatheringCategory.id.eq(gathering.gatheringCategory.id))
                 .leftJoin(gatheringApplicants)
-                .on(gatheringApplicants.gathering.id.eq(gathering.id).and(gatheringApplicants.gatheringStatus.eq(GatheringStatus.CONSENT)))
+                .on(gatheringApplicants.gathering.id.eq(gathering.id)
+                        .and(gatheringApplicants.gatheringStatus.eq(GatheringStatus.CONSENT)))
                 .leftJoin(bookMarkGathering)
                 .on(bookMarkGathering.gathering.id.eq(gathering.id))
                 .orderBy(gathering.createdAt.desc())
@@ -241,7 +240,6 @@ public class UserRepositoryImpl extends QuerydslRepositorySupport implements Use
         StringExpression gatheringStatus = getGatheringStatus();
         NumberExpression<Integer> gatheringApplicantCount = countGatheringApplicant(userId);
 
-
         JPQLQuery<Gathering> query = from(gathering)
                 .leftJoin(zoneCategoryParent)
                 .on(zoneCategoryParent.id.eq(gathering.zoneCategory.parentZoneCategory.id))
@@ -254,7 +252,7 @@ public class UserRepositoryImpl extends QuerydslRepositorySupport implements Use
 
         List<GatheringApplicantResponse> list = query
                 .groupBy(gathering.id, zoneCategoryParent.id, zoneCategoryChild.id,
-                            gatheringCategory.id, gatheringApplicants.id)
+                        gatheringCategory.id, gatheringApplicants.id)
                 .select(Projections.constructor(
                         GatheringApplicantResponse.class,
                         gathering.id,
@@ -273,7 +271,7 @@ public class UserRepositoryImpl extends QuerydslRepositorySupport implements Use
                         gathering.startAge,
                         gathering.endAge,
                         gathering.personCount,
-                        gatheringApplicantCount,                        isUserGreatGathering(userId),
+                        gatheringApplicantCount, isUserGreatGathering(userId),
                         gatheringStatus,
                         gathering.isFinish
                 ))
@@ -291,7 +289,8 @@ public class UserRepositoryImpl extends QuerydslRepositorySupport implements Use
         JPQLQuery<Long> countApplicant = JPAExpressions
                 .select(gatheringApplicants.count())
                 .from(gatheringApplicants)
-                .where(gatheringApplicants.user.id.eq(userId).and(gatheringApplicants.gatheringStatus.eq(GatheringStatus.CONSENT)));
+                .where(gatheringApplicants.user.id.eq(userId)
+                        .and(gatheringApplicants.gatheringStatus.eq(GatheringStatus.CONSENT)));
 
         return Expressions.numberTemplate(Long.class, "{0}", countApplicant)
                 .coalesce(0L)

@@ -32,10 +32,10 @@ public class Token {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @Column(nullable = false,name = "refresh_token")
+    @Column(nullable = false, name = "refresh_token")
     private String refreshToken;
 
-    @Column(nullable = false,name = "oauth_token")
+    @Column(nullable = false, name = "oauth_token")
     private String oauthToken;
 
     public Token(User user, String refreshToken) {

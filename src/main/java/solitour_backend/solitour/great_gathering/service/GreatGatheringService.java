@@ -9,7 +9,6 @@ import solitour_backend.solitour.gathering.repository.GatheringRepository;
 import solitour_backend.solitour.great_gathering.entity.GreatGathering;
 import solitour_backend.solitour.great_gathering.exception.GatheringGreatNotExistsException;
 import solitour_backend.solitour.great_gathering.repository.GreatGatheringRepository;
-import solitour_backend.solitour.great_information.exception.InformationGreatNotExistsException;
 import solitour_backend.solitour.user.entity.User;
 import solitour_backend.solitour.user.repository.UserRepository;
 
