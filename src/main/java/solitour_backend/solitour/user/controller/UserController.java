@@ -58,6 +58,13 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
+    @DeleteMapping("/profile")
+    public ResponseEntity<Void> deleteUserProfile(@AuthenticationPrincipal Long userId) {
+        userService.deleteUserProfile(userId);
+
+        return ResponseEntity.ok().build();
+    }
+
     @PutMapping("/nickname")
     public ResponseEntity<String> updateNickname(@AuthenticationPrincipal Long userId,
                                                  @RequestBody UpdateNicknameRequest request) {

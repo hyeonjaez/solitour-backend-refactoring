@@ -60,6 +60,12 @@ public class UserService {
         user.updateUserImage(response.getImageUrl());
     }
 
+    @Transactional
+    public void deleteUserProfile(Long userId) {
+        User user = userRepository.findByUserId(userId);
+        resetUserProfile(user, user.getUserImage().getAddress(), user.getSex());
+    }
+
     public Page<GatheringMypageResponse> retrieveGatheringHost(Pageable pageable, Long userId) {
         return userRepository.retrieveGatheringHost(pageable, userId);
     }
@@ -77,4 +83,16 @@ public class UserService {
         User user = userRepository.findByUserId(userId);
         user.updateUserInfo(request);
     }
+
+    private void resetUserProfile(User user, String imageUrl, String sex) {
+        checkUserProfile(imageUrl);
+        if (sex.equals("male")) {
+            user.updateUserImage(maleProfileUrl);
+        } else if (sex.equals("female")) {
+            user.updateUserImage(femaleProfileUrl);
+        } else {
+            user.updateUserImage(noneProfileUrl);
+        }
+    }
+
 }
