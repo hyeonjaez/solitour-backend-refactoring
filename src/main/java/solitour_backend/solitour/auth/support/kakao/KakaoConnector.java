@@ -3,7 +3,6 @@ package solitour_backend.solitour.auth.support.kakao;
 
 import java.io.IOException;
 import java.util.Collections;
-import java.util.Optional;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
@@ -37,10 +36,11 @@ public class KakaoConnector {
         headers.set("Authorization", String.join(" ", BEARER_TYPE, kakaoToken.getAccessToken()));
         HttpEntity<Void> entity = new HttpEntity<>(headers);
 
-        ResponseEntity<KakaoUserResponse> responseEntity = REST_TEMPLATE.exchange(provider.getUserInfoUrl(), HttpMethod.GET, entity,
+        ResponseEntity<KakaoUserResponse> responseEntity = REST_TEMPLATE.exchange(provider.getUserInfoUrl(),
+                HttpMethod.GET, entity,
                 KakaoUserResponse.class);
 
-        return new KakaoTokenAndUserResponse(kakaoToken,responseEntity.getBody());
+        return new KakaoTokenAndUserResponse(kakaoToken, responseEntity.getBody());
 
     }
 

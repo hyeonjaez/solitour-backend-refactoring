@@ -2,18 +2,17 @@ package solitour_backend.solitour.diary.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import solitour_backend.solitour.diary.diary_day_content.DiaryDayContent;
+import solitour_backend.solitour.diary.dto.request.DiaryCreateRequest;
+import solitour_backend.solitour.diary.dto.request.DiaryCreateRequest.DiaryDayRequest;
 import solitour_backend.solitour.diary.dto.request.DiaryUpdateRequest;
 import solitour_backend.solitour.diary.dto.request.DiaryUpdateRequest.DiaryUpdateDayRequest;
 import solitour_backend.solitour.diary.dto.response.DiaryContent;
-import solitour_backend.solitour.diary.dto.request.DiaryCreateRequest;
-import solitour_backend.solitour.diary.dto.request.DiaryCreateRequest.DiaryDayRequest;
 import solitour_backend.solitour.diary.dto.response.DiaryResponse;
 import solitour_backend.solitour.diary.entity.Diary;
 import solitour_backend.solitour.diary.exception.DiaryNotExistsException;
@@ -133,7 +132,6 @@ public class DiaryService {
         if (request.getDeleteTitleImage() != "") {
             s3Uploader.deleteImage(request.getDeleteTitleImage());
         }
-
 
         for (DiaryUpdateDayRequest dayRequest : request.getDiaryDayRequests()) {
             for (String imageUrl : dayRequest.getSplitImageUrl(dayRequest.getDeleteImagesUrl())) {

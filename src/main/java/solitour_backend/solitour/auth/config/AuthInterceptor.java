@@ -32,7 +32,7 @@ public class AuthInterceptor implements HandlerInterceptor {
         if (authenticated.isPresent()) {
             try {
                 validateToken(request);
-            }catch (TokenNotValidException e) {
+            } catch (TokenNotValidException e) {
                 throw new TokenNotExistsException("토큰이 존재하지 않습니다.");
             }
         }

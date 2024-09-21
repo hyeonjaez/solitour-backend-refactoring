@@ -11,8 +11,6 @@ import solitour_backend.solitour.auth.config.Authenticated;
 import solitour_backend.solitour.auth.config.AuthenticationPrincipal;
 import solitour_backend.solitour.great_gathering.entity.GreatGathering;
 import solitour_backend.solitour.great_gathering.service.GreatGatheringService;
-import solitour_backend.solitour.great_information.entity.GreatInformation;
-import solitour_backend.solitour.great_information.service.GreatInformationService;
 
 @Authenticated
 @RestController
@@ -24,7 +22,7 @@ public class GreatGatheringController {
 
     @PostMapping()
     public ResponseEntity<Long> createGatheringGreat(@AuthenticationPrincipal Long userId,
-                                                       @RequestParam Long gatheringId) {
+                                                     @RequestParam Long gatheringId) {
         GreatGathering greatGathering = service.createGatheringGreat(userId, gatheringId);
 
         return ResponseEntity.ok(greatGathering.getId());
@@ -32,7 +30,7 @@ public class GreatGatheringController {
 
     @DeleteMapping()
     public ResponseEntity<Void> deleteGatheringGreat(@AuthenticationPrincipal Long userId,
-                                                       @RequestParam Long gatheringId) {
+                                                     @RequestParam Long gatheringId) {
         service.deleteGatheringGreat(userId, gatheringId);
 
         return ResponseEntity.noContent().build();

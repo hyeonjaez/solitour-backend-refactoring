@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
-import jdk.jshell.spi.ExecutionControl.UserException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
@@ -81,7 +80,7 @@ public class OauthService {
         Cookie accessCookie = createCookie("access_token", token, ACCESS_COOKIE_AGE);
         Cookie refreshCookie = createCookie("refresh_token", refreshToken, REFRESH_COOKIE_AGE);
 
-        return new LoginResponse(accessCookie, refreshCookie,user.getUserStatus());
+        return new LoginResponse(accessCookie, refreshCookie, user.getUserStatus());
     }
 
     private Cookie createCookie(String name, String value, int maxAge) {
@@ -100,7 +99,7 @@ public class OauthService {
             KakaoUserResponse kakaoUserResponse = response.getKakaoUserResponse();
 
             String id = kakaoUserResponse.getId().toString();
-            User user =  userRepository.findByOauthId(id)
+            User user = userRepository.findByOauthId(id)
                     .orElseGet(() -> saveKakaoUser(kakaoUserResponse));
 
             checkUserStatus(user);
@@ -120,10 +119,10 @@ public class OauthService {
             throw new RuntimeException("지원하지 않는 oauth 타입입니다.");
         }
     }
-    
+
     private void checkUserStatus(User user) {
         UserStatus userStatus = user.getUserStatus();
-        switch (userStatus){
+        switch (userStatus) {
             case BLOCK -> throw new BlockedUserException("차단된 계정입니다.");
             case DELETE -> throw new DeletedUserException("탈퇴한 계정입니다.");
             case DORMANT -> throw new DormantUserException("휴면 계정입니다.");
@@ -131,7 +130,7 @@ public class OauthService {
     }
 
     private void saveToken(KakaoTokenResponse tokenResponse, User user) {
-        Token token  = Token.builder()
+        Token token = Token.builder()
                 .user(user)
                 .oauthToken(tokenResponse.getRefreshToken())
                 .build();
@@ -258,21 +257,23 @@ public class OauthService {
 
     private void changeToDefaultProfile(User user, UserImage userImage) {
         String defaultImageUrl = getDefaultProfile(user);
-        deleteUserProfileFromS3(userImage,defaultImageUrl);
+        deleteUserProfileFromS3(userImage, defaultImageUrl);
     }
 
     private String getDefaultProfile(User user) {
         String sex = user.getSex();
-        if(sex.equals("male")){{
-            return USER_PROFILE_MALE;
-        }} else {
+        if (sex.equals("male")) {
+            {
+                return USER_PROFILE_MALE;
+            }
+        } else {
             return USER_PROFILE_FEMALE;
         }
     }
 
-    private void deleteUserProfileFromS3(UserImage userImage,String defaultImageUrl) {
+    private void deleteUserProfileFromS3(UserImage userImage, String defaultImageUrl) {
         String userImageUrl = userImage.getAddress();
-        if(userImageUrl.equals(USER_PROFILE_MALE) || userImageUrl.equals(USER_PROFILE_FEMALE)){
+        if (userImageUrl.equals(USER_PROFILE_MALE) || userImageUrl.equals(USER_PROFILE_FEMALE)) {
             return;
         }
         s3Uploader.deleteImage(userImageUrl);

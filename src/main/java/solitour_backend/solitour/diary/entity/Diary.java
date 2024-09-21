@@ -22,7 +22,6 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import solitour_backend.solitour.diary.diary_day_content.DiaryDayContent;
-import solitour_backend.solitour.diary.dto.request.DiaryCreateRequest;
 import solitour_backend.solitour.diary.dto.request.DiaryUpdateRequest;
 import solitour_backend.solitour.user.entity.User;
 

@@ -17,9 +17,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import solitour_backend.solitour.auth.config.Authenticated;
 import solitour_backend.solitour.auth.config.AuthenticationPrincipal;
+import solitour_backend.solitour.diary.dto.request.DiaryCreateRequest;
 import solitour_backend.solitour.diary.dto.request.DiaryUpdateRequest;
 import solitour_backend.solitour.diary.dto.response.DiaryContent;
-import solitour_backend.solitour.diary.dto.request.DiaryCreateRequest;
 import solitour_backend.solitour.diary.dto.response.DiaryResponse;
 import solitour_backend.solitour.diary.service.DiaryService;
 

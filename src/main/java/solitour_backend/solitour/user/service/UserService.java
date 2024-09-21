@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import solitour_backend.solitour.gathering.dto.response.GatheringApplicantResponse;
-import solitour_backend.solitour.gathering.dto.response.GatheringBriefResponse;
 import solitour_backend.solitour.gathering.dto.response.GatheringMypageResponse;
 import solitour_backend.solitour.image.s3.S3Uploader;
 import solitour_backend.solitour.information.dto.response.InformationBriefResponse;
@@ -18,8 +17,6 @@ import solitour_backend.solitour.user.exception.NicknameAlreadyExistsException;
 import solitour_backend.solitour.user.repository.UserRepository;
 import solitour_backend.solitour.user.service.dto.response.UserInfoResponse;
 import solitour_backend.solitour.user_image.dto.UserImageResponse;
-import solitour_backend.solitour.user_image.entity.UserImage;
-import solitour_backend.solitour.user_image.entity.UserImageRepository;
 import solitour_backend.solitour.user_image.service.UserImageService;
 
 @Service
