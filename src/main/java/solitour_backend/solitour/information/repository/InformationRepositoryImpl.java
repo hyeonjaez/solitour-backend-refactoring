@@ -76,25 +76,15 @@ public class InformationRepositoryImpl extends QuerydslRepositorySupport impleme
         NumberExpression<Integer> countGreatInformation = countGreatInformationByInformationById();
 
         long total = from(information)
-                .join(zoneCategoryChild).on(zoneCategoryChild.id.eq(information.zoneCategory.id))
-                .leftJoin(zoneCategoryParent).on(zoneCategoryParent.id.eq(zoneCategoryChild.parentZoneCategory.id))
-                .leftJoin(bookMarkInformation)
-                .on(bookMarkInformation.information.id.eq(information.id).and(bookMarkInformation.user.id.eq(userId)))
-                .leftJoin(image)
-                .on(image.information.id.eq(information.id).and(image.imageStatus.eq(ImageStatus.THUMBNAIL)))
-                .join(category).on(category.id.eq(information.category.id).and(categoryCondition))
                 .where(whereClause)
-                .select(information.count()).fetchCount();
+                .select(information.id).fetchCount();
 
         List<InformationBriefResponse> list = from(information)
                 .join(zoneCategoryChild).on(zoneCategoryChild.id.eq(information.zoneCategory.id))
                 .leftJoin(zoneCategoryParent).on(zoneCategoryParent.id.eq(zoneCategoryChild.parentZoneCategory.id))
-                .leftJoin(bookMarkInformation)
-                .on(bookMarkInformation.information.id.eq(information.id).and(bookMarkInformation.user.id.eq(userId)))
                 .leftJoin(image)
                 .on(image.information.id.eq(information.id).and(image.imageStatus.eq(ImageStatus.THUMBNAIL)))
                 .join(category).on(category.id.eq(information.category.id).and(categoryCondition))
-                .leftJoin(greatInformation).on(greatInformation.information.id.eq(information.id))
                 .where(whereClause)
                 .groupBy(information.id, zoneCategoryChild.id, zoneCategoryParent.id, image.id)
                 .orderBy(orderSpecifier)
@@ -104,8 +94,9 @@ public class InformationRepositoryImpl extends QuerydslRepositorySupport impleme
                         information.title,
                         zoneCategoryParent.name,
                         zoneCategoryChild.name,
+                        information.category.name,
                         information.viewCount,
-                        bookMarkInformation.user.id.isNotNull(),
+                        isInformationBookmark(userId),
                         image.address,
                         countGreatInformation,
                         isUserGreatInformation(userId)
@@ -122,11 +113,8 @@ public class InformationRepositoryImpl extends QuerydslRepositorySupport impleme
         return from(information)
                 .leftJoin(zoneCategoryChild).on(zoneCategoryChild.id.eq(information.zoneCategory.id))
                 .leftJoin(zoneCategoryParent).on(zoneCategoryParent.id.eq(zoneCategoryChild.parentZoneCategory.id))
-                .leftJoin(bookMarkInformation)
-                .on(bookMarkInformation.information.id.eq(information.id).and(bookMarkInformation.user.id.eq(userId)))
                 .leftJoin(image)
                 .on(image.information.id.eq(information.id).and(image.imageStatus.eq(ImageStatus.THUMBNAIL)))
-                .leftJoin(greatInformation).on(greatInformation.information.id.eq(information.id))
                 .leftJoin(category).on(category.id.eq(information.category.id))
                 .where(information.createdDate.after(LocalDateTime.now().minusMonths(3)))
                 .groupBy(information.id, information.title, zoneCategoryParent.name, zoneCategoryChild.name,
@@ -140,7 +128,7 @@ public class InformationRepositoryImpl extends QuerydslRepositorySupport impleme
                         zoneCategoryChild.name,
                         category.parentCategory.name,
                         information.viewCount,
-                        bookMarkInformation.user.id.isNotNull(),
+                        isInformationBookmark(userId),
                         image.address,
                         countGreatInformationByInformationById(),
                         isUserGreatInformation(userId)
@@ -154,11 +142,8 @@ public class InformationRepositoryImpl extends QuerydslRepositorySupport impleme
         return from(information)
                 .join(zoneCategoryChild).on(zoneCategoryChild.id.eq(information.zoneCategory.id))
                 .leftJoin(zoneCategoryParent).on(zoneCategoryParent.id.eq(zoneCategoryChild.parentZoneCategory.id))
-                .leftJoin(bookMarkInformation)
-                .on(bookMarkInformation.information.id.eq(information.id).and(bookMarkInformation.user.id.eq(userId)))
                 .leftJoin(image).on(image.information.id.eq(information.id)
                         .and(image.imageStatus.eq(ImageStatus.THUMBNAIL)))
-                .leftJoin(greatInformation).on(greatInformation.information.id.eq(information.id))
                 .where(information.category.id.eq(childCategoryId).and(information.id.ne(informationId)))
                 .groupBy(information.id, zoneCategoryChild.id, zoneCategoryParent.id, image.id)
                 .orderBy(information.createdDate.desc())
@@ -168,8 +153,9 @@ public class InformationRepositoryImpl extends QuerydslRepositorySupport impleme
                         information.title,
                         zoneCategoryParent.name,
                         zoneCategoryChild.name,
+                        information.category.name,
                         information.viewCount,
-                        bookMarkInformation.user.id.isNotNull(),
+                        isInformationBookmark(userId),
                         image.address,
                         countGreatInformationByInformationById(),
                         isUserGreatInformation(userId)
@@ -233,6 +219,7 @@ public class InformationRepositoryImpl extends QuerydslRepositorySupport impleme
                         information.title,
                         zoneCategoryParent.name,
                         zoneCategoryChild.name,
+                        information.category.name,
                         information.viewCount,
                         bookMarkInformation.user.id.isNotNull(),
                         image.address,
@@ -278,7 +265,9 @@ public class InformationRepositoryImpl extends QuerydslRepositorySupport impleme
                 .from(greatInformationSub)
                 .where(greatInformationSub.information.id.eq(information.id));
 
-        return Expressions.numberTemplate(Long.class, "{0}", likeCountSubQuery).coalesce(0L).intValue();
+        return Expressions.numberTemplate(Long.class, "{0}", likeCountSubQuery)
+                .coalesce(0L)
+                .intValue();
     }
 
     private BooleanExpression isUserGreatInformation(Long userId) {
@@ -287,6 +276,17 @@ public class InformationRepositoryImpl extends QuerydslRepositorySupport impleme
                         .from(greatInformation)
                         .where(greatInformation.information.id.eq(information.id)
                                 .and(greatInformation.user.id.eq(userId)))
+                        .exists())
+                .then(true)
+                .otherwise(false);
+    }
+
+    private BooleanExpression isInformationBookmark(Long userId) {
+        return new CaseBuilder()
+                .when(JPAExpressions.selectOne()
+                        .from(bookMarkInformation)
+                        .where(bookMarkInformation.information.id.eq(information.id)
+                                .and(bookMarkInformation.user.id.eq(userId)))
                         .exists())
                 .then(true)
                 .otherwise(false);
