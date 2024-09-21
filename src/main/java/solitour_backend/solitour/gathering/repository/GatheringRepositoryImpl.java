@@ -78,7 +78,7 @@ public class GatheringRepositoryImpl extends QuerydslRepositorySupport implement
                         isGatheringBookmark(userId),
                         likeCount,
                         gathering.gatheringCategory.name,
-                        gathering.user.name,
+                        gathering.user.nickname,
                         gathering.scheduleStartDate,
                         gathering.scheduleEndDate,
                         gathering.deadline,

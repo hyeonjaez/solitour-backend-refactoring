@@ -11,6 +11,7 @@ public class InformationBriefResponse {
     private String title;
     private String zoneCategoryParentName;
     private String zoneCategoryChildName;
+    private String categoryName;
     private Integer viewCount;
     private Boolean isBookMark;
     private String thumbNailImage;
