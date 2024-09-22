@@ -56,11 +56,7 @@ public class GatheringRepositoryImpl extends QuerydslRepositorySupport implement
                         .and(gathering.isDeleted.eq(Boolean.FALSE))
                         .and(gathering.deadline.after(LocalDateTime.now()))
                 )
-                .groupBy(gathering.id, zoneCategoryChild.id, zoneCategoryParent.id, category.id,
-                        gathering.title, gathering.viewCount, gathering.user.name,
-                        gathering.scheduleStartDate, gathering.scheduleEndDate,
-                        gathering.deadline, gathering.allowedSex,
-                        gathering.startAge, gathering.endAge, gathering.personCount)
+                .groupBy(gathering.id, zoneCategoryChild.id, zoneCategoryParent.id)
                 .orderBy(gathering.createdAt.desc())
                 .select(Projections.constructor(
                         GatheringBriefResponse.class,
@@ -100,11 +96,7 @@ public class GatheringRepositoryImpl extends QuerydslRepositorySupport implement
                 .join(zoneCategoryChild).on(zoneCategoryChild.id.eq(gathering.zoneCategory.id))
                 .leftJoin(zoneCategoryParent).on(zoneCategoryParent.id.eq(zoneCategoryChild.parentZoneCategory.id))
                 .where(booleanBuilder)
-                .groupBy(gathering.id, zoneCategoryChild.id, zoneCategoryParent.id, category.id,
-                        gathering.title, gathering.viewCount, gathering.user.name,
-                        gathering.scheduleStartDate, gathering.scheduleEndDate,
-                        gathering.deadline, gathering.allowedSex,
-                        gathering.startAge, gathering.endAge, gathering.personCount)
+                .groupBy(gathering.id, zoneCategoryChild.id, zoneCategoryParent.id)
                 .orderBy(getOrderSpecifier(gatheringPageRequest.getSort(), gathering.id))
                 .select(Projections.constructor(
                         GatheringBriefResponse.class,
@@ -216,11 +208,7 @@ public class GatheringRepositoryImpl extends QuerydslRepositorySupport implement
                         .and(gathering.isDeleted.eq(Boolean.FALSE))
                         .and(gathering.createdAt.after(LocalDateTime.now().minusMonths(3)))
                         .and(gathering.deadline.after(LocalDateTime.now())))
-                .groupBy(gathering.id, zoneCategoryChild.id, zoneCategoryParent.id, category.id,
-                        gathering.title, gathering.viewCount, gathering.user.name,
-                        gathering.scheduleStartDate, gathering.scheduleEndDate,
-                        gathering.deadline, gathering.allowedSex,
-                        gathering.startAge, gathering.endAge, gathering.personCount)
+                .groupBy(gathering.id, zoneCategoryChild.id, zoneCategoryParent.id)
                 .orderBy(countGreatGatheringByGatheringById(gathering.id).desc())
                 .select(Projections.constructor(
                         GatheringBriefResponse.class,
