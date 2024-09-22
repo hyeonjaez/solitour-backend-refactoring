@@ -3,11 +3,7 @@ package solitour_backend.solitour.gathering.repository;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.core.types.dsl.CaseBuilder;
-import com.querydsl.core.types.dsl.Expressions;
-import com.querydsl.core.types.dsl.NumberExpression;
-import com.querydsl.core.types.dsl.PathBuilder;
+import com.querydsl.core.types.dsl.*;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.JPQLQuery;
 
@@ -51,8 +47,6 @@ public class GatheringRepositoryImpl extends QuerydslRepositorySupport implement
 
     @Override
     public List<GatheringBriefResponse> getGatheringRecommend(Long gatheringId, Long gatheringCategoryId, Long userId) {
-        NumberExpression<Integer> likeCount = countGreatGatheringByGatheringById();
-        NumberExpression<Integer> applicantsCount = applicantsCountNowConsent();
         return from(gathering)
                 .join(zoneCategoryChild).on(zoneCategoryChild.id.eq(gathering.zoneCategory.id))
                 .leftJoin(zoneCategoryParent).on(zoneCategoryParent.id.eq(zoneCategoryChild.parentZoneCategory.id))
@@ -76,7 +70,7 @@ public class GatheringRepositoryImpl extends QuerydslRepositorySupport implement
                         zoneCategoryChild.name,
                         gathering.viewCount,
                         isGatheringBookmark(userId),
-                        likeCount,
+                        countGreatGatheringByGatheringById(gathering.id),
                         gathering.gatheringCategory.name,
                         gathering.user.nickname,
                         gathering.scheduleStartDate,
@@ -86,7 +80,7 @@ public class GatheringRepositoryImpl extends QuerydslRepositorySupport implement
                         gathering.startAge,
                         gathering.endAge,
                         gathering.personCount,
-                        applicantsCount,
+                        applicantsCountNowConsent(gathering.id),
                         isUserGreatGathering(userId)
                 )).limit(3L).fetch();
     }
@@ -97,11 +91,6 @@ public class GatheringRepositoryImpl extends QuerydslRepositorySupport implement
                                                                        GatheringPageRequest gatheringPageRequest,
                                                                        Long userId) {
         BooleanBuilder booleanBuilder = makeWhereSQL(gatheringPageRequest);
-
-        OrderSpecifier<?> orderSpecifier = getOrderSpecifier(gatheringPageRequest.getSort());
-
-        NumberExpression<Integer> countGreatGathering = countGreatGatheringByGatheringById();
-        NumberExpression<Integer> applicantsCount = applicantsCountNowConsent();
 
         long total = from(gathering)
                 .where(booleanBuilder)
@@ -116,7 +105,7 @@ public class GatheringRepositoryImpl extends QuerydslRepositorySupport implement
                         gathering.scheduleStartDate, gathering.scheduleEndDate,
                         gathering.deadline, gathering.allowedSex,
                         gathering.startAge, gathering.endAge, gathering.personCount)
-                .orderBy(orderSpecifier)
+                .orderBy(getOrderSpecifier(gatheringPageRequest.getSort(), gathering.id))
                 .select(Projections.constructor(
                         GatheringBriefResponse.class,
                         gathering.id,
@@ -125,7 +114,7 @@ public class GatheringRepositoryImpl extends QuerydslRepositorySupport implement
                         zoneCategoryChild.name,
                         gathering.viewCount,
                         isGatheringBookmark(userId),
-                        countGreatGathering,
+                        countGreatGatheringByGatheringById(gathering.id),
                         gathering.gatheringCategory.name,
                         gathering.user.nickname,
                         gathering.scheduleStartDate,
@@ -135,7 +124,7 @@ public class GatheringRepositoryImpl extends QuerydslRepositorySupport implement
                         gathering.startAge,
                         gathering.endAge,
                         gathering.personCount,
-                        applicantsCount,
+                        applicantsCountNowConsent(gathering.id),
                         isUserGreatGathering(userId)
                 ))
                 .offset(pageable.getOffset())
@@ -150,10 +139,6 @@ public class GatheringRepositoryImpl extends QuerydslRepositorySupport implement
                                                               GatheringPageRequest gatheringPageRequest, Long userId,
                                                               String decodedTag) {
         BooleanBuilder booleanBuilder = makeWhereSQL(gatheringPageRequest);
-
-        OrderSpecifier<?> orderSpecifier = getOrderSpecifier(gatheringPageRequest.getSort());
-
-        NumberExpression<Integer> countGreatGathering = countGreatGatheringByGatheringById();
 
         long total = from(gathering)
                 .join(zoneCategoryChild).on(zoneCategoryChild.id.eq(gathering.zoneCategory.id))
@@ -176,7 +161,7 @@ public class GatheringRepositoryImpl extends QuerydslRepositorySupport implement
                 .on(gatheringTag.gathering.id.eq(gathering.id).and(gatheringTag.tag.name.eq(decodedTag)))
                 .where(booleanBuilder.and(gatheringTag.tag.name.eq(decodedTag)))
                 .groupBy(gathering.id, zoneCategoryChild.id, zoneCategoryParent.id, category.id)
-                .orderBy(orderSpecifier)
+                .orderBy(getOrderSpecifier(gatheringPageRequest.getSort(), gathering.id))
                 .select(Projections.constructor(
                         GatheringBriefResponse.class,
                         gathering.id,
@@ -185,7 +170,7 @@ public class GatheringRepositoryImpl extends QuerydslRepositorySupport implement
                         zoneCategoryChild.name,
                         gathering.viewCount,
                         bookMarkGathering.user.id.isNotNull(),
-                        countGreatGathering,
+                        countGreatGatheringByGatheringById(gathering.id),
                         gathering.gatheringCategory.name,
                         gathering.user.name,
                         gathering.scheduleStartDate,
@@ -208,7 +193,7 @@ public class GatheringRepositoryImpl extends QuerydslRepositorySupport implement
     @Override
     public List<GatheringRankResponse> getGatheringRankList() {
         return from(gathering)
-                .orderBy(countGreatGatheringByGatheringById().desc())
+                .orderBy(countGreatGatheringByGatheringById(gathering.id).desc())
                 .groupBy(gathering.id, gathering.title)
                 .where(gathering.isFinish.eq(Boolean.FALSE)
                         .and(gathering.isDeleted.eq(Boolean.FALSE))
@@ -224,8 +209,6 @@ public class GatheringRepositoryImpl extends QuerydslRepositorySupport implement
 
     @Override
     public List<GatheringBriefResponse> getGatheringLikeCountFromCreatedIn3(Long userId) {
-        NumberExpression<Integer> likeCount = countGreatGatheringByGatheringById();
-        NumberExpression<Integer> applicantsCount = applicantsCountNowConsent();
         return from(gathering)
                 .join(zoneCategoryChild).on(zoneCategoryChild.id.eq(gathering.zoneCategory.id))
                 .leftJoin(zoneCategoryParent).on(zoneCategoryParent.id.eq(zoneCategoryChild.parentZoneCategory.id))
@@ -238,7 +221,7 @@ public class GatheringRepositoryImpl extends QuerydslRepositorySupport implement
                         gathering.scheduleStartDate, gathering.scheduleEndDate,
                         gathering.deadline, gathering.allowedSex,
                         gathering.startAge, gathering.endAge, gathering.personCount)
-                .orderBy(likeCount.desc())
+                .orderBy(countGreatGatheringByGatheringById(gathering.id).desc())
                 .select(Projections.constructor(
                         GatheringBriefResponse.class,
                         gathering.id,
@@ -247,7 +230,7 @@ public class GatheringRepositoryImpl extends QuerydslRepositorySupport implement
                         zoneCategoryChild.name,
                         gathering.viewCount,
                         isGatheringBookmark(userId),
-                        likeCount,
+                        countGreatGatheringByGatheringById(gathering.id),
                         gathering.gatheringCategory.name,
                         gathering.user.nickname,
                         gathering.scheduleStartDate,
@@ -257,7 +240,7 @@ public class GatheringRepositoryImpl extends QuerydslRepositorySupport implement
                         gathering.startAge,
                         gathering.endAge,
                         gathering.personCount,
-                        applicantsCount,
+                        applicantsCountNowConsent(gathering.id),
                         isUserGreatGathering(userId)
                 )).limit(6L).fetch();
     }
@@ -306,12 +289,12 @@ public class GatheringRepositoryImpl extends QuerydslRepositorySupport implement
     }
 
     // 정렬 방식
-    private OrderSpecifier<?> getOrderSpecifier(String sort) {
+    private OrderSpecifier<?> getOrderSpecifier(String sort, NumberPath<Long> gatheringId) {
         PathBuilder<Gathering> entityPath = new PathBuilder<>(Gathering.class, "gathering");
 
         if (Objects.nonNull(sort)) {
             if (LIKE_COUNT_SORT.equalsIgnoreCase(sort)) {
-                return countGreatGatheringByGatheringById().desc();
+                return countGreatGatheringByGatheringById(gatheringId).desc();
             } else if (VIEW_COUNT_SORT.equalsIgnoreCase(sort)) {
                 return entityPath.getNumber("viewCount", Integer.class).desc();
             }
@@ -321,12 +304,12 @@ public class GatheringRepositoryImpl extends QuerydslRepositorySupport implement
     }
 
     // 좋아요 수 가져오는 식
-    private NumberExpression<Integer> countGreatGatheringByGatheringById() {
+    private NumberExpression<Integer> countGreatGatheringByGatheringById(NumberPath<Long> gatheringId) {
         QGreatGathering greatGatheringSub = QGreatGathering.greatGathering;
         JPQLQuery<Long> likeCountSubQuery = JPAExpressions
                 .select(greatGatheringSub.count())
                 .from(greatGatheringSub)
-                .where(greatGatheringSub.gathering.id.eq(gathering.id));
+                .where(greatGatheringSub.gathering.id.eq(gatheringId));
 
         return Expressions.numberTemplate(Long.class, "{0}", likeCountSubQuery)
                 .coalesce(0L)
@@ -355,11 +338,11 @@ public class GatheringRepositoryImpl extends QuerydslRepositorySupport implement
                 .otherwise(false);
     }
 
-    private NumberExpression<Integer> applicantsCountNowConsent() {
+    private NumberExpression<Integer> applicantsCountNowConsent(NumberPath<Long> gatheringId) {
         JPQLQuery<Integer> applicantsCountSubQuery = JPAExpressions
                 .select(gatheringApplicants.count().intValue())
                 .from(gatheringApplicants)
-                .where(gatheringApplicants.gathering.id.eq(gathering.id)
+                .where(gatheringApplicants.gathering.id.eq(gatheringId)
                         .and(gatheringApplicants.gatheringStatus.eq(GatheringStatus.CONSENT)));
 
         return Expressions.numberTemplate(Integer.class, "{0}", applicantsCountSubQuery)
