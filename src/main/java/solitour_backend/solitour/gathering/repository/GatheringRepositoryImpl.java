@@ -128,31 +128,24 @@ public class GatheringRepositoryImpl extends QuerydslRepositorySupport implement
 
     @Override
     public Page<GatheringBriefResponse> getPageGatheringByTag(Pageable pageable,
-                                                              GatheringPageRequest gatheringPageRequest, Long userId,
+                                                              GatheringPageRequest gatheringPageRequest,
+                                                              Long userId,
                                                               String decodedTag) {
         BooleanBuilder booleanBuilder = makeWhereSQL(gatheringPageRequest);
+        booleanBuilder.and(gatheringTag.tag.name.eq(decodedTag));
 
         long total = from(gathering)
-                .join(zoneCategoryChild).on(zoneCategoryChild.id.eq(gathering.zoneCategory.id))
-                .leftJoin(zoneCategoryParent).on(zoneCategoryParent.id.eq(zoneCategoryChild.parentZoneCategory.id))
-                .leftJoin(bookMarkGathering)
-                .on(bookMarkGathering.gathering.id.eq(gathering.id).and(bookMarkGathering.user.id.eq(userId)))
-                .leftJoin(gatheringApplicants).on(gatheringApplicants.gathering.id.eq(gathering.id))
-                .leftJoin(gatheringTag)
-                .on(gatheringTag.gathering.id.eq(gathering.id).and(gatheringTag.tag.name.eq(decodedTag)))
-                .where(booleanBuilder.and(gatheringTag.tag.name.eq(decodedTag)))
-                .select(gathering.id.count()).fetchCount();
+                .leftJoin(gatheringTag).on(gatheringTag.gathering.id.eq(gathering.id))
+                .where(booleanBuilder)
+                .select(gathering.id.count())
+                .fetchCount();
 
         List<GatheringBriefResponse> content = from(gathering)
                 .join(zoneCategoryChild).on(zoneCategoryChild.id.eq(gathering.zoneCategory.id))
                 .leftJoin(zoneCategoryParent).on(zoneCategoryParent.id.eq(zoneCategoryChild.parentZoneCategory.id))
-                .leftJoin(bookMarkGathering)
-                .on(gatheringApplicants.gathering.id.eq(gathering.id).and(gatheringApplicants.gatheringStatus.eq(GatheringStatus.CONSENT)))
-                .leftJoin(gatheringApplicants).on(gatheringApplicants.gathering.id.eq(gathering.id).and(gatheringApplicants.gatheringStatus.eq(GatheringStatus.CONSENT)))
-                .leftJoin(gatheringTag)
-                .on(gatheringTag.gathering.id.eq(gathering.id).and(gatheringTag.tag.name.eq(decodedTag)))
-                .where(booleanBuilder.and(gatheringTag.tag.name.eq(decodedTag)))
-                .groupBy(gathering.id, zoneCategoryChild.id, zoneCategoryParent.id, category.id)
+                .leftJoin(gatheringTag).on(gatheringTag.gathering.id.eq(gathering.id))
+                .where(booleanBuilder)
+                .groupBy(gathering.id, zoneCategoryChild.id, zoneCategoryParent.id)
                 .orderBy(getOrderSpecifier(gatheringPageRequest.getSort(), gathering.id))
                 .select(Projections.constructor(
                         GatheringBriefResponse.class,
@@ -161,10 +154,10 @@ public class GatheringRepositoryImpl extends QuerydslRepositorySupport implement
                         zoneCategoryParent.name,
                         zoneCategoryChild.name,
                         gathering.viewCount,
-                        bookMarkGathering.user.id.isNotNull(),
+                        isGatheringBookmark(userId, gathering.id),
                         countGreatGatheringByGatheringById(gathering.id),
                         gathering.gatheringCategory.name,
-                        gathering.user.name,
+                        gathering.user.nickname,
                         gathering.scheduleStartDate,
                         gathering.scheduleEndDate,
                         gathering.deadline,
@@ -172,7 +165,7 @@ public class GatheringRepositoryImpl extends QuerydslRepositorySupport implement
                         gathering.startAge,
                         gathering.endAge,
                         gathering.personCount,
-                        gatheringApplicants.count().coalesce(0L).intValue(),
+                        applicantsCountNowConsent(gathering.id),
                         isUserGreatGathering(userId)
                 ))
                 .offset(pageable.getOffset())
