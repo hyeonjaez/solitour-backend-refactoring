@@ -86,7 +86,17 @@ public class UserService {
     @Transactional
     public void updateUserInfo(Long userId, UpdateUserInfoRequest request) {
         User user = userRepository.findByUserId(userId);
+        changeUserProfile(user, request);
         user.updateUserInfo(request);
+    }
+
+    private void changeUserProfile(User user, UpdateUserInfoRequest request) {
+        String sex = request.getSex();
+        if(sex.equals("male")){
+            user.updateUserImage(maleProfileUrl);
+        } else if (sex.equals("female")) {
+            user.updateUserImage(femaleProfileUrl);
+        }
     }
 
     private void resetUserProfile(User user, String imageUrl, String sex) {
