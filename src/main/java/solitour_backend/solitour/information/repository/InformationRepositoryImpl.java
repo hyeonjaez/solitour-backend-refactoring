@@ -119,7 +119,7 @@ public class InformationRepositoryImpl extends QuerydslRepositorySupport impleme
                 .where(information.createdDate.after(LocalDateTime.now().minusMonths(3)))
                 .groupBy(information.id, information.title, zoneCategoryParent.name, zoneCategoryChild.name,
                         bookMarkInformation.id, image.address)
-                .orderBy(greatInformation.information.id.count().desc())
+                .orderBy(countGreatInformationByInformationById().desc())
                 .select(Projections.constructor(
                         InformationMainResponse.class,
                         information.id,
@@ -238,7 +238,7 @@ public class InformationRepositoryImpl extends QuerydslRepositorySupport impleme
                 .leftJoin(greatInformation)
                 .on(greatInformation.information.id.eq(information.id))
                 .groupBy(information.id, information.title)
-                .orderBy(greatInformation.information.id.count().desc())
+                .orderBy(countGreatInformationByInformationById().desc())
                 .limit(5)
                 .select(Projections.constructor(
                         InformationRankResponse.class,
