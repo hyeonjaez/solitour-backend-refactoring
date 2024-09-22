@@ -81,6 +81,7 @@ public class UserRepositoryImpl extends QuerydslRepositorySupport implements Use
                         information.title,
                         zoneCategoryParent.name,
                         zoneCategoryChild.name,
+                        information.category.name,
                         information.viewCount,
                         bookMarkInformation.user.id.isNotNull(),
                         image.address,
