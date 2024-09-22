@@ -249,14 +249,16 @@ public class InformationRepositoryImpl extends QuerydslRepositorySupport impleme
         return information.createdDate.desc();
     }
 
-    private NumberExpression<Long> countGreatInformationByInformationById(NumberPath<Long> informationId) {
+    private NumberExpression<Integer> countGreatInformationByInformationById(NumberPath<Long> informationId) {
         QGreatInformation greatInformationSub = QGreatInformation.greatInformation;
         JPQLQuery<Long> likeCountSubQuery = JPAExpressions
                 .select(greatInformationSub.count())
                 .from(greatInformationSub)
                 .where(greatInformationSub.information.id.eq(informationId));  // 파라미터로 받은 NumberPath와 비교
 
-        return Expressions.asNumber(likeCountSubQuery).longValue();  // 명확하게 Long 타입 반환
+        return Expressions.numberTemplate(Long.class, "{0}", likeCountSubQuery)
+                .coalesce(0L)
+                .intValue();
     }
 
     private BooleanExpression isUserGreatInformation(Long userId) {
