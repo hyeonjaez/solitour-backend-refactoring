@@ -23,17 +23,12 @@ jobs:
         run: |
           mkdir -p ./src/main/resources
           echo "${{ secrets.APPLICATION_YML }}"  > ./src/main/resources/application.yml
+          echo "${{ secrets.APPLICATION_COMMON }}"  > ./src/main/resources/application-common.yml
           echo "${{ secrets.APPLICATION_DEV }}"  > ./src/main/resources/application-dev.yml
           echo "${{ secrets.APPLICATION_PROD }}"  > ./src/main/resources/application-prod.yml
           echo "${{ secrets.APPLICATION_LOCAL }}"  > ./src/main/resources/application-local.yml
           echo "${{ secrets.APPLICATION_TEST }}"  > ./src/main/resources/application-test.yml
 
-#      - name: sql 파일 만들기
-#        run: |
-#          echo "${{ secrets.SCHEMA }}" > ./src/main/resources/schema.sql
-#          echo "${{ secrets.CATEGORY }}" > ./src/main/resources/category.sql
-#          echo "${{ secrets.GATHERING_CATEGORY }}" > ./src/main/resources/gathering_category.sql
-#          echo "${{ secrets.ZONE_CATEGORY }}" > ./src/main/resources/zone_category.sql
 
       - name: gradlew 실행 권한 부여
         run: chmod +x ./gradlew
