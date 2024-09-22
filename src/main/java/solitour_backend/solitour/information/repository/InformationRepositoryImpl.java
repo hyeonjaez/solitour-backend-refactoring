@@ -3,10 +3,7 @@ package solitour_backend.solitour.information.repository;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.core.types.dsl.CaseBuilder;
-import com.querydsl.core.types.dsl.Expressions;
-import com.querydsl.core.types.dsl.NumberExpression;
+import com.querydsl.core.types.dsl.*;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.JPQLQuery;
 
@@ -72,8 +69,6 @@ public class InformationRepositoryImpl extends QuerydslRepositorySupport impleme
             whereClause.and(information.title.trim().containsIgnoreCase(searchKeyword));
         }
 
-        OrderSpecifier<?> orderSpecifier = getOrderSpecifier(informationPageRequest.getSort());
-        NumberExpression<Integer> countGreatInformation = countGreatInformationByInformationById();
 
         long total = from(information)
                 .where(whereClause)
@@ -87,7 +82,7 @@ public class InformationRepositoryImpl extends QuerydslRepositorySupport impleme
                 .join(category).on(category.id.eq(information.category.id).and(categoryCondition))
                 .where(whereClause)
                 .groupBy(information.id, zoneCategoryChild.id, zoneCategoryParent.id, image.id)
-                .orderBy(orderSpecifier)
+                .orderBy(getOrderSpecifier(informationPageRequest.getSort(), information.id))
                 .select(Projections.constructor(
                         InformationBriefResponse.class,
                         information.id,
@@ -98,7 +93,7 @@ public class InformationRepositoryImpl extends QuerydslRepositorySupport impleme
                         information.viewCount,
                         isInformationBookmark(userId),
                         image.address,
-                        countGreatInformation,
+                        countGreatInformationByInformationById(information.id),
                         isUserGreatInformation(userId)
                 )).offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -113,13 +108,12 @@ public class InformationRepositoryImpl extends QuerydslRepositorySupport impleme
         return from(information)
                 .leftJoin(zoneCategoryChild).on(zoneCategoryChild.id.eq(information.zoneCategory.id))
                 .leftJoin(zoneCategoryParent).on(zoneCategoryParent.id.eq(zoneCategoryChild.parentZoneCategory.id))
-                .leftJoin(image)
-                .on(image.information.id.eq(information.id).and(image.imageStatus.eq(ImageStatus.THUMBNAIL)))
+                .leftJoin(image).on(image.information.id.eq(information.id).and(image.imageStatus.eq(ImageStatus.THUMBNAIL)))
                 .leftJoin(category).on(category.id.eq(information.category.id))
                 .where(information.createdDate.after(LocalDateTime.now().minusMonths(3)))
                 .groupBy(information.id, information.title, zoneCategoryParent.name, zoneCategoryChild.name,
                         bookMarkInformation.id, image.address)
-                .orderBy(countGreatInformationByInformationById().desc())
+                .orderBy(countGreatInformationByInformationById(information.id).desc()) // 파라미터로 information.id 전달
                 .select(Projections.constructor(
                         InformationMainResponse.class,
                         information.id,
@@ -130,10 +124,9 @@ public class InformationRepositoryImpl extends QuerydslRepositorySupport impleme
                         information.viewCount,
                         isInformationBookmark(userId),
                         image.address,
-                        countGreatInformationByInformationById(),
+                        countGreatInformationByInformationById(information.id), // 파라미터 전달
                         isUserGreatInformation(userId)
                 )).limit(6).fetch();
-
     }
 
     @Override
@@ -157,7 +150,7 @@ public class InformationRepositoryImpl extends QuerydslRepositorySupport impleme
                         information.viewCount,
                         isInformationBookmark(userId),
                         image.address,
-                        countGreatInformationByInformationById(),
+                        countGreatInformationByInformationById(information.id),
                         isUserGreatInformation(userId)
                 ))
                 .limit(3L)
@@ -183,8 +176,6 @@ public class InformationRepositoryImpl extends QuerydslRepositorySupport impleme
             categoryCondition.and(category.parentCategory.id.eq(parentCategoryId));
         }
 
-        OrderSpecifier<?> orderSpecifier = getOrderSpecifier(informationPageRequest.getSort());
-        NumberExpression<Integer> countGreatInformation = countGreatInformationByInformationById();
 
         long total = from(information)
                 .join(zoneCategoryChild).on(zoneCategoryChild.id.eq(information.zoneCategory.id))
@@ -212,7 +203,7 @@ public class InformationRepositoryImpl extends QuerydslRepositorySupport impleme
                 .on(infoTag.information.id.eq(information.id))
                 .where(whereClause)
                 .groupBy(information.id, zoneCategoryChild.id, zoneCategoryParent.id, image.id, infoTag.id)
-                .orderBy(orderSpecifier)
+                .orderBy(getOrderSpecifier(informationPageRequest.getSort(), information.id))
                 .select(Projections.constructor(
                         InformationBriefResponse.class,
                         information.id,
@@ -223,7 +214,7 @@ public class InformationRepositoryImpl extends QuerydslRepositorySupport impleme
                         information.viewCount,
                         bookMarkInformation.user.id.isNotNull(),
                         image.address,
-                        countGreatInformation,
+                        countGreatInformationByInformationById(information.id),
                         isUserGreatInformation(userId)
                 )).offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -238,7 +229,7 @@ public class InformationRepositoryImpl extends QuerydslRepositorySupport impleme
                 .leftJoin(greatInformation)
                 .on(greatInformation.information.id.eq(information.id))
                 .groupBy(information.id, information.title)
-                .orderBy(countGreatInformationByInformationById().desc())
+                .orderBy(countGreatInformationByInformationById(information.id).desc())
                 .limit(5)
                 .select(Projections.constructor(
                         InformationRankResponse.class,
@@ -247,10 +238,10 @@ public class InformationRepositoryImpl extends QuerydslRepositorySupport impleme
                 )).fetch();
     }
 
-    private OrderSpecifier<?> getOrderSpecifier(String sort) {
+    private OrderSpecifier<?> getOrderSpecifier(String sort, NumberPath<Long> informationId) {
         if (Objects.nonNull(sort)) {
             if (Objects.equals(LIKE_COUNT_SORT, sort)) {
-                return countGreatInformationByInformationById().desc();
+                return countGreatInformationByInformationById(informationId).desc();
             } else if (Objects.equals(VIEW_COUNT_SORT, sort)) {
                 return information.viewCount.desc();
             }
@@ -258,16 +249,14 @@ public class InformationRepositoryImpl extends QuerydslRepositorySupport impleme
         return information.createdDate.desc();
     }
 
-    private NumberExpression<Integer> countGreatInformationByInformationById() {
+    private NumberExpression<Long> countGreatInformationByInformationById(NumberPath<Long> informationId) {
         QGreatInformation greatInformationSub = QGreatInformation.greatInformation;
         JPQLQuery<Long> likeCountSubQuery = JPAExpressions
                 .select(greatInformationSub.count())
                 .from(greatInformationSub)
-                .where(greatInformationSub.information.id.eq(information.id));
+                .where(greatInformationSub.information.id.eq(informationId));  // 파라미터로 받은 NumberPath와 비교
 
-        return Expressions.numberTemplate(Long.class, "{0}", likeCountSubQuery)
-                .coalesce(0L)
-                .intValue();
+        return Expressions.asNumber(likeCountSubQuery).longValue();  // 명확하게 Long 타입 반환
     }
 
     private BooleanExpression isUserGreatInformation(Long userId) {
