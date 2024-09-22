@@ -111,9 +111,8 @@ public class InformationRepositoryImpl extends QuerydslRepositorySupport impleme
                 .leftJoin(image).on(image.information.id.eq(information.id).and(image.imageStatus.eq(ImageStatus.THUMBNAIL)))
                 .leftJoin(category).on(category.id.eq(information.category.id))
                 .where(information.createdDate.after(LocalDateTime.now().minusMonths(3)))
-                .groupBy(information.id, information.title, zoneCategoryParent.name, zoneCategoryChild.name,
-                        bookMarkInformation.id, image.address)
-                .orderBy(countGreatInformationByInformationById(information.id).desc()) // 파라미터로 information.id 전달
+                .groupBy(information.id, zoneCategoryParent.name, zoneCategoryChild.name, image.address)
+                .orderBy(countGreatInformationByInformationById(information.id).desc())
                 .select(Projections.constructor(
                         InformationMainResponse.class,
                         information.id,
