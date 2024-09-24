@@ -1,0 +1,90 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "main", "develop" ]
+  pull_request:
+    branches: [ "main", "develop" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Github Repository 에 올린 파일들을 볼러오기
+        uses: actions/checkout@v4
+
+      - name: JDK 17 버전 설치
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: application.yml 파일 만들기
+        run: |
+          mkdir -p ./src/main/resources
+          echo "${{ secrets.APPLICATION_YML }}"  > ./src/main/resources/application.yml
+          echo "${{ secrets.APPLICATION_COMMON }}"  > ./src/main/resources/application-common.yml
+          echo "${{ secrets.APPLICATION_DEV }}"  > ./src/main/resources/application-dev.yml
+          echo "${{ secrets.APPLICATION_PROD }}"  > ./src/main/resources/application-prod.yml
+          echo "${{ secrets.APPLICATION_LOCAL }}"  > ./src/main/resources/application-local.yml
+          echo "${{ secrets.APPLICATION_TEST }}"  > ./src/main/resources/application-test.yml
+
+
+      - name: gradlew 실행 권한 부여
+        run: chmod +x ./gradlew
+
+      - name: 테스트 및 빌드하기 (main 브랜치)
+        if: github.ref == 'refs/heads/main'
+        run: ./gradlew clean build -PspringProfile=prod --warning-mode all --scan
+
+      - name: 테스트 및 빌드하기 (develop 브랜치)
+        if: github.ref == 'refs/heads/develop'
+        run: |
+          ./gradlew clean test -PspringProfile=test
+          ./gradlew build -x test -PspringProfile=dev --warning-mode all --scan
+
+      - name: 빌드된 파일 이름 변경
+        run: mv ./build/libs/*SNAPSHOT.jar ./project.jar
+
+      - name: SCP로 EC2에 빌드된 파일 전송
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_PRIVATE_KEY }}
+          source: project.jar
+          target: /home/ubuntu/solitour-server/tobe
+
+      - name: SSH로 EC2 접속
+        if: github.ref == 'refs/heads/main'
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_PRIVATE_KEY }}
+          script_stop: true
+          script: |
+            rm -rf /home/ubuntu/solitour-server/current 
+            mkdir /home/ubuntu/solitour-server/current
+            mv /home/ubuntu/solitour-server/tobe/project.jar /home/ubuntu/solitour-server/current/project.jar
+            cd /home/ubuntu/solitour-server/current
+            sudo fuser -k -n tcp 8080 || true
+            nohup java -jar -Dspring.profiles.active=prod project.jar & > ./output.log 2>&1 &
+            rm -rf /home/ubuntu/solitour-server/tobe
+
+      - name: SSH로 EC2 접속
+        if: github.ref == 'refs/heads/develop'
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_PRIVATE_KEY }}
+          script_stop: true
+          script: |
+            rm -rf /home/ubuntu/solitour-server/current 
+            mkdir /home/ubuntu/solitour-server/current
+            mv /home/ubuntu/solitour-server/tobe/project.jar /home/ubuntu/solitour-server/current/project.jar
+            cd /home/ubuntu/solitour-server/current
+            sudo fuser -k -n tcp 8080 || true
+            nohup java -jar -Dspring.profiles.active=dev project.jar > ./output.log 2>&1 &
+            rm -rf /home/ubuntu/solitour-server/tobe

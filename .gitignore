@@ -175,3 +175,10 @@ Temporary Items
 
 # idea 전부 무시
 .idea/**
+
+# local docker db 파일
+/docker/db/
+
+# 설정 파일
+/src/main/resources/**.yml
+/src/main/resources

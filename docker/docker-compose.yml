@@ -1,0 +1,23 @@
+version: '3'
+services:
+  solitour:
+    image: library/mysql:8.3
+    container_name: solitour-db
+    restart: always
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: 1234
+      MYSQL_DATABASE: solitour
+      MYSQL_USER: soli
+      MYSQL_PASSWORD: 1234
+      TZ: Asia/Seoul
+      DB_HOST: host.docker.internal
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - ./db/mysql/data:/var/lib/mysql
+      - ./db/mysql/config:/etc/mysql/conf.d
+      - ./db/mysql/init:/docker-entrypoint-initdb.d
+    platform: linux/x86_64
