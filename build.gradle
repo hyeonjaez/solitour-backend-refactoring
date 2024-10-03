@@ -26,7 +26,7 @@ repositories {
 }
 
 ext {
-    set('snippetsDir', file("build/generated-snippets"))
+    set('snippetsDir', file("src/dos")) // 변경된 경로
 }
 
 dependencies {
@@ -34,7 +34,6 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
-
 
     implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.6'
@@ -49,7 +48,6 @@ dependencies {
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
 
     implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
-// queryDsl 라이브러리
     annotationProcessor "com.querydsl:querydsl-apt:5.0.0:jakarta"
     annotationProcessor "jakarta.annotation:jakarta.annotation-api"
     annotationProcessor "jakarta.persistence:jakarta.persistence-api"
@@ -69,18 +67,13 @@ tasks.named('test') {
 
 tasks.named('asciidoctor') {
     inputs.dir snippetsDir
-    dependsOn test
-}
-
-ext {
-    set('snippetsDir', file("src/docs"))
+    // dependsOn test 를 제거하여 순환 종속성을 피합니다.
 }
 
 asciidoctor {
     configurations 'asciidoctorExt'
     baseDirFollowsSourceFile()
     inputs.dir snippetsDir
-    dependsOn test
 }
 
 asciidoctor.doFirst {
@@ -88,12 +81,11 @@ asciidoctor.doFirst {
 }
 
 task copyDocument(type: Copy) {
-    dependsOn asciidoctor
     from file("build/docs/asciidoc")
     into file("src/main/resources/docs")
 }
 
-
+// build 작업에 copyDocument를 추가합니다.
 build {
     dependsOn copyDocument
 }
