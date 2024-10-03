@@ -73,21 +73,21 @@ tasks.named('asciidoctor') {
 }
 
 ext {
-    snippetsDir = file('build/generated-snippets') // (5)
+    set('snippetsDir', file("src/docs"))
 }
 
 asciidoctor {
-    configurations 'asciidoctorExt' // (7)
-    baseDirFollowsSourceFile() // (8)
-    inputs.dir snippetsDir // (9)
-    dependsOn test // (10)
+    configurations 'asciidoctorExt'
+    baseDirFollowsSourceFile()
+    inputs.dir snippetsDir
+    dependsOn test
 }
 
 asciidoctor.doFirst {
-    delete file('src/main/resources/docs')  // (11)
+    delete file('src/main/resources/docs')
 }
 
-task copyDocument(type: Copy) { // (12)
+task copyDocument(type: Copy) {
     dependsOn asciidoctor
     from file("build/docs/asciidoc")
     into file("src/main/resources/docs")
