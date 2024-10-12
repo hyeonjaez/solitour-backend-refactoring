@@ -19,6 +19,7 @@ DROP TABLE IF EXISTS `banner`;
 DROP TABLE IF EXISTS `notice`;
 DROP TABLE IF EXISTS `qna_message`;
 DROP TABLE IF EXISTS `qna`;
+DROP TABLE IF EXISTS `term`;
 DROP TABLE IF EXISTS `user`;
 DROP TABLE IF EXISTS `user_image`;
 DROP TABLE IF EXISTS `diary_day_content`;
@@ -311,4 +312,16 @@ CREATE TABLE `diary_day_content`
     `diary_day_content_image`          TEXT DEFAULT NULL,
     PRIMARY KEY (`diary_day_content_id`),
     CONSTRAINT `FK_diary_day_content_TO_diary` FOREIGN KEY (`diary_id`) REFERENCES `diary` (`diary_id`)
+);
+
+
+CREATE TABLE `term`
+(
+    `term_id`                  BIGINT   NOT NULL AUTO_INCREMENT,
+    `user_id`                  BIGINT   NOT NULL,
+    `term_condition_agreement` BOOLEAN  NOT NULL,
+    `term_privacy_agreement`   BOOLEAN  NOT NULL,
+    `term_created_at`          DATETIME NOT NULL,
+    PRIMARY KEY (`term_id`),
+    CONSTRAINT `FK_term_TO_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`)
 );
