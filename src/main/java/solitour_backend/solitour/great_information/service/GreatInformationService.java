@@ -23,7 +23,7 @@ public class GreatInformationService {
 
     @Transactional
     public GreatInformation createInformationGreat(Long userId, Long infoId) {
-        User user = userRepository.findByUserId(userId);
+        User user = userRepository.findById(userId).orElseThrow();
         Information information = informationRepository.findById(infoId)
                 .orElseThrow(() -> new InformationNotExistsException("해당 정보가 없습니다."));
 

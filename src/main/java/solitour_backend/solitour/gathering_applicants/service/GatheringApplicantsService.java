@@ -1,6 +1,7 @@
 package solitour_backend.solitour.gathering_applicants.service;
 
 import java.util.Objects;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,7 +18,6 @@ import solitour_backend.solitour.gathering_applicants.exception.GatheringApplica
 import solitour_backend.solitour.gathering_applicants.exception.GatheringNotManagerException;
 import solitour_backend.solitour.gathering_applicants.repository.GatheringApplicantsRepository;
 import solitour_backend.solitour.user.entity.User;
-import solitour_backend.solitour.user.exception.UserNotExistsException;
 import solitour_backend.solitour.user.repository.UserRepository;
 
 @Service
@@ -35,9 +35,7 @@ public class GatheringApplicantsService {
                                 new GatheringNotExistsException("해당하는 id의 gathering 이 존재 하지 않습니다"));
 
         User user = userRepository.findById(userId)
-                .orElseThrow(
-                        () ->
-                                new UserNotExistsException("해당하는 id의 user가 없습니다"));
+                .orElseThrow();
 
         if (Objects.equals(gathering.getUser(), user)) {
             throw new GatheringApplicantsManagerException("모임을 만든 사람은 해당 모임에 무조건 참여 하여 이미 있습니다");
@@ -67,9 +65,7 @@ public class GatheringApplicantsService {
                                 new GatheringNotExistsException("해당하는 id의 gathering 이 존재 하지 않습니다"));
 
         User user = userRepository.findById(userId)
-                .orElseThrow(
-                        () ->
-                                new UserNotExistsException("해당하는 id의 user 가 없습니다"));
+                .orElseThrow();
 
         if (Objects.equals(gathering.getUser(), user)) {
             throw new GatheringApplicantsManagerException("모임을 만든 사람은 해당 모임에 빠질 수 없습니다.");
@@ -93,9 +89,7 @@ public class GatheringApplicantsService {
                                 new GatheringNotExistsException("해당하는 id의 gathering 이 존재 하지 않습니다"));
 
         User user = userRepository.findById(userId)
-                .orElseThrow(
-                        () ->
-                                new UserNotExistsException("해당하는 id의 user 가 없습니다"));
+                .orElseThrow();
 
         if (!Objects.equals(gathering.getUser(), user)) {
             throw new GatheringNotManagerException("해당하는 user 가 해당 gathering 의 manage 가 아닙니다");

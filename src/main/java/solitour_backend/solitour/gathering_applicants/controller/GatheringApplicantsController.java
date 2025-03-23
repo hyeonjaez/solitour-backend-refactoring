@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import solitour_backend.solitour.auth.config.AuthenticationPrincipal;
 import solitour_backend.solitour.error.Utils;
 import solitour_backend.solitour.gathering_applicants.dto.request.GatheringApplicantsModifyRequest;
 import solitour_backend.solitour.gathering_applicants.service.GatheringApplicantsService;
@@ -23,8 +22,8 @@ import solitour_backend.solitour.gathering_applicants.service.GatheringApplicant
 public class GatheringApplicantsController {
     private final GatheringApplicantsService gatheringApplicantsService;
 
-    @PostMapping("/{gatheringId}")
-    public ResponseEntity<Void> participateGathering(@AuthenticationPrincipal Long userId,
+    @PostMapping("/{gatheringId}/users/{userId}")
+    public ResponseEntity<Void> participateGathering(@PathVariable Long userId,
                                                      @PathVariable Long gatheringId) {
         gatheringApplicantsService.participateGatheringFromAnotherUser(userId, gatheringId);
 
@@ -33,8 +32,8 @@ public class GatheringApplicantsController {
                 .build();
     }
 
-    @DeleteMapping("/{gatheringId}")
-    public ResponseEntity<Void> deleteParticipateGathering(@AuthenticationPrincipal Long userId,
+    @DeleteMapping("/{gatheringId}/users/{userId}")
+    public ResponseEntity<Void> deleteParticipateGathering(@PathVariable Long userId,
                                                            @PathVariable Long gatheringId) {
         gatheringApplicantsService.deleteGatheringApplicantsFromAnotherUser(userId, gatheringId);
 
@@ -43,8 +42,8 @@ public class GatheringApplicantsController {
                 .build();
     }
 
-    @PutMapping("/{gatheringId}")
-    public ResponseEntity<Void> updateParticipateGatheringStatus(@AuthenticationPrincipal Long userId,
+    @PutMapping("/{gatheringId}/users/{userId}")
+    public ResponseEntity<Void> updateParticipateGatheringStatus(@PathVariable Long userId,
                                                                  @PathVariable Long gatheringId,
                                                                  @Valid @RequestBody GatheringApplicantsModifyRequest gatheringApplicantsModifyRequest,
                                                                  BindingResult bindingResult) {

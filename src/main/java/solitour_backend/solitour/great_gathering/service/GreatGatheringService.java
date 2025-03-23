@@ -23,7 +23,7 @@ public class GreatGatheringService {
 
     @Transactional
     public GreatGathering createGatheringGreat(Long userId, Long gatheringId) {
-        User user = userRepository.findByUserId(userId);
+        User user = userRepository.findById(userId).orElseThrow();
         Gathering gathering = gatheringRepository.findById(gatheringId)
                 .orElseThrow(() -> new GatheringNotExistsException("해당 모임이 없습니다."));
 

@@ -11,7 +11,6 @@ import solitour_backend.solitour.gathering_applicants.entity.GatheringStatus;
 import solitour_backend.solitour.gathering_category.dto.response.GatheringCategoryResponse;
 import solitour_backend.solitour.place.dto.response.PlaceResponse;
 import solitour_backend.solitour.tag.dto.response.TagResponse;
-import solitour_backend.solitour.user.dto.UserPostingResponse;
 import solitour_backend.solitour.zone_category.dto.response.ZoneCategoryResponse;
 
 @Getter
@@ -34,7 +33,6 @@ public class GatheringDetailResponse {
 
     private List<TagResponse> tagResponses;
 
-    private UserPostingResponse userPostingResponse;
     private PlaceResponse placeResponse;
     private ZoneCategoryResponse zoneCategoryResponse;
     private GatheringCategoryResponse gatheringCategoryResponse;
@@ -45,8 +43,6 @@ public class GatheringDetailResponse {
     private Boolean isLike;
 
     private String openChattingUrl;
-
-    private String userImage;
 
     private List<GatheringApplicantsResponse> gatheringApplicantsResponses;
 

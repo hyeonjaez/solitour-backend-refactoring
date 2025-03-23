@@ -3,17 +3,10 @@ package solitour_backend.solitour.information.service;
 import static solitour_backend.solitour.information.repository.InformationRepositoryCustom.LIKE_COUNT_SORT;
 import static solitour_backend.solitour.information.repository.InformationRepositoryCustom.VIEW_COUNT_SORT;
 
-import java.net.URLDecoder;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -63,14 +56,8 @@ import solitour_backend.solitour.tag.dto.mapper.TagMapper;
 import solitour_backend.solitour.tag.dto.response.TagResponse;
 import solitour_backend.solitour.tag.entity.Tag;
 import solitour_backend.solitour.tag.repository.TagRepository;
-import solitour_backend.solitour.user.dto.UserPostingResponse;
-import solitour_backend.solitour.user.dto.mapper.UserMapper;
 import solitour_backend.solitour.user.entity.User;
-import solitour_backend.solitour.user.exception.UserNotExistsException;
 import solitour_backend.solitour.user.repository.UserRepository;
-import solitour_backend.solitour.user_image.entity.UserImage;
-import solitour_backend.solitour.user_image.entity.UserImageRepository;
-import solitour_backend.solitour.util.HmacUtils;
 import solitour_backend.solitour.zone_category.dto.mapper.ZoneCategoryMapper;
 import solitour_backend.solitour.zone_category.dto.response.ZoneCategoryResponse;
 import solitour_backend.solitour.zone_category.entity.ZoneCategory;
@@ -95,10 +82,8 @@ public class InformationService {
     private final PlaceMapper placeMapper;
     private final ZoneCategoryMapper zoneCategoryMapper;
     private final ImageMapper imageMapper;
-    private final UserMapper userMapper;
     private final GreatInformationRepository greatInformationRepository;
     private final BookMarkInformationRepository bookMarkInformationRepository;
-    private final UserImageRepository userImageRepository;
     private final ImageRepository imageRepository;
     private final CategoryMapper categoryMapper;
 
@@ -127,8 +112,7 @@ public class InformationService {
         );
 
         User user = userRepository.findById(userId)
-                .orElseThrow(
-                        () -> new UserNotExistsException("해당하는 id의 User 가 없습니다"));
+                .orElseThrow();
 
         Information information =
                 new Information(
@@ -172,15 +156,13 @@ public class InformationService {
     }
 
     @Transactional
-    public InformationDetailResponse getDetailInformation(Long userId, Long informationId, HttpServletRequest request, HttpServletResponse response) {
+    public InformationDetailResponse getDetailInformation(Long userId, Long informationId) {
         Information information = informationRepository.findById(informationId)
                 .orElseThrow(
                         () ->
                                 new InformationNotExistsException("해당하는 id 의 information 이 존재하지 않습니다."));
 
         List<InfoTag> infoTags = infoTagRepository.findAllByInformationId(information.getId());
-
-        UserPostingResponse userPostingResponse = userMapper.mapToUserPostingResponse(information.getUser());
 
         List<TagResponse> tagResponses = new ArrayList<>();
         if (!infoTags.isEmpty()) {
@@ -205,16 +187,8 @@ public class InformationService {
 
         User user = information.getUser();
 
-        String userImageUrl = userImageRepository.findById(user.getId())
-                .map(UserImage::getAddress)
-                .orElseGet(
-                        () -> userRepository.getProfileUrl(user.getSex()));
 
-        try {
-            updateViewCount(information, request, response, userId);
-        } catch (Exception e) {
-            throw new IllegalArgumentException();
-        }
+        information.upViewCount();
 
         return new InformationDetailResponse(
                 information.getTitle(),
@@ -223,14 +197,12 @@ public class InformationService {
                 information.getViewCount(),
                 information.getContent(),
                 information.getTip(),
-                userPostingResponse,
                 tagResponses,
                 placeResponse,
                 zoneCategoryResponse,
                 categoryResponse,
                 imageResponseList,
                 likeCount,
-                userImageUrl,
                 isLike,
                 informationRecommend);
     }
@@ -476,73 +448,5 @@ public class InformationService {
                 decodedTag);
     }
 
-    public void updateViewCount(Information information, HttpServletRequest request, HttpServletResponse response, Long userId) throws Exception {
-        String cookieName = "viewed_informations";
-        Cookie[] cookies = request.getCookies();
-        Cookie postCookie = null;
-
-        if (Objects.nonNull(cookies)) {
-            postCookie = Arrays.stream(cookies)
-                    .filter(cookie -> cookieName.equals(cookie.getName()))
-                    .findFirst()
-                    .orElse(null);
-        }
-
-        LocalDate now = LocalDate.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        String cookieData = userId + "_" + information.getId() + "_" + now.format(formatter);
-
-        if (Objects.nonNull(postCookie) && postCookie.getValue() != null) {
-            String[] informationDataArray = URLDecoder.decode(postCookie.getValue(), StandardCharsets.UTF_8).split(",");
-            boolean isUpdated = false;
-            boolean hasExistingData = false;
-
-            for (int i = 0; i < informationDataArray.length; i++) {
-                String[] parts = informationDataArray[i].split("\\|");
-                if (parts.length == 2) {
-                    if (HmacUtils.verifyHmac(parts[0], parts[1])) {
-                        String[] cookieInfo = parts[0].split("_");
-                        Long cookieUserId = Long.parseLong(cookieInfo[0]);
-                        Long cookieGatheringId = Long.parseLong(cookieInfo[1]);
-                        LocalDate lastViewedAt = LocalDate.parse(cookieInfo[2], formatter);
-
-                        if (cookieUserId.equals(userId) && cookieGatheringId.equals(information.getId())) {
-                            hasExistingData = true;
-                            if (lastViewedAt.isBefore(now.minusDays(1))) {
-                                incrementInformationViewCount(information);
-                                String newHmac = HmacUtils.generateHmac(cookieData);
-                                informationDataArray[i] = cookieData + "|" + newHmac;
-                                isUpdated = true;
-                            }
-                            break;
-                        }
-                    }
-
-                }
-            }
-
-            if (isUpdated || !hasExistingData) {
-                if (!hasExistingData) {
-                    incrementInformationViewCount(information);
-                }
-                String hmac = HmacUtils.generateHmac(cookieData);
-                String updatedValue = String.join(",", informationDataArray) + "," + cookieData + "|" + hmac;
-                postCookie.setValue(URLEncoder.encode(updatedValue, StandardCharsets.UTF_8));
-                postCookie.setPath("/");
-                response.addCookie(postCookie);
-            }
-        } else {
-            incrementInformationViewCount(information);
-            String hmac = HmacUtils.generateHmac(cookieData);
-            Cookie newCookie = new Cookie(cookieName, URLEncoder.encode(cookieData + "|" + hmac, StandardCharsets.UTF_8));
-            newCookie.setMaxAge(60 * 60 * 24);
-            newCookie.setPath("/");
-            response.addCookie(newCookie);
-        }
-    }
-
-    private void incrementInformationViewCount(Information information) {
-        information.upViewCount();
-    }
 
 }

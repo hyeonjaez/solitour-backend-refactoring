@@ -4,14 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import solitour_backend.solitour.auth.config.Authenticated;
-import solitour_backend.solitour.auth.config.AuthenticationPrincipal;
 import solitour_backend.solitour.image.dto.response.S3FileResponse;
 import solitour_backend.solitour.image.image_status.ImageType;
 import solitour_backend.solitour.image.service.ImageService;
@@ -22,13 +16,13 @@ import solitour_backend.solitour.image.service.ImageService;
 public class ImageController {
 
     private final ImageService imageService;
+
     @Value("${image.env}")
     private String env;
 
 
-    @Authenticated
-    @PostMapping
-    public ResponseEntity<S3FileResponse> uploadImage(@AuthenticationPrincipal Long userId,
+    @PostMapping("/users/{userId}")
+    public ResponseEntity<S3FileResponse> uploadImage(@PathVariable Long userId,
                                                       @RequestPart("image") MultipartFile userImage,
                                                       @RequestParam ImageType type) {
         checkType(type);

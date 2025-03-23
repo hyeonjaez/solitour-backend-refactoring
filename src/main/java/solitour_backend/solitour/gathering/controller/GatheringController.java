@@ -28,11 +28,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import solitour_backend.solitour.auth.config.AuthenticationPrincipal;
-import solitour_backend.solitour.auth.exception.TokenNotExistsException;
-import solitour_backend.solitour.auth.exception.TokenNotValidException;
-import solitour_backend.solitour.auth.support.CookieExtractor;
-import solitour_backend.solitour.auth.support.JwtTokenProvider;
 import solitour_backend.solitour.error.Utils;
 import solitour_backend.solitour.error.exception.RequestValidationFailedException;
 import solitour_backend.solitour.gathering.dto.request.GatheringModifyRequest;
@@ -49,10 +44,9 @@ import solitour_backend.solitour.gathering.service.GatheringService;
 @RequestMapping("/api/gatherings")
 public class GatheringController {
     private final GatheringService gatheringService;
-    private final JwtTokenProvider jwtTokenProvider;
 
-    @PostMapping
-    public ResponseEntity<GatheringResponse> createGathering(@AuthenticationPrincipal Long userId,
+    @PostMapping("/users/{userId}")
+    public ResponseEntity<GatheringResponse> createGathering(@PathVariable Long userId,
                                                              @Valid @RequestBody GatheringRegisterRequest gatheringRegisterRequest,
                                                              BindingResult bindingResult) {
         Utils.validationRequest(bindingResult);
@@ -75,20 +69,18 @@ public class GatheringController {
                 .body(gatheringResponse);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<GatheringDetailResponse> getGatheringDetail(@PathVariable Long id,
-                                                                      HttpServletRequest request,
-                                                                      HttpServletResponse response) {
-        Long userId = findUser(request);
-        GatheringDetailResponse gatheringDetail = gatheringService.getGatheringDetail(userId, id, request, response);
+    @GetMapping("/{id}/users/{userId}")
+    public ResponseEntity<GatheringDetailResponse> getGatheringDetail(@PathVariable Long userId,
+                                                                      @PathVariable Long id) {
+        GatheringDetailResponse gatheringDetail = gatheringService.getGatheringDetail(userId, id);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(gatheringDetail);
     }
 
-    @PutMapping("/{gatheringId}")
-    public ResponseEntity<GatheringResponse> updateGathering(@AuthenticationPrincipal Long userId,
+    @PutMapping("/{gatheringId}/users/{userId}")
+    public ResponseEntity<GatheringResponse> updateGathering(@PathVariable Long userId,
                                                              @PathVariable Long gatheringId,
                                                              @Valid @RequestBody GatheringModifyRequest gatheringModifyRequest) {
 
@@ -112,9 +104,9 @@ public class GatheringController {
                 .body(gatheringResponse);
     }
 
-    @DeleteMapping("/{gatheringId}")
-    public ResponseEntity<Void> deleteGathering(@PathVariable Long gatheringId, HttpServletRequest request) {
-        Long userId = findUser(request);
+    @DeleteMapping("/{gatheringId}/users/{userId}")
+    public ResponseEntity<Void> deleteGathering(@PathVariable Long userId,
+                                                @PathVariable Long gatheringId) {
 
         gatheringService.deleteGathering(gatheringId, userId);
 
@@ -124,13 +116,12 @@ public class GatheringController {
     }
 
 
-    @GetMapping
-    public ResponseEntity<Page<GatheringBriefResponse>> pageGatheringSortAndFilter(@RequestParam(defaultValue = "0") int page,
+    @GetMapping("/users/{userId}")
+    public ResponseEntity<Page<GatheringBriefResponse>> pageGatheringSortAndFilter(@PathVariable Long userId,
+                                                                                   @RequestParam(defaultValue = "0") int page,
                                                                                    @Valid @ModelAttribute GatheringPageRequest gatheringPageRequest,
-                                                                                   BindingResult bindingResult,
-                                                                                   HttpServletRequest request) {
+                                                                                   BindingResult bindingResult) {
         Utils.validationRequest(bindingResult);
-        Long userId = findUser(request);
 
         Pageable pageable = PageRequest.of(page, PAGE_SIZE);
         Page<GatheringBriefResponse> pageGathering = gatheringService.getPageGathering(pageable, gatheringPageRequest,
@@ -141,18 +132,17 @@ public class GatheringController {
                 .body(pageGathering);
     }
 
-    @GetMapping("/tag/search")
-    public ResponseEntity<Page<GatheringBriefResponse>> getPageGatheringByTag(@RequestParam(defaultValue = "0") int page,
+    @GetMapping("/tag/search/users/{userId}")
+    public ResponseEntity<Page<GatheringBriefResponse>> getPageGatheringByTag(@PathVariable Long userId,
+                                                                              @RequestParam(defaultValue = "0") int page,
                                                                               @Valid @ModelAttribute GatheringPageRequest gatheringPageRequest,
                                                                               @RequestParam(required = false, name = "tagName") String tag,
-                                                                              BindingResult bindingResult,
-                                                                              HttpServletRequest request)
+                                                                              BindingResult bindingResult)
             throws UnsupportedEncodingException {
         String decodedValue = java.net.URLDecoder.decode(tag, "UTF-8");
         String filteredTag = decodedValue.replaceAll("[^a-zA-Z0-9가-힣]", "");
 
         Utils.validationRequest(bindingResult);
-        Long userId = findUser(request);
         Pageable pageable = PageRequest.of(page, PAGE_SIZE);
         Page<GatheringBriefResponse> briefGatheringPage = gatheringService.getPageGatheringByTag(pageable, userId, gatheringPageRequest, filteredTag);
         return ResponseEntity
@@ -169,8 +159,8 @@ public class GatheringController {
                 .body(gatheringRankOrderByLikes);
     }
 
-    @PutMapping("/finish/{gatheringId}")
-    public ResponseEntity<Void> gatheringFinish(@AuthenticationPrincipal Long userId,
+    @PutMapping("/finish/{gatheringId}/users/{userId}")
+    public ResponseEntity<Void> gatheringFinish(@PathVariable Long userId,
                                                 @PathVariable Long gatheringId) {
         gatheringService.setGatheringFinish(userId, gatheringId);
         return ResponseEntity
@@ -178,8 +168,8 @@ public class GatheringController {
                 .build();
     }
 
-    @PutMapping("/not-finish/{gatheringId}")
-    public ResponseEntity<Void> gatheringNotFinish(@AuthenticationPrincipal Long userId,
+    @PutMapping("/not-finish/{gatheringId}/users/{userId}")
+    public ResponseEntity<Void> gatheringNotFinish(@PathVariable Long userId,
                                                    @PathVariable Long gatheringId) {
 
         gatheringService.setGatheringNotFinish(userId, gatheringId);
@@ -190,9 +180,9 @@ public class GatheringController {
     }
 
 
-    @GetMapping("/home")
-    public ResponseEntity<List<GatheringBriefResponse>> getHomeGathering(HttpServletRequest request) {
-        Long userId = findUser(request);
+    @GetMapping("/home/users/{userId}")
+    public ResponseEntity<List<GatheringBriefResponse>> getHomeGathering(@PathVariable Long userId,
+                                                                         HttpServletRequest request) {
 
         List<GatheringBriefResponse> gatheringOrderByLikesFilterByCreate3After = gatheringService.getGatheringOrderByLikesFilterByCreate3After(
                 userId);
@@ -200,23 +190,6 @@ public class GatheringController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(gatheringOrderByLikesFilterByCreate3After);
-    }
-
-    private Long findUser(HttpServletRequest request) {
-        String token = CookieExtractor.findToken("access_token", request.getCookies());
-
-        if (Objects.isNull(token)) {
-            token = CookieExtractor.findToken("refresh_token", request.getCookies());
-        }
-        if (Objects.isNull(token)) {
-            return (long) 0;
-        }
-
-        if (jwtTokenProvider.validateTokenNotUsable(token)) {
-            throw new TokenNotExistsException("토큰이 존재하지 않습니다.");
-        }
-
-        return jwtTokenProvider.getPayload(token);
     }
 
 

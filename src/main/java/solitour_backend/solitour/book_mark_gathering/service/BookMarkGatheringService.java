@@ -23,7 +23,7 @@ public class BookMarkGatheringService {
 
     @Transactional
     public BookMarkGathering createUserBookmark(Long userId, Long gatheringId) {
-        User user = userRepository.findByUserId(userId);
+        User user = userRepository.findById(userId).orElseThrow();
         Gathering gathering = gatheringRepository.findById(gatheringId)
                 .orElseThrow(() -> new InformationNotExistsException("해당하는 정보가 없습니다"));
 

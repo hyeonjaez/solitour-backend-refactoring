@@ -1,4 +1,4 @@
-package solitour_backend.solitour.user.dto.response;
+package solitour_backend.solitour.user.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,8 +7,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public class UserGatheringResponse {
     private Long id;
-    private String profileUrl;
-    private String nickname;
+    private String name;
     private Integer age;
     private String sex;
 }

@@ -3,11 +3,6 @@ package solitour_backend.solitour.gathering.service;
 import static solitour_backend.solitour.gathering.repository.GatheringRepositoryCustom.LIKE_COUNT_SORT;
 import static solitour_backend.solitour.gathering.repository.GatheringRepositoryCustom.VIEW_COUNT_SORT;
 
-import java.net.URLDecoder;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import jakarta.servlet.http.Cookie;
@@ -56,14 +51,8 @@ import solitour_backend.solitour.tag.dto.mapper.TagMapper;
 import solitour_backend.solitour.tag.dto.response.TagResponse;
 import solitour_backend.solitour.tag.entity.Tag;
 import solitour_backend.solitour.tag.repository.TagRepository;
-import solitour_backend.solitour.user.dto.UserPostingResponse;
-import solitour_backend.solitour.user.dto.mapper.UserMapper;
 import solitour_backend.solitour.user.entity.User;
-import solitour_backend.solitour.user.exception.UserNotExistsException;
 import solitour_backend.solitour.user.repository.UserRepository;
-import solitour_backend.solitour.user_image.entity.UserImage;
-import solitour_backend.solitour.user_image.entity.UserImageRepository;
-import solitour_backend.solitour.util.HmacUtils;
 import solitour_backend.solitour.zone_category.dto.mapper.ZoneCategoryMapper;
 import solitour_backend.solitour.zone_category.dto.response.ZoneCategoryResponse;
 import solitour_backend.solitour.zone_category.entity.ZoneCategory;
@@ -84,18 +73,16 @@ public class GatheringService {
     private final TagRepository tagRepository;
     private final GatheringTagRepository gatheringTagRepository;
     private final GatheringMapper gatheringMapper;
-    private final UserMapper userMapper;
     private final PlaceMapper placeMapper;
     private final ZoneCategoryMapper zoneCategoryMapper;
     private final GreatGatheringRepository greatGatheringRepository;
     private final GatheringApplicantsRepository gatheringApplicantsRepository;
     private final GatheringApplicantsMapper gatheringApplicantsMapper;
     private final GatheringCategoryMapper gatheringCategoryMapper;
-    private final UserImageRepository userImageRepository;
 
 
     @Transactional
-    public GatheringDetailResponse getGatheringDetail(Long userId, Long gatheringId, HttpServletRequest request, HttpServletResponse response) {
+    public GatheringDetailResponse getGatheringDetail(Long userId, Long gatheringId) {
         Gathering gathering = gatheringRepository.findById(gatheringId)
                 .orElseThrow(
                         () -> new GatheringNotExistsException("해당하는 id의 gathering 이 존재 하지 않습니다"));
@@ -104,7 +91,6 @@ public class GatheringService {
             throw new GatheringDeleteException("해당하는 모임은 삭제가 되었습니다");
         }
 
-        UserPostingResponse userPostingResponse = userMapper.mapToUserPostingResponse(gathering.getUser());
 
         List<GatheringTag> gatheringTags = gatheringTagRepository.findAllByGathering_Id(gathering.getId());
 
@@ -132,11 +118,6 @@ public class GatheringService {
 
         User user = gathering.getUser();
 
-        String userImageUrl = userImageRepository.findById(user.getUserImage().getId())
-                .map(UserImage::getAddress)
-                .orElseGet(
-                        () -> userRepository.getProfileUrl(user.getSex())
-                );
 
         GatheringStatus gatheringStatus = null;
         GatheringApplicants gatheringApplicants = gatheringApplicantsRepository.findByGatheringIdAndUserId(gathering.getId(), userId).orElse(null);
@@ -158,11 +139,7 @@ public class GatheringService {
         List<GatheringBriefResponse> gatheringRecommend = gatheringRepository.getGatheringRecommend(gathering.getId(),
                 gathering.getGatheringCategory().getId(), userId);
 
-        try {
-            updateViewCount(gathering, request, response, userId);
-        } catch (Exception e) {
-            throw new IllegalArgumentException();
-        }
+        gathering.upViewCount();
 
 
         return new GatheringDetailResponse(
@@ -179,7 +156,6 @@ public class GatheringService {
                 gathering.getStartAge(),
                 gathering.getEndAge(),
                 tagResponses,
-                userPostingResponse,
                 placeResponse,
                 zoneCategoryResponse,
                 gatheringCategoryResponse,
@@ -187,7 +163,6 @@ public class GatheringService {
                 nowPersonCount,
                 isLike,
                 gathering.getOpenChattingUrl(),
-                userImageUrl,
                 gatheringApplicantsResponses,
                 gatheringRecommend,
                 gatheringStatus
@@ -207,8 +182,7 @@ public class GatheringService {
 
         Place savePlace = placeRepository.save(place);
         User user = userRepository.findById(userId)
-                .orElseThrow(
-                        () -> new UserNotExistsException("해당하는 id 의 User 가 없습니다"));
+                .orElseThrow();
         GatheringCategory gatheringCategory = gatheringCategoryRepository.findById(
                         gatheringRegisterRequest.getGatheringCategoryId())
                 .orElseThrow(
@@ -262,8 +236,7 @@ public class GatheringService {
     public GatheringResponse modifyGathering(Long userId, Long gatheringId,
                                              GatheringModifyRequest gatheringModifyRequest) {
         User user = userRepository.findById(userId)
-                .orElseThrow(
-                        () -> new UserNotExistsException("해당하는 id의 User 가 없습니다"));
+                .orElseThrow();
 
         Gathering gathering = gatheringRepository.findById(gatheringId)
                 .orElseThrow(
@@ -340,8 +313,7 @@ public class GatheringService {
                         () -> new GatheringNotExistsException("해당하는 id의 gathering 이 존재 하지 않습니다"));
 
         User user = userRepository.findById(userId)
-                .orElseThrow(
-                        () -> new UserNotExistsException("해당하는 id의 User 가 없습니다"));
+                .orElseThrow();
 
         if (!Objects.equals(user, gathering.getUser())) {
             throw new GatheringNotManagerException("해당 유저는 권한이 없습니다");
@@ -385,8 +357,7 @@ public class GatheringService {
                         () -> new GatheringNotExistsException("해당하는 id의 gathering 이 존재 하지 않습니다"));
 
         User user = userRepository.findById(userId)
-                .orElseThrow(
-                        () -> new UserNotExistsException("해당하는 id의 User 가 없습니다"));
+                .orElseThrow();
 
         if (!Objects.equals(user, gathering.getUser())) {
             throw new GatheringNotManagerException("해당 유저는 권한이 없습니다");
@@ -410,8 +381,7 @@ public class GatheringService {
                         () -> new GatheringNotExistsException("해당하는 id의 gathering 이 존재 하지 않습니다"));
 
         User user = userRepository.findById(userId)
-                .orElseThrow(
-                        () -> new UserNotExistsException("해당하는 id의 User 가 없습니다"));
+                .orElseThrow();
 
         if (!Objects.equals(user, gathering.getUser())) {
             throw new GatheringNotManagerException("해당 유저는 권한이 없습니다");
@@ -472,79 +442,6 @@ public class GatheringService {
                 gatheringPageRequest.getEndDate())) {
             throw new RequestValidationFailedException("시작 날짜와 종료 날짜는 둘 다 입력되거나 둘 다 비어 있어야 합니다.");
         }
-    }
-
-
-    public void updateViewCount(Gathering gathering, HttpServletRequest request, HttpServletResponse response, Long userId) throws Exception {
-        String cookieName = "viewed_gatherings";
-        Cookie[] cookies = request.getCookies();
-        Cookie postCookie = null;
-
-        if (Objects.nonNull(cookies)) {
-            postCookie = Arrays.stream(cookies)
-                    .filter(cookie -> cookieName.equals(cookie.getName()))
-                    .findFirst()
-                    .orElse(null);
-        }
-
-        LocalDate now = LocalDate.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        String cookieData = userId + "_" + gathering.getId() + "_" + now.format(formatter);
-
-        if (Objects.nonNull(postCookie) && postCookie.getValue() != null) {
-            String[] gatheringDataArray = URLDecoder.decode(postCookie.getValue(), StandardCharsets.UTF_8).split(",");
-            boolean isUpdated = false;
-            boolean hasExistingData = false;
-
-            for (int i = 0; i < gatheringDataArray.length; i++) {
-                String[] parts = gatheringDataArray[i].split("\\|");
-
-                if (parts.length == 2) {
-                    if (HmacUtils.verifyHmac(parts[0], parts[1])) {
-                        String[] cookieInfo = parts[0].split("_");
-                        Long cookieUserId = Long.parseLong(cookieInfo[0]);
-                        Long cookieGatheringId = Long.parseLong(cookieInfo[1]);
-                        LocalDate lastViewedAt = LocalDate.parse(cookieInfo[2], formatter);
-
-                        if (cookieUserId.equals(userId) && cookieGatheringId.equals(gathering.getId())) {
-                            hasExistingData = true;
-                            if (lastViewedAt.isBefore(now.minusDays(1))) {
-                                incrementGatheringViewCount(gathering);
-                                String newHmac = HmacUtils.generateHmac(cookieData);
-                                gatheringDataArray[i] = cookieData + "|" + newHmac;
-                                isUpdated = true;
-                            }
-                            break;
-                        }
-                    }
-
-                }
-            }
-
-            if (isUpdated || !hasExistingData) {
-                if (!hasExistingData) {
-                    incrementGatheringViewCount(gathering);
-                }
-                String hmac = HmacUtils.generateHmac(cookieData);
-                String updatedValue = String.join(",", gatheringDataArray) + "," + cookieData + "|" + hmac;
-                postCookie.setValue(URLEncoder.encode(updatedValue, StandardCharsets.UTF_8));
-                postCookie.setPath("/");
-                response.addCookie(postCookie);
-            }
-
-
-        } else {
-            incrementGatheringViewCount(gathering);
-            String hmac = HmacUtils.generateHmac(cookieData);
-            Cookie newCookie = new Cookie(cookieName, URLEncoder.encode(cookieData + "|" + hmac, StandardCharsets.UTF_8));
-            newCookie.setMaxAge(60 * 60 * 24);
-            newCookie.setPath("/");
-            response.addCookie(newCookie);
-        }
-    }
-
-    private void incrementGatheringViewCount(Gathering gathering) {
-        gathering.upViewCount();
     }
 
 

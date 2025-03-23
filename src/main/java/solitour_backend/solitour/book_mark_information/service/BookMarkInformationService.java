@@ -21,7 +21,7 @@ public class BookMarkInformationService {
     private final InformationRepository informationRepository;
 
     public BookMarkInformation createUserBookmark(Long userId, Long infoId) {
-        User user = userRepository.findByUserId(userId);
+        User user = userRepository.findById(userId).orElseThrow();
         Information information = informationRepository.findById(infoId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 정보가 없습니다."));
 
