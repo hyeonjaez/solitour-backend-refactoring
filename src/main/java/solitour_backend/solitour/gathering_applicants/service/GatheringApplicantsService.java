@@ -111,6 +111,14 @@ public class GatheringApplicantsService {
             return false;
         }
 
+        if (Objects.equals(gatheringApplicantsModifyRequest.getGatheringStatus(), GatheringStatus.CONSENT)) {
+            int nowPersonCount = gatheringApplicantsRepository.countAllByGathering_IdAndGatheringStatus(gatheringId,
+                    GatheringStatus.CONSENT);
+            if (nowPersonCount >= gathering.getPersonCount()) {
+                throw new GatheringApplicantsAlreadyFullPeopleException("이미 인원이 가득 찼습니다.");
+            }
+        }
+
         gatheringApplicants.setGatheringStatus(gatheringApplicantsModifyRequest.getGatheringStatus());
         return true;
     }
