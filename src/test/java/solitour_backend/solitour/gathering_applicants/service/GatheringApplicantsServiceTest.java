@@ -95,7 +95,7 @@ class GatheringApplicantsServiceTest {
     @DisplayName("모임 참여 수락 시 인원 제한 초과 방지 테스트")
     void acceptParticipantsShouldNotExceedPersonLimit() {
         int success = 0;
-        int fail = 0;
+        int failCount = 0;
 
         for (User user : applicants) {
             GatheringApplicantsModifyRequest request = new GatheringApplicantsModifyRequest();
@@ -107,7 +107,7 @@ class GatheringApplicantsServiceTest {
                         manager.getId(), gathering.getId(), request);
                 if (result) success++;
             } catch (GatheringApplicantsAlreadyFullPeopleException e) {
-                fail++;
+                failCount++;
             }
         }
 
@@ -116,11 +116,11 @@ class GatheringApplicantsServiceTest {
 
         assertEquals(PERSON_LIMIT, consentCount);
         assertEquals(PERSON_LIMIT, success);
-        assertEquals(TOTAL_USERS - PERSON_LIMIT, fail);
+        assertEquals(TOTAL_USERS - PERSON_LIMIT, failCount);
     }
 
     @Test
-    @DisplayName("작성자가 아닌 다른 사용자가 모임 신청 상태 변환시 예외 발생")
+    @DisplayName("작성자가 아닌 다른 사용자가 모임 신청 상태 변환시 예외 발생 테스트")
     void nonManagerTryingToAcceptParticipantShouldThrowException() {
         User nonManager = applicants.get(0);
 
@@ -129,9 +129,9 @@ class GatheringApplicantsServiceTest {
         ReflectionTestUtils.setField(request, "gatheringStatus", GatheringStatus.CONSENT);
 
         assertThrows(GatheringNotManagerException.class, () -> {
-            gatheringApplicantsService.updateGatheringApplicantsManagement(
-                    nonManager.getId(), gathering.getId(), request);
-        });
+                    gatheringApplicantsService.updateGatheringApplicantsManagement(nonManager.getId(), gathering.getId(), request);
+                }
+        );
     }
 
     @Test
@@ -271,7 +271,7 @@ class GatheringApplicantsServiceTest {
     }
 
     @Test
-    @DisplayName("작성자가 인원 제한 내에서 정상적으로 수락 요청을 처리하면 모두 성공한다")
+    @DisplayName("작성자가 인원 제한 내에서 정상적으로 수락 요청을 처리하면 모두 성공하는 테스트")
     void acceptParticipantsWithinLimitShouldSucceedForAll() {
         int personLimit = 3;
         gathering.setPersonCount(personLimit);
