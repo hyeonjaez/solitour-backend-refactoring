@@ -1,5 +1,6 @@
 package solitour_backend.solitour.gathering_applicants.service;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 import lombok.RequiredArgsConstructor;
@@ -118,7 +119,7 @@ public class GatheringApplicantsService {
                 throw new GatheringApplicantsAlreadyFullPeopleException("이미 인원이 가득 찼습니다.");
             }
         }
-
+        gathering.setEditedAt(LocalDateTime.now());
         gatheringApplicants.setGatheringStatus(gatheringApplicantsModifyRequest.getGatheringStatus());
         return true;
     }
