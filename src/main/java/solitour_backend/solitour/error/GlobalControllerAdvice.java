@@ -1,7 +1,9 @@
 package solitour_backend.solitour.error;
 
+import jakarta.persistence.OptimisticLockException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import solitour_backend.solitour.book_mark_gathering.exception.GatheringBookMarkNotExistsException;
@@ -46,12 +48,22 @@ public class GlobalControllerAdvice {
             ZoneCategoryAlreadyExistsException.class,
             ImageAlreadyExistsException.class,
             GatheringApplicantsAlreadyExistsException.class,
-            GatheringApplicantsAlreadyFullPeopleException.class
+            GatheringApplicantsAlreadyFullPeopleException.class,
     })
     public ResponseEntity<String> conflictException(Exception exception) {
         return ResponseEntity
                 .status(HttpStatus.CONFLICT)
                 .body(exception.getMessage());
+    }
+
+    @ExceptionHandler({
+            ObjectOptimisticLockingFailureException.class,
+            OptimisticLockException.class
+    })
+    public ResponseEntity<String> optimisticLockingFailureException() {
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body("인원이 초과되었거나 다른 사용자가 먼저 수락되었습니다");
     }
 
     @ExceptionHandler({
@@ -85,10 +97,7 @@ public class GlobalControllerAdvice {
     }
 
 
-
-
     @ExceptionHandler({
-
     })
     public ResponseEntity<String> serverErrorException(Exception exception) {
         return ResponseEntity
