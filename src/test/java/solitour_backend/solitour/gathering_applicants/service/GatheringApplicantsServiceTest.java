@@ -183,8 +183,7 @@ class GatheringApplicantsServiceTest {
         List<String> logs = Collections.synchronizedList(new ArrayList<>());
         AtomicInteger count = new AtomicInteger();
         for (int i = 0; i < threadCount; i++) {
-            final int index = i;
-            User applicantUser = applicants.get(index);
+            User applicantUser = applicants.get(i);
             GatheringApplicantsModifyRequest request = new GatheringApplicantsModifyRequest();
             ReflectionTestUtils.setField(request, "userId", applicantUser.getId());
             ReflectionTestUtils.setField(request, "gatheringStatus", GatheringStatus.CONSENT);
@@ -215,7 +214,86 @@ class GatheringApplicantsServiceTest {
                 gathering.getId(), GatheringStatus.CONSENT);
 
 
-        assertTrue(3 < consentCount);
+        assertTrue(3 >= consentCount);
+    }
+
+    @Test
+    @DisplayName("낙관적인 락을 사용했을때는 여러 동시 요청이 들어와도 가장 처음 요청 만 수락하고 전부 예외처리 한다.")
+    void optimisticLockShouldAllowOnlyFirstRequestAndRejectOthersWithException() throws InterruptedException {
+        gathering.setPersonCount(1);
+        gatheringRepository.save(gathering);
+
+        int threadCount = 10;
+        ExecutorService executor = Executors.newFixedThreadPool(threadCount);
+        CountDownLatch latch = new CountDownLatch(threadCount);
+        List<String> logs = Collections.synchronizedList(new ArrayList<>());
+        AtomicInteger count = new AtomicInteger();
+
+        AtomicInteger successCount = new AtomicInteger();
+        AtomicInteger failCount = new AtomicInteger();
+
+        for (int i = 0; i < threadCount; i++) {
+            User applicantUser = applicants.get(i);
+            GatheringApplicantsModifyRequest request = new GatheringApplicantsModifyRequest();
+            ReflectionTestUtils.setField(request, "userId", applicantUser.getId());
+            ReflectionTestUtils.setField(request, "gatheringStatus", GatheringStatus.CONSENT);
+
+            executor.execute(() -> {
+                try {
+                    boolean result = gatheringApplicantsService.updateGatheringApplicantsManagement(
+                            manager.getId(), gathering.getId(), request);
+                    if (result) {
+                        logs.add(count.incrementAndGet() + "번째 수락 성공: " + applicantUser.getId());
+                        successCount.getAndIncrement();
+                    } else {
+                        logs.add("변경 없음");
+                    }
+                } catch (Exception e) {
+                    failCount.getAndIncrement();
+                    logs.add("예외: " + e.getClass().getSimpleName());
+                } finally {
+                    latch.countDown();
+                }
+            });
+        }
+
+        latch.await();
+        executor.shutdown();
+
+        logs.forEach(System.out::println);
+
+        long consentCount = gatheringApplicantsRepository.countAllByGathering_IdAndGatheringStatus(
+                gathering.getId(), GatheringStatus.CONSENT);
+
+        assertEquals(1, successCount.intValue());
+        assertEquals(9, failCount.intValue());
+        assertEquals(1, consentCount);
+    }
+
+    @Test
+    @DisplayName("작성자가 인원 제한 내에서 정상적으로 수락 요청을 처리하면 모두 성공한다")
+    void acceptParticipantsWithinLimitShouldSucceedForAll() {
+        int personLimit = 3;
+        gathering.setPersonCount(personLimit);
+        gatheringRepository.save(gathering);
+
+        List<User> consentTargets = applicants.subList(0, personLimit);
+        for (User applicant : consentTargets) {
+            GatheringApplicantsModifyRequest request = new GatheringApplicantsModifyRequest();
+            ReflectionTestUtils.setField(request, "userId", applicant.getId());
+            ReflectionTestUtils.setField(request, "gatheringStatus", GatheringStatus.CONSENT);
+
+            boolean result = gatheringApplicantsService.updateGatheringApplicantsManagement(
+                    manager.getId(), gathering.getId(), request
+            );
+
+            assertTrue(result, "작성자가 정상적으로 수락 요청을 처리해야 합니다.");
+        }
+
+        long consentCount = gatheringApplicantsRepository.countAllByGathering_IdAndGatheringStatus(
+                gathering.getId(), GatheringStatus.CONSENT);
+
+        assertEquals(personLimit, consentCount);
     }
 
 
